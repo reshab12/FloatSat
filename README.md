@@ -82,6 +82,8 @@ Following are the links to Windows installer for the different dependencies.
 3. Under ```System variables```, locate the ```PATH``` variable and edit it.
 4. Paste the path of the bin directory in the ```Variable value``` field.
 5. After adding the path, restart your terminal. The version check should then work.
+   
+**Note:** Please restart the computer after adding the executable directories to the global path.
 
 ## First project: Hello blinky
 
