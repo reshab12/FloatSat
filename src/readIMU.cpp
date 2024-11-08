@@ -24,7 +24,8 @@ uint8_t LSM9DS1_CTRL_REG4_M[2] = {0x23,0b00001100};
 struct Offsets{
     float gyro[3];
 	float accel[3];
-	float magneto[3];
+	float magnetoMin[3] = {0,0,0};
+	float magnetoMax[3] = {0,0,0};
 }offsets;
 
 void i2cerror(){
@@ -78,7 +79,14 @@ void readMagneto(int16_t* xyzCoordinates){
 }
 
 void offsetMagneto(Offsets* offset){
-    //ToDo
+    int16_t xyzCoordinates[3];
+	for(int i = 0; i<10000; i++){
+		readMagneto(xyzCoordinates);
+		for(int j = 0; j< 3; j++){
+			if(xyzCoordinates[j] < offset->magnetoMin[j]) offset->magnetoMin[j] = xyzCoordinates[j];
+			else if(xyzCoordinates[j] > offset->magnetoMin[j]) offset->magnetoMin[j] = xyzCoordinates[j];
+		}
+	}
 }
 
 class Sensor : public StaticThread<>{
@@ -99,14 +107,23 @@ public:
             PRINTF("I am %d! \r\n", data);
         */
         int16_t xyzGyro[3];
+		int16_t xyzMagneto[3];
         offsetGyro(&offsets);
+		offsetMagneto(&offsets);
         float gx, gy, gz;
-        TIME_LOOP(1 * SECONDS, 10 * MILLISECONDS){
+		float mx, my, mz;
+        TIME_LOOP(1 * SECONDS, 500* MILLISECONDS){
             readGyro(xyzGyro);
+			readMagneto(xyzMagneto);
+
             gx = (xyzGyro[0] - offsets.gyro[0]) * 0.07;
             gy = (xyzGyro[1] - offsets.gyro[1]) * 0.07;
             gz = (xyzGyro[2] - offsets.gyro[2]) * 0.07;
-            //PRINTF("gx: %f dps \r\n gy: %f dps \r\n gz: %f dps \r\n", gx, gy, gz);
+
+			mx = ((xyzMagneto[0] - offsets.magnetoMin[0])/(offsets.magnetoMax[0] - offsets.magnetoMin[0]) * 2 - 1) * 0.00014;
+			my = ((xyzMagneto[1] - offsets.magnetoMin[1])/(offsets.magnetoMax[1] - offsets.magnetoMin[1]) * 2 - 1) * 0.00014;
+			mz = ((xyzMagneto[2] - offsets.magnetoMin[2])/(offsets.magnetoMax[2] - offsets.magnetoMin[2]) * 2 - 1) * 0.00014;
+            PRINTF("gx: %f dps \r\n gy: %f dps \r\n gz: %f dps \r\n", gx, gy, gz);
         }
     }
 };
