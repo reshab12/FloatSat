@@ -41,7 +41,8 @@ C_INCLUDES =  \
 -I"rodos/src/independent" \
 -I"rodos/default_usr_configs" \
 -I"rodos/api/hal" \
--I"rodos/api"
+-I"rodos/api" \
+-I"include"
 
 # C/C++ defines
 C_DEFS =  \
