@@ -36,7 +36,7 @@ Following sections guides you through the installation of these dependencies on 
 
 Followings are the commands to install above mentioned softwares. Before any of that, please make sure to update your system with the command ```sudo apt upgrade``` and ```sudo apt update```.
 
-1. **VS Code:** ```sudo snap install code```
+1. **VS Code:** ```sudo snap install code --classic```
 2. **GNU Toolchain:** ```sudo apt-get install gcc-arm-none-eabi gdb-multiarch```
 3. **OpenOCD:** It is to be noted that the  command ```sudo apt-get install openocd``` *does not* install the latest version of the OpenOCD and might create problem with flash and debug. Therefore, it is advisable that you compile and install the OpenOCD from its official repository using following commands:
 
@@ -82,6 +82,8 @@ Following are the links to Windows installer for the different dependencies.
 3. Under ```System variables```, locate the ```PATH``` variable and edit it.
 4. Paste the path of the bin directory in the ```Variable value``` field.
 5. After adding the path, restart your terminal. The version check should then work.
+   
+**Note:** Please restart the computer after adding the executable directories to the global path.
 
 ## First project: Hello blinky
 
