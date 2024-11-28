@@ -20,8 +20,9 @@ RULE_DEST = /etc/udev/rules.d/$(RULE_FILE)
 DEBUG = 1
 
 # C++ source files
-CXX_SOURCES = \
+CXX_SOURCES = src/ \
 $(main)
+
 
 # C source files
 C_SOURCES = \
