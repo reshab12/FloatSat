@@ -38,7 +38,7 @@ struct __attribute__((packed)) star_map
 //from IMU to sensorfusion thread
 struct imu_data
 {
-    float wz,wz,wz,mx,my,mz,ax,ay,az;
+    float wx,wy,wz,mx,my,mz,ax,ay,az;
 };
 
 //angular position data 
