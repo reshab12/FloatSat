@@ -17,7 +17,7 @@ const uint32_t topic_id_satellite_mode = 1014;
 struct telecommand 
 {
   uint8_t command_id;
-  double command_variable;
+  uint32_t command_variable;
 };
 
 // telemetryframe 
@@ -75,6 +75,8 @@ extern Topic<position_data> topic_position_data;
 extern Topic<control_value> topic_control_value;
 extern Topic<additional_sensor_data> topic_additional_sensor_data;
 extern Topic<satellite_mode> topic_satellite_mode;
+
+CommBuffer<satellite_mode> cb_satellite_mode_receiver_thread;
 
 
 #endif

@@ -1,4 +1,5 @@
 #include "rxtx.hpp"
+#include "commands.hpp"
 
 /* ~~~~~ Transmitter thread ~~~~~ */
 
@@ -34,10 +35,27 @@
 
     switch (telecom->command_id)
     {
-    case 0:
-      /* code */
+    case command_id_mission_mode:
+      satellite_mode mode;
+      cb_satellite_mode_receiver_thread.get(mode);
+      mode.mission_mode = telecom->command_variable;
+      topic_satellite_mode.publish(mode);
       break;
     
+    case command_id_control_mode:
+      satellite_mode mode;
+      cb_satellite_mode_receiver_thread.get(mode);
+      mode.control_mode = telecom->command_variable;
+      topic_satellite_mode.publish(mode);
+      break;
+
+    case command_id_pose_estimation_mode:
+      satellite_mode mode;
+      cb_satellite_mode_receiver_thread.get(mode);
+      mode.pose_estimation_mode = telecom->command_variable;     
+      topic_satellite_mode.publish(mode);
+      break;
+
     default:
       break;
     }
