@@ -133,8 +133,9 @@ void offsetMagneto(Offsets* offset){
 		else if(xyzCoordinates[0] > offset->magnetoMax[0]) offset->magnetoMax[0] = xyzCoordinates[0];
 		AT(NOW()+ 10 * MILLISECONDS);
 	}
+	PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[0], offset->magnetoMin[0]);
 	offsetMag = (offset->magnetoMin[0] + offset->magnetoMax[0])/2;
-	magOffsetMin = offsetMag & 0xFF00;
+	magOffsetMin = offsetMag & 0x00FF;
 	magOffsetMax = (offsetMag & 0xFF00) >> 8;
 	uint8_t xL[2] = {OFFSET_X_REG_L_M, magOffsetMin};
 	uint8_t xH[2] = {OFFSET_X_REG_H_M, magOffsetMax};
@@ -147,8 +148,9 @@ void offsetMagneto(Offsets* offset){
 		else if(xyzCoordinates[1] > offset->magnetoMax[1]) offset->magnetoMax[1] = xyzCoordinates[1];
 		AT(NOW()+ 10 * MILLISECONDS);
 	}
+	PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[1], offset->magnetoMin[1]);
 	offsetMag = (offset->magnetoMin[1] + offset->magnetoMax[1])/2;
-	magOffsetMin = offsetMag & 0xFF00;
+	magOffsetMin = offsetMag & 0x00FF;
 	magOffsetMax = (offsetMag & 0xFF00) >> 8;
 	uint8_t yL[2] = {OFFSET_Y_REG_L_M, magOffsetMin};
 	uint8_t yH[2] = {OFFSET_Y_REG_H_M, magOffsetMax};
@@ -161,8 +163,9 @@ void offsetMagneto(Offsets* offset){
 		else if(xyzCoordinates[2] > offset->magnetoMax[2]) offset->magnetoMax[2] = xyzCoordinates[2];
 		AT(NOW()+ 10 * MILLISECONDS);
 	}
+	PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[2], offset->magnetoMin[2]);
 	offsetMag = (offset->magnetoMin[2] + offset->magnetoMax[2])/2;
-	magOffsetMin = offsetMag & 0xFF00;
+	magOffsetMin = offsetMag & 0x00FF;
 	magOffsetMax = (offsetMag & 0xFF00) >> 8;
 	uint8_t zL[2] = {OFFSET_Z_REG_L_M, magOffsetMin};
 	uint8_t zH[2] = {OFFSET_Z_REG_H_M, magOffsetMax};
@@ -183,9 +186,10 @@ void calcHeadingGyro(Attitude* attitude, int16_t gyro, Offsets* offset, float de
 void calcHeadingMagneto(Attitude* attitude, double magneto[3], Offsets* offset, float roll, float pitch){
 	/*Todo figure out how to get pitch and roll
 	* Then use mxh and myh in atan2 */
-	float mxh = magneto[0] * cos(pitch) + magneto[2] * sin(pitch);
-	float myh = magneto[0] * sin(roll) * sin(pitch) + magneto[1] * cos(roll) - magneto[2] * sin(roll) * cos(pitch);
-	attitude->headingMagneto = (atan2(myh, mxh)/M_PI) * 360;
+	//float mxh = magneto[0] * cos(pitch) + magneto[2] * sin(pitch);
+	//float myh = magneto[0] * sin(roll) * sin(pitch) + magneto[1] * cos(roll) - magneto[2] * sin(roll) * cos(pitch);
+	
+	attitude->headingMagneto = (atan2(magneto[1], magneto[0])/M_PI) * 180;
 }
 
 class Sensor : public StaticThread<>{
@@ -226,7 +230,7 @@ public:
             gy = (xyzGyro[1] - offsets.gyro[1]) * 0.07;
             gz = (xyzGyro[2] - offsets.gyro[2]) * 0.07;
 
-            PRINTF("gx: %f degrees \r\n", attitude.headingMagneto);
+            PRINTF("heading: %f degrees \r\n ", attitude.headingMagneto);
 			//MW_PRINTF("gx: %f Gauss  gy: %f Gauss  gz: %f Gauss \r\n", (xyzMagneto[0]*0.00014), (xyzMagneto[1]*0.00014), (xyzMagneto[2]*0.00014));
         }
     }
