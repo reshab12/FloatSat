@@ -28,7 +28,7 @@ uint8_t LSM9DS1_OUT_X_L_M[1] = {0x28}; //Magnetometer
 uint8_t LSM9DS1_OUT_X_TEMP_L[1] = {0x15}; //Temperatur
 
 uint8_t LSM9DS1_CTRL_REG1_G[2] = {0x10,0b11011011}; /* {Gyroscope CTRL_REG1_G register address, Value needs to be written} */
-uint8_t LSM9DS1_CTRL_REG6_XL[2] = {0x20,0b11000000};
+uint8_t LSM9DS1_CTRL_REG6_XL[2] = {0x20,0b11000000}; /*Acc CTRL_REG6_XL. Setting ouput speed to max and +-2g*/
 uint8_t LSM9DS1_CTRL_REG1_M[2] = {0x20,0b01111100};
 uint8_t LSM9DS1_CTRL_REG2_M[2] = {0x21,0b00000000};
 uint8_t LSM9DS1_CTRL_REG3_M[2] = {0x22,0b00000000};
