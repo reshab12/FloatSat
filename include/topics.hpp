@@ -38,14 +38,14 @@ struct __attribute__((packed)) star_map
 //from IMU to sensorfusion thread
 struct imu_data
 {
-    float wx,wy,wz,mx,my,mz,ax,ay,az;
+    float wx,wy,wz,mx,my,mz,ax,ay,az = 0;
 };
 
 //angular position data 
 //from sensorfusion to controller
 struct position_data
 {
-    float x,y,z;
+    float x,y,z = 0;
 };
 
 //the value send to the motor-controller
@@ -63,9 +63,9 @@ struct additional_sensor_data
 //
 struct satellite_mode
 {
-    uint8_t pose_estimation_mode;
-    uint8_t control_mode;
-    uint8_t mission_mode;
+    uint8_t pose_estimation_mode = 0;
+    uint8_t control_mode = 0;
+    uint8_t mission_mode = 0;
 };
 
 extern Topic<telecommand> topic_telecommand_uplink;
@@ -75,8 +75,6 @@ extern Topic<position_data> topic_position_data;
 extern Topic<control_value> topic_control_value;
 extern Topic<additional_sensor_data> topic_additional_sensor_data;
 extern Topic<satellite_mode> topic_satellite_mode;
-
-CommBuffer<satellite_mode> cb_satellite_mode_receiver_thread;
 
 
 #endif

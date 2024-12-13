@@ -6,3 +6,5 @@ sudo chmod 777 /dev/rfcomm0
 make flash main=hello_python.cpp 
 
 python3 python_rxtx.py
+
+pyuic6 mainwindow.ui -o MainWindow.py
