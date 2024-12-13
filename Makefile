@@ -26,7 +26,7 @@ $(main)
 
 
 # C source files
-C_SOURCES = \
+C_SOURCES =  \
 
 # C/C++ include folders
 C_INCLUDES =  \
@@ -44,7 +44,8 @@ C_INCLUDES =  \
 -I"rodos/default_usr_configs" \
 -I"rodos/api/hal" \
 -I"rodos/api" \
--I"include"
+-I"include" \
+-I"IMULibrary"
 
 # C/C++ defines
 C_DEFS =  \
