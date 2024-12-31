@@ -1,5 +1,4 @@
-#ifndef __commands_hpp__
-#define __commands_hpp__
+#pragma once
 
 #include "rodos.h"
 
@@ -12,5 +11,3 @@ const uint8_t command_id_control_mode =             0x01;
 //pose estimation modes
 const uint8_t command_id_pose_estimation_mode =     0x02;
 
-
-#endif

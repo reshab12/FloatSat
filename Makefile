@@ -20,8 +20,11 @@ RULE_DEST = /etc/udev/rules.d/$(RULE_FILE)
 DEBUG = 1
 
 # C++ source files
-CXX_SOURCES = src/\
-src/topics.cpp \
+CXX_SOURCES = src/topics.cpp \
+src/readIMU.cpp \
+src/rxtx.cpp \
+newKalman/kalman.cpp \
+src/kalman_thread.cpp \
 $(main)
 
 
@@ -45,6 +48,8 @@ C_INCLUDES =  \
 -I"rodos/api/hal" \
 -I"rodos/api" \
 -I"include" \
+-I"newKalman"\
+-I"/usr/include/eigen3" \
 -I"IMULibrary"
 
 # C/C++ defines
@@ -110,6 +115,7 @@ CXXFLAGS=$(CFLAGS)
 CXXFLAGS+=-fno-rtti -fno-exceptions
 CXXFLAGS+=-std=c++11
 CXXFLAGS+=-U__STRICT_ANSI__
+CXXFLAGS+=-Wno-psabi
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections \
 $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 

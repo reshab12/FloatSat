@@ -1,12 +1,12 @@
-#include "rodos.h"
-#include "gateway.h"
-#include "topics.hpp"
+#pragma once
+
+#include "main.hpp"
 
 /* ~~~~~ Set UART as gateway ~~~~~ */
 
-static HAL_UART bluetooth(UART_IDX2); // Tx: PD5, Rx: PD6
+/*static HAL_UART bluetooth(UART_IDX2); // Tx: PD5, Rx: PD6
 static LinkinterfaceUART link_name_not_imp(&bluetooth, 115200, 3, 10);
-static Gateway gw_name_not_imp(&link_name_not_imp, true);
+static Gateway gw_name_not_imp(&link_name_not_imp, true);*/
 
 /* ~~~~~ Transmitter thread ~~~~~ */
 
@@ -31,3 +31,5 @@ struct Receiver : public Subscriber
 
   uint32_t put(const uint32_t topic_id, const size_t len, void *msg, const NetMsgInfo &) override;
 };
+
+

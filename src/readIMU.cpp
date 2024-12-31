@@ -7,6 +7,7 @@ struct SensorData sensorData;
 float lastTime = 0;
 float timeNow = 0;
 float deltaTime = 0;
+HAL_I2C imu(I2C_IDX1);
 
 void i2cerror(){
 	imu.reset();
@@ -48,33 +49,6 @@ void calcAccel(SensorData* data){
 	data->accel[2] = xyzCoordinates[2] * 0.000061;
 }
 
-/*void offsetAccel(Offsets* offset, int axis){
-	int16_t xyzCoordinates[3];
-
-	switch(axis){
-	case 2:
-		for(int i = 0; i<50; i++){
-			readAccel(xyzCoordinates);
-			offset->accel[0] = offset->accel[0] + xyzCoordinates[0];
-			offset->accel[1] = offset->accel[1] + xyzCoordinates[1];
-		}
-		break;
-	case 0:
-		for(int i = 0; i<50; i++){
-			readAccel(xyzCoordinates);
-			offset->accel[2] = offset->accel[2] + xyzCoordinates[2];
-			offset->accel[1] = offset->accel[1] + xyzCoordinates[1];
-		}
-		break;
-	case 1:
-		for(int i = 0; i<50; i++){
-			readAccel(xyzCoordinates);
-			offset->accel[0] = offset->accel[0] + xyzCoordinates[0];
-			offset->accel[2] = offset->accel[2] + xyzCoordinates[2];
-		}
-		break;
-	}
-}*/
 
 float calcPitch(SensorData* data){
 	float numerator = -(data->accel[1]);
@@ -124,9 +98,6 @@ void readMagneto(int16_t* xyzCoordinates){
 
 void offsetMagneto(Offsets* offset){
     int16_t xyzCoordinates[3];
-	uint8_t magOffsetMin = 0;
-	uint8_t magOffsetMax = 0;
-	int16_t offsetMag = 0;
 	PRINTF("Rotate about x-Axis");
 	for(int i = 0; i<1000; i++){
 		readMagneto(xyzCoordinates);
@@ -153,7 +124,7 @@ void offsetMagneto(Offsets* offset){
 	PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[2], offset->magnetoMin[2]);
 }
 
-void calibrateMagneto(Offsets* offsets, int16_t x, int16_t y, int16_t z, double calibratedMagneto[3]){
+void calibrateMagneto(Offsets* offsets, int16_t x, int16_t y, int16_t z, float calibratedMagneto[3]){
 	calibratedMagneto[0] = ((x - offsets->magnetoMin[0])/(offsets->magnetoMax[0] - offsets->magnetoMin[0]) * 2 - 1);
 	calibratedMagneto[1] = ((y - offsets->magnetoMin[1])/(offsets->magnetoMax[1] - offsets->magnetoMin[1]) * 2 - 1);
 	calibratedMagneto[2] = ((z - offsets->magnetoMin[2])/(offsets->magnetoMax[2] - offsets->magnetoMin[2]) * 2 - 1);
@@ -169,7 +140,7 @@ void calcHeadingGyro(Attitude* attitude, int16_t gyro, Offsets* offset, float de
 	attitude->headingGyro = temp;
 }
 
-void calcHeadingMagneto(Attitude* attitude, double magneto[3], Offsets* offset, float roll, float pitch){
+void calcHeadingMagneto(Attitude* attitude, float magneto[3], float roll, float pitch){
 	/*Todo figure out how to get pitch and roll
 	* Then use mxh and myh in atan2 */
 	float mxh = magneto[0] * cos(pitch) + magneto[2] * sin(pitch);
@@ -178,15 +149,14 @@ void calcHeadingMagneto(Attitude* attitude, double magneto[3], Offsets* offset, 
 	attitude->headingMagneto = atan2(magneto[1],magneto[0]) * 180/M_PI + 180;
 }
 
-class Sensor : public StaticThread<>{
-public:
-	Sensor(const char* name) : StaticThread(name){};
 
-	void init() {
+	Sensor::Sensor(const char* name) : StaticThread(name,200){};
+
+	void Sensor::init() {
 		initialize();
 	}
 
-	void run() {
+	void Sensor::run() {
         /*Uncomment if you want to checkt for WHO AM I
             uint8_t data = 0;
             stat = imu.writeRead(LSM9DS1_AG, LSM9DS1_WHO_AM_I,1,data,1);
@@ -196,11 +166,12 @@ public:
         int16_t xyzGyro[3];
 		int16_t xyzMagneto[3];
 		int16_t xyzAccel[3];
-        offsetGyro(&offsets);
-		offsetMagneto(&offsets);
-        float gx, gy, gz;
-		double calibratedMagneto[3];
-        TIME_LOOP(1 * SECONDS, 500 * MILLISECONDS){
+        //offsetGyro(&offsets);
+		//offsetMagneto(&offsets);
+		float calibratedMagneto[3];
+
+		imu_data data;
+        TIME_LOOP(1 * SECONDS, 100 * MILLISECONDS){
 			readGyro(xyzGyro);
 			readMagneto(xyzMagneto);
 			readAccel(xyzAccel);
@@ -210,16 +181,27 @@ public:
 			calibrateMagneto(&offsets, xyzMagneto[0], xyzMagneto[1], xyzMagneto[2], calibratedMagneto);
 			float pitch = calcPitch(&sensorData);
 			float roll = calcRoll(&sensorData);
-			calcHeadingMagneto(&attitude, calibratedMagneto, &offsets, roll, pitch);
+			
+			calcHeadingMagneto(&attitude, calibratedMagneto, roll, pitch);
 
-    		//gx = (xyzGyro[0] - offsets.gyro[0]) * 0.07;
-            //gy = (xyzGyro[1] - offsets.gyro[1]) * 0.07;
-            //gz = (xyzGyro[2] - offsets.gyro[2]) * 0.07;
+			data.wx = (xyzGyro[0] * 0.07 - offsets.gyro[0]);
+			data.wy = (xyzGyro[1] * 0.07 - offsets.gyro[0]);
+			data.wz = (xyzGyro[2] * 0.07 - offsets.gyro[0]);
 
-            PRINTF("heading: %f degrees \r\n", attitude.headingMagneto);
+			data.ax = sensorData.accel[0];
+			data.ay = sensorData.accel[1];
+			data.az = sensorData.accel[2];
+
+			data.mx = calibratedMagneto[0];
+			data.my = calibratedMagneto[1];
+			data.mz = calibratedMagneto[2];
+
+			topic_imu_data.publish(data);
+
+            //PRINTF("heading: %f degrees \r\n", attitude.headingMagneto);
 			//MW_PRINTF("gx: %f Gauss  gy: %f Gauss  gz: %f Gauss \r\n", (xyzMagneto[0]*0.00014), (xyzMagneto[1]*0.00014), (xyzMagneto[2]*0.00014));
         }
     }
-};
 
-Sensor sensorThread("readIMU");
+
+//Sensor sensorThread("readIMU");
