@@ -169,6 +169,8 @@ void calcHeadingMagneto(Attitude* attitude, float magneto[3], float roll, float 
         //offsetGyro(&offsets);
 		//offsetMagneto(&offsets);
 		float calibratedMagneto[3];
+		float pitch;
+		float roll;
 
 		imu_data data;
         TIME_LOOP(1 * SECONDS, 100 * MILLISECONDS){
@@ -179,8 +181,8 @@ void calcHeadingMagneto(Attitude* attitude, float magneto[3], float roll, float 
 			deltaTime = computeDeltaTime();
 			calcHeadingGyro(&attitude, xyzGyro[2], &offsets, deltaTime);
 			calibrateMagneto(&offsets, xyzMagneto[0], xyzMagneto[1], xyzMagneto[2], calibratedMagneto);
-			float pitch = calcPitch(&sensorData);
-			float roll = calcRoll(&sensorData);
+			pitch = calcPitch(&sensorData);
+			roll = calcRoll(&sensorData);
 			
 			calcHeadingMagneto(&attitude, calibratedMagneto, roll, pitch);
 
