@@ -57,8 +57,8 @@ float calcPitch(SensorData* data){
 }
 
 float calcRoll(SensorData* data){
-	float numerator = data->accel[0];
-	float denominator = sqrt(data->accel[1] * data->accel[1] + data->accel[2] * data->accel[2]);
+	float numerator = data->accel[2];
+	float denominator = sqrt(data->accel[1] * data->accel[1] + data->accel[0] * data->accel[0]);
 	return atan2(numerator, denominator);
 }
 
@@ -135,7 +135,7 @@ void calibrateMagneto(Offsets* offsets, int16_t x, int16_t y, int16_t z, float c
 
 void calcHeadingGyro(Attitude* attitude, int16_t gyro, Offsets* offset, float deltaTime){
 	float temp;
-	temp = attitude->headingGyro + (gyro * 0.07 - offset->gyro[2]) * deltaTime;
+	temp = attitude->headingGyro + (gyro * 0.07 - offset->gyro[0]) * deltaTime;
 	if(temp >= 360) temp -= 360;
 	attitude->headingGyro = temp;
 }
@@ -146,7 +146,7 @@ void calcHeadingMagneto(Attitude* attitude, float magneto[3], float roll, float 
 	float mxh = magneto[0] * cos(pitch) + magneto[2] * sin(pitch);
 	float myh = magneto[0] * sin(roll) * sin(pitch) + magneto[1] * cos(roll) - magneto[2] * sin(roll) * cos(pitch);
 	
-	attitude->headingMagneto = atan2(magneto[1],magneto[0]) * 180/M_PI + 180;
+	attitude->headingMagneto = atan2(magneto[1],magneto[2]) * 180/M_PI + 180;
 }
 
 
@@ -179,7 +179,7 @@ void calcHeadingMagneto(Attitude* attitude, float magneto[3], float roll, float 
 			readAccel(xyzAccel);
 			calcAccel(&sensorData);
 			deltaTime = computeDeltaTime();
-			calcHeadingGyro(&attitude, xyzGyro[2], &offsets, deltaTime);
+			calcHeadingGyro(&attitude, xyzGyro[0], &offsets, deltaTime);
 			calibrateMagneto(&offsets, xyzMagneto[0], xyzMagneto[1], xyzMagneto[2], calibratedMagneto);
 			pitch = calcPitch(&sensorData);
 			roll = calcRoll(&sensorData);
