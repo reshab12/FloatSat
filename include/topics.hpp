@@ -52,7 +52,7 @@ struct position_data
 //the value send to the motor-controller
 struct control_value
 {
-    /* data */
+    uint16_t increments;
 };
 
 //
