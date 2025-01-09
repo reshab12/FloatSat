@@ -1,12 +1,29 @@
 //#include "readIMU.hpp"
+#include "math.h"
 
-#define I_WHEEL 303.0
-#define I_SATELLITE 7610.2
-#define KP 20000
-#define KI 5000
-#define KD 35000
+#include "topics.hpp"
+#include "encoder.hpp"
+
+#define I_WHEEL 0.0000391
+#define I_SATELLITE 0.00783661541
+#define KP_P 20000
+#define KI_P 5000
+#define KD_P 35000
+#define KP_V 20000
+#define KI_V 5000
+#define KD_V 35000
+#define KP_M 10
+#define KI_M 5
+#define KD_M 15
 #define INCREMENTS 40000
 #define FREQUENCY 50
-#define CONTROLETIME 1/FREQUENCY * SECONDS
+#define CONTROLTIME 1/FREQUENCY * SECONDS
+#define MAX_RPM  17000
+#define MAX_RAD_PER_SEC  (MAX_RPM * 2 * M_PI) / 60
+#define MAX_VOLTS 5
 
-//float calcPID(float desiredAngle, float currentAngle, float dt, float omega_wheel);
+void calcPIDMotor(float desiredVelocity, controller_errors* controler_errors, control_value* control, additional_sensor_data* data);
+
+void calcPIDPos(float desiredAngle, imu_data* imu, position_data* pos, additional_sensor_data* data, controller_errors* errors);
+
+void calcPIDVel(float desiredSpeed, imu_data* imu, additional_sensor_data* data, controller_errors* errors);

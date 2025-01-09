@@ -58,7 +58,7 @@ struct control_value
 //
 struct additional_sensor_data
 {
-    /* data */
+    float motorSpeed; //RPM
 };
 
 //

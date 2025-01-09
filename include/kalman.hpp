@@ -28,11 +28,11 @@ public:
   KalmanFilter(
       double dt,
       const Eigen::MatrixXd& A,
+      const Eigen::MatrixXd& G,
       const Eigen::MatrixXd& C,
       const Eigen::MatrixXd& Q,
       const Eigen::MatrixXd& R,
-      const Eigen::MatrixXd& P,
-      const Eigen::MatrixXd& G
+      const Eigen::MatrixXd& P
   );
 
   /**
@@ -71,7 +71,7 @@ public:
 private:
 
   // Matrices for computation
-  Eigen::MatrixXd A, C, Q, R, P, K, P0;
+  Eigen::MatrixXd A, G, C, Q, R, P, K, P0;
 
   // System dimensions
   int m, n;
