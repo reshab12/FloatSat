@@ -17,5 +17,4 @@ Topic<additional_sensor_data> topic_additional_sensor_data(topic_id_additional_s
 
 Topic<satellite_mode> topic_satellite_mode(topic_id_satellite_mode,"topic_satellite_mode");
 
-Topic<start_mission> topic_start_mission(topic_id_start_mission,"topic_start_mission");
-
+Topic<variables> topic_variables(topic_id_variables,"topic_variables");

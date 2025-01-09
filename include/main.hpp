@@ -12,7 +12,6 @@
 #include "topics.hpp"
 #include "commands.hpp"
 #include "readIMU.hpp"
-#include "kalman_thread.hpp"
 #include "rxtx.hpp"
 #include "sateliteModes.hpp"
 

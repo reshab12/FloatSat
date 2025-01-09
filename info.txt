@@ -1,5 +1,9 @@
 sudo make 
 sudo rfcomm connect /dev/rfcomm0 00:0E:EA:CF:7C:2A 1 &
+
+felix grupe bt:
+sudo rfcomm connect /dev/rfcomm0 00:0E:EA:CF:7C:3C 1 &
+
 rfcomm -a
 sudo chmod 777 /dev/rfcomm0
 

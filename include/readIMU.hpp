@@ -26,9 +26,9 @@ const uint8_t LSM9DS1_CTRL_REG3_M[2] = {0x22,0b00000000};
 const uint8_t LSM9DS1_CTRL_REG4_M[2] = {0x23,0b00001100};
 
 struct Offsets{
-    float gyro[3] = {0,0,0};
-	double magnetoMin[3] = {9999999.9,9999999.9,9999999.9};
-	double magnetoMax[3] = {-9999999.9,-9999999.9,-9999999.9};
+    float gyro[3] = {-0.69,2.323,0.405};
+	double magnetoMin[3] = {999.9,999.9,999.9};
+	double magnetoMax[3] = {-999.9,-999.9,-999.9};
 	//float accel[3] = {0,0,0};
 };
 
@@ -68,20 +68,38 @@ void offsetMagneto(Offsets* offset);
 
 void calibrateMagneto(Offsets* offsets, int16_t x, int16_t y, int16_t z, float calibratedMagneto[3]);
 
-float computeDeltaTime();
+void calcHeadingMagnetoPitchRoll(Attitude* attitude, float magneto[3], float roll, float pitch);
 
-void calcHeadingMagneto(Attitude* attitude, float magneto[3], float roll, float pitch);
+void calcHeadingMagneto(Attitude* attitude, float magneto[3]);
 
 void calcHeadingGyro(Attitude* attitude, int16_t gyro, Offsets* offset, float deltaTime);
 
-/*class Sensor : public StaticThread<>{
-public:
-	Sensor(const char* name) : StaticThread<>(name){};
-	void init();
-	void run();
-};*/
 
 class Sensor : public StaticThread<>{
+private:
+	void update(const Matrix_<1,1,float> & y, float u);//update the kalman filter
+    void updateDt();//update the Time 
+
+    Matrix_<2,2,float> A; //Matrixes for the filter
+    Matrix_<2,1,float> G;
+    Matrix_<1,2,float> C;
+    Matrix_<2,2,float> Q;
+    Matrix_<1,1,float> R;
+    Matrix_<2,2,float> P;
+    Matrix_<2,1,float> K;
+
+    double t; // Time of the Last measurement
+    double dt; // Discrete time step
+    bool initialized;  // Is the filter initialized?
+    double R_Gyro; //gyro bias
+
+    Matrix_<2,2,float>  I;  // n-size identity
+    Matrix_<2,1,float>  x_hat, x_hat_new;  // Estimated states
+
+    struct Offsets offsets;
+    struct Attitude attitude;
+    struct SensorData sensorData;
+
 public:
 	Sensor(const char* name);
 
