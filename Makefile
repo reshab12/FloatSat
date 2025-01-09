@@ -23,6 +23,8 @@ DEBUG = 1
 CXX_SOURCES = src/topics.cpp \
 src/readIMU.cpp \
 src/rxtx.cpp \
+src/encoder.cpp \
+src/LSM9DS1.cpp \
 $(main)
 
 
