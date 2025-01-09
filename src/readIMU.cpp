@@ -153,6 +153,8 @@ void Sensor::updateDt(){
 	G.r[0][1]=1;
 
 	Q.r[0][0]=dt*dt * R_Gyro;
+	Q.r[0][1]=dt*R_Gyro;
+	Q.r[1][0]=dt*R_Gyro;
 	Q.r[1][1]= R_Gyro;
 
 }
@@ -202,6 +204,8 @@ void Sensor::init() {
 	//R_Gyro = 0.01;
 	R_Gyro = 0.01;
 	dt = 100 * MILLISECONDS/100000000;
+
+	updateDt();
 	 
    	// dt = dt/10;
 	//dt=0.02;
