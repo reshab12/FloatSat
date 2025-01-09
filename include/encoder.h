@@ -57,7 +57,7 @@ void GyroCal(float* gbias);
 
 void AccelCal(float* abias);
 
-void MotorSpeedUpdate();
+void MotorSpeedUpdate(additional_sensor_data* motor);
 
 void ADCUpdate();
 

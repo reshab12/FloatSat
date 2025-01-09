@@ -39,8 +39,6 @@ static Application module01("LSM9DS1 AHRS", 2001);
 						  0            // double deltaTime;
 };*/
 
-additional_sensor_data motor;
-
 // Create an instance of the LSM9DS1 library called `imu`.
 LSM9DS1 imuLib;
 
@@ -270,7 +268,7 @@ void TIM2_IRQHandler(void)
 }
 }
 
-void MotorSpeedUpdate()
+void MotorSpeedUpdate(additional_sensor_data* motor)
 {
 	double SensorTime = ((NOW()-CaptureTime)/(double)MILLISECONDS);
 	if (SensorTime>250) //minimum measured speed is 2 RPS(120 RPM). This can give us 250ms of minimum interval between interrupts (2 interrupts every one revolution).
@@ -280,9 +278,9 @@ void MotorSpeedUpdate()
 
 	if (EncoderB)
 	{
-		motor.motorSpeed  = -1*((float)TIM2Freq / 16) * 60;  //CCW
+		motor->motorSpeed  = -1*((float)TIM2Freq / 16) * 60;  //CCW
 	}
-	else {motor.motorSpeed  = ((float)TIM2Freq / 16) * 60;}  //CW
+	else {motor->motorSpeed  = ((float)TIM2Freq / 16) * 60;}  //CW
 }
 
 

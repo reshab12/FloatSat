@@ -5,7 +5,7 @@
 
 
 HAL_PWM pwmMotor(PWM_IDX00);
-//additional_sensor_data data;
+additional_sensor_data motor;
 
 void initializeMotor(){
     pwmMotor.init(5000,400);
@@ -130,20 +130,10 @@ public:
     }
 
     void run(){
-        //int last_cnt = 0;
-
-        pwmMotor.write(1000);
-        /*TIME_LOOP(NOW(), 20 * MILLISECONDS)
-        {
-          int cnt = get_count();
-
-          if(cnt != last_cnt)
-          {
-            PRINTF("Counts: %d\r\n", get_count());
-            last_cnt = cnt;
-          }
-        }*/
-        MotorSpeedUpdate();
+        TIME_LOOP(NOW() + 2 * SECONDS, 1 * SECONDS){
+            MotorSpeedUpdate(&motor);
+            PRINTF("MotorSpeed: %f \n", motor.motorSpeed);
+        }
     }
 };
 
