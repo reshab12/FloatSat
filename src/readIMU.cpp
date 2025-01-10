@@ -71,7 +71,6 @@ void offsetGyro(Offsets* offset){
 	offset->gyro[0] = (offset->gyro[0]/10000)*0.07;
 	offset->gyro[1] = (offset->gyro[1]/10000)*0.07;
 	offset->gyro[2] = (offset->gyro[2]/10000)*0.07;
-	MW_PRINTF("x: %f, y: %f, z: %f",offset->gyro[0],offset->gyro[1],offset->gyro[2]);
 }
 
 void readMagneto(int16_t* xyzCoordinates){
@@ -149,13 +148,15 @@ void Sensor::updateDt(){
 	t = RODOS::NOW();
 
 	//A.r[0][1]=dt;
-	G.r[0][0]=dt;
-	G.r[0][1]=1;
+	G.r[0][0]= dt;
+	//G.r[0][1]= 0;
 
-	Q.r[0][0]=dt*dt * R_Gyro;
-	Q.r[0][1]=dt*R_Gyro;
-	Q.r[1][0]=dt*R_Gyro;
-	Q.r[1][1]= R_Gyro;
+	
+
+	Q.r[0][0]= dt*dt * R_GYROX;
+	Q.r[0][1]= dt*R_GYROX;
+	Q.r[1][0]= dt*R_GYROX;
+	Q.r[1][1]= R_GYROX;
 
 }
 
@@ -202,7 +203,6 @@ void Sensor::init() {
 	initialize();
 
 	//R_Gyro = 0.01;
-	R_Gyro = 0.01;
 	dt = 100 * MILLISECONDS/100000000;
 
 	updateDt();
@@ -213,7 +213,7 @@ void Sensor::init() {
 	A.r[0][0]=1;							
 	A.r[0][1]=0;
 	A.r[1][0]=0;
-	A.r[1][1]=1;
+	A.r[1][1]=0;
 
 	G.r[0][0]=dt;					
 	G.r[0][1]=1;
@@ -221,10 +221,10 @@ void Sensor::init() {
 	C.r[0][0]=1;
 	C.r[0][1]=0;
 
-	Q.r[0][0]=dt*dt * R_Gyro;		
-	Q.r[0][1]=dt*R_Gyro;
-	Q.r[1][0]=dt*R_Gyro;
-	Q.r[1][1]=R_Gyro;
+	Q.r[0][0]=dt*dt * R_GYROX;		
+	Q.r[0][1]=dt*R_GYROX;
+	Q.r[1][0]=dt*R_GYROX;
+	Q.r[1][1]=R_GYROX;
 
 	R.r[0][0]=10;							
 
@@ -301,7 +301,7 @@ void Sensor::run() {
 		float r2 = data.wz;
 		float p2 = (data.mx);
 		float y2 = (data.my);
-		float cz= atan2(p2,y2) * 180/M_PI + 180;
+		float cz = atan2(p2,y2) * 180/M_PI + 180;
 		
 		if(cz > 180) cz = -360+cz;
 		else if(cz < -180) cz = 360+cz;
@@ -313,7 +313,7 @@ void Sensor::run() {
 		update(peter,r2);
 		test += r2 * dt;
 		
-		//MW_PRINTF("%f %f | %f %f | %f |%f %f %f | %f\n",x_hat.r[0][0],x_hat.r[1][0],peter.r[0][0],r2, dt, data.mx,data.my,data.mz, cz);
+		PRINTF("%f %f | %f %f | %f |%f %f %f | %f\n",x_hat.r[0][0],x_hat.r[1][0],peter.r[0][0],r2, dt, data.mx,data.my,data.mz, cz);
 		
 		position_data pose;
 		pose.headingMagneto = (((int)x_hat.r[0][0])%360)-180;

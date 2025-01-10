@@ -12,6 +12,10 @@
 #define OFFSET_Z_REG_L_M	0x09
 #define OFFSET_Z_REG_H_M	0x0A
 
+#define R_GYROX 0.040
+#define R_GYROY 0.033
+#define R_GYROZ 0.029
+
 const uint8_t LSM9DS1_WHO_AM_I[1] = {0x0F}; /* WHO_AM_I register address with a value of 0x68 in the AG sensor and 0x3D in the M sensor*/
 const uint8_t LSM9DS1_OUT_X_G_L[1] = {0x18}; /* The starting data register address for the Gyroscope */
 const uint8_t LSM9DS1_OUT_X_XL_L[1] = {0x28}; //Accelerometer
