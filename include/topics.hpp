@@ -58,7 +58,8 @@ struct control_value
 //
 struct additional_sensor_data
 {
-    float motorSpeed; //RPM
+    int16_t motorSpeed; //RPM
+    float omega_wheel; //From motor PID calulated change to omega wheel.
 };
 
 //
@@ -88,6 +89,13 @@ struct variables
     uint32_t requested_angle;
     uint32_t requested_rot_speed;
 };
+
+struct controller_errors
+{
+    float merror, mIerror, merror_change, mLast_error = 0;
+    float verror, vIerror, verror_change, vLast_error = 0;
+    float perror, pIerror, perror_change, pLast_error = 0;
+}
 
 
 extern Topic<telecommand> topic_telecommand_uplink;

@@ -1,19 +1,16 @@
 #include "rodos.h"
-#include "pidPos.hpp"
+#include "pidControl.hpp"
 
-#include "hal_pwm.h"
-
-void calcPIDMotor(float desiredVelocity, controller_errors* errors, control_value* control, additional_sensor_data* data){
-    float omega_wheel;
-    getMotorSpeed(data);
+void calcPIDMotor(int16_t desiredVelocity, controller_errors* errors, control_value* control, additional_sensor_data* data){
+    MotorSpeedUpdate(&data);  //Get the current motor speed.
     errors->merror = desiredVelocity - data->motorSpeed;
-    errors->mIerror += errors->mIerror * CONTROLTIME;
-    errors->merror_change = (errors->mLast_error - errors->merror)/CONTROLTIME;
+    errors->mIerror += errors->mIerror * MOTORCONTROLTIME;
+    errors->merror_change = (errors->mLast_error - errors->merror)/MOTORCONTROLTIME;
     errors->mLast_error = errors->merror;
 
-    omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
+    data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
 
-    control->increments = ((omega_wheel / MAX_RAD_PER_SEC * MAX_VOLTS) / MAX_VOLTS) * INCREMENTS;   
+    control->increments += (omega_wheel / MAX_RPM) * INCREMENTS;   
 }
 
 void calcPIDPos(float desiredAngle, imu_data* imu, position_data* pos, additional_sensor_data* data, controller_errors* errors){
