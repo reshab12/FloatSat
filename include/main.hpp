@@ -14,4 +14,5 @@
 #include "readIMU.hpp"
 #include "rxtx.hpp"
 #include "sateliteModes.hpp"
-
+#include "pidControl.hpp"
+#include "driveMotor.hpp"

@@ -21,6 +21,12 @@ struct telecommand
   uint32_t command_variable;
 };
 
+enum direction
+{
+    FORWARD,
+    BACKWARD
+};
+
 struct failed_telecommand 
 {
   bool failed;
@@ -46,6 +52,7 @@ struct position_data
 {
     float headingMagneto = 0;
 	float headingGyro = 0;
+    float heading = 0;
     float pitch, roll, yaw;
 };
 
@@ -53,6 +60,7 @@ struct position_data
 struct control_value
 {
     uint16_t increments;
+    direction turnDirection;
 };
 
 //
@@ -95,7 +103,7 @@ struct controller_errors
     float merror, mIerror, merror_change, mLast_error = 0;
     float verror, vIerror, verror_change, vLast_error = 0;
     float perror, pIerror, perror_change, pLast_error = 0;
-}
+};
 
 
 extern Topic<telecommand> topic_telecommand_uplink;

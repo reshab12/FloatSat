@@ -2,10 +2,10 @@
 #include "math.h"
 
 #include "topics.hpp"
-#include "encoder.hpp"
+#include "encoder.h"
 
-#define I_WHEEL 0.0000391
-#define I_SATELLITE 0.00783661541
+#define I_WHEEL 0.0001175
+#define I_SATELLITE 0.00834099434
 #define KP_P 20000
 #define KI_P 5000
 #define KD_P 35000
@@ -14,16 +14,18 @@
 #define KD_V 350
 #define KP_M 10
 #define KI_M 5
-#define KD_M 15
-#define INCREMENTS 40000
-#define FREQUENCY 50
+#define KD_M 0
+#define INCREMENTS 4000
+#define FREQUENCY 500
+#define MOTORFREQUENCY 200
+#define MOTORCONTROLTIME 1/MOTORFREQUENCY * SECONDS
 #define CONTROLTIME 1/FREQUENCY * SECONDS
-#define MAX_RPM  4100 // 9000
+#define MAX_RPM  9000 // 4100
 #define MIN_RPM 200
 #define MAX_RAD_PER_SEC  (MAX_RPM * 2 * M_PI) / 60
 #define MAX_VOLTS 5
 
-void calcPIDMotor(float desiredVelocity, controller_errors* controler_errors, control_value* control, additional_sensor_data* data);
+void calcPIDMotor(int16_t desiredVelocity, controller_errors* errors, control_value* control, additional_sensor_data* data);
 
 void calcPIDPos(float desiredAngle, imu_data* imu, position_data* pos, additional_sensor_data* data, controller_errors* errors);
 

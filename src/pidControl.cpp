@@ -2,7 +2,7 @@
 #include "pidControl.hpp"
 
 void calcPIDMotor(int16_t desiredVelocity, controller_errors* errors, control_value* control, additional_sensor_data* data){
-    MotorSpeedUpdate(&data);  //Get the current motor speed.
+    MotorSpeedUpdate(data);  //Get the current motor speed.
     errors->merror = desiredVelocity - data->motorSpeed;
     errors->mIerror += errors->mIerror * MOTORCONTROLTIME;
     errors->merror_change = (errors->mLast_error - errors->merror)/MOTORCONTROLTIME;
@@ -10,7 +10,10 @@ void calcPIDMotor(int16_t desiredVelocity, controller_errors* errors, control_va
 
     data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
 
-    control->increments += (omega_wheel / MAX_RPM) * INCREMENTS;   
+    control->increments += (data->omega_wheel / MAX_RPM) * INCREMENTS;
+    
+    if(control->increments < 0) control->turnDirection = BACKWARD;
+    else control->turnDirection = FORWARD;   
 }
 
 void calcPIDPos(float desiredAngle, imu_data* imu, position_data* pos, additional_sensor_data* data, controller_errors* errors){

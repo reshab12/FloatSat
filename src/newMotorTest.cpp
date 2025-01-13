@@ -2,123 +2,26 @@
 #include "hal_pwm.h"
 
 #include "encoder.h"
+#include "readIMU.hpp"
+#include "main.hpp"
 
-
-HAL_PWM pwmMotor(PWM_IDX00);
 additional_sensor_data motor;
+controller_errors errors;
+control_value control;
 
-void initializeMotor(){
-    pwmMotor.init(5000,400);
+
+float calcVar(){
+    int16_t xyzGyro[3];
+    Offsets offset;
+    offsetGyro(&offset);
+    float sum;
+    for(int i = 0; i < 5000; i++){
+        readGyro(xyzGyro);
+        sum += (xyzGyro[2] * 0.07 - offset.gyro[2]) * (xyzGyro[2] * 0.07 - offset.gyro[2]);
+        AT(NOW() + 5 * MILLISECONDS);
+    }
+    return sum/5000;
 }
-
-
-/*float getMaxMotorSpeed()
-{
-    float speed = 0.0;
-    for (int i = 0; i < 1000; i++)
-    {
-        getMotorSpeed(&data);
-        speed += data.motorSpeed;
-        AT(NOW() + 20 * MILLISECONDS);
-    }
-    return speed/1000.0;
-}
-
-
-class MotorTest : StaticThread<>{
-public:
-    MotorTest(const char* name):StaticThread(name){};
-
-    void init(){
-        initializeMotor();
-    }
-
-    void run(){
-        float speed;
-        uint16_t velocity = 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        velocity += 200;
-        pwmMotor.write(velocity);
-        PRINTF("Speed is %d \r\n", velocity);
-        AT(NOW() + 1 * SECONDS);
-        speed = getMaxMotorSpeed();
-        PRINTF("Max Speed: %f \r\n", speed);
-    }
-};*/
 
 class EncoderTest : StaticThread<>{
 public:
@@ -132,10 +35,42 @@ public:
     void run(){
         TIME_LOOP(NOW() + 2 * SECONDS, 1 * SECONDS){
             MotorSpeedUpdate(&motor);
-            PRINTF("MotorSpeed: %f \n", motor.motorSpeed);
+            PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
         }
     }
 };
 
-EncoderTest encoderTest("EncoderTest");
+class VarianzGyro : StaticThread<>{
+public:
+    VarianzGyro(const char* name):StaticThread(name){}
+
+    void init(){
+        initialize();
+    }
+
+    void run(){
+        float var;
+        var = calcVar();
+        PRINTF("Varianz Gyro: %f", var);
+    }
+};
+
+class MotorControlerTest : StaticThread<>{
+public: 
+    MotorControlerTest(const char* name):StaticThread(name){}
+
+    void init(){
+        initializeMotor();
+    }
+
+    void run(){
+        int rpm = 300; 
+        calcPIDMotor(rpm, &errors, &control, &motor);
+        PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
+    }
+};
+
+MotorControlerTest test("Test");
+//VarianzGyro varianzTest("VarianzTest");
+//EncoderTest encoderTest("EncoderTest");
 //MotorTest motorTest("MotorTest");
