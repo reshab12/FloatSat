@@ -43,33 +43,33 @@ struct __attribute__((packed)) star_map
 //from IMU to sensorfusion thread
 struct imu_data
 {
-    float wx,wy,wz,mx,my,mz,ax,ay,az = 0;
+    float wx,wy,wz,mx,my,mz,ax,ay,az = 0;   //W is in dps
 };
 
 //angular position data 
 //from sensorfusion to controller
 struct position_data
 {
-    float headingMagneto = 0;
-	float headingGyro = 0;
-    float heading = 0;
-    float pitch, roll, yaw;
+    float headingMagneto = 0;   //-180 to 180 degrees
+	float headingGyro = 0;      //-180 to 180 degrees
+    float heading = 0;          //-180 to 180 degrees
+    float pitch, roll, yaw;     // in radian
 };
 
 //the value send to the motor-controller
 struct control_value
 {
-    uint16_t increments;
-    direction turnDirection;
-    float satVelocity;
-    uint16_t desiredMotorSpeed;
+    uint16_t increments;            //increments set for the motor PWM
+    direction turnDirection;        //CW or CCW
+    float satVelocity;              //Desired Velocity from the position controler
+    uint16_t desiredMotorSpeed;     //Desired motor RPM from the velocity controler
 };
 
 //
 struct additional_sensor_data
 {
-    int16_t motorSpeed; //RPM
-    float omega_wheel; //From motor PID calulated change to omega wheel.
+    uint16_t motorSpeed;    //RPM of the motor
+    float omega_wheel;      //From motor PID calulated change to omega wheel.
 };
 
 //
@@ -102,9 +102,9 @@ struct variables
 
 struct controller_errors
 {
-    float merror, mIerror, merror_change, mLast_error = 0;
-    float verror, vIerror, verror_change, vLast_error = 0;
-    float perror, pIerror, perror_change, pLast_error = 0;
+    float merror, mIerror, merror_change, mLast_error = 0;  //errors for the motor controler
+    float verror, vIerror, verror_change, vLast_error = 0;  //errors for the velocity controler
+    float perror, pIerror, perror_change, pLast_error = 0;  //errors for the position controler
 };
 
 
