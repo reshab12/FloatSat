@@ -1,9 +1,9 @@
 #include "rodos.h"
 #include "pidControl.hpp"
 
-void calcPIDMotor(int16_t desiredVelocity, controller_errors* errors, control_value* control, additional_sensor_data* data){
+void calcPIDMotor(controller_errors* errors, control_value* control, additional_sensor_data* data){
     MotorSpeedUpdate(data);  //Get the current motor speed.
-    errors->merror = desiredVelocity - data->motorSpeed;
+    errors->merror = control->desiredMotorSpeed - data->motorSpeed;
     errors->mIerror += errors->mIerror * MOTORCONTROLTIME;
     errors->merror_change = (errors->mLast_error - errors->merror)/MOTORCONTROLTIME;
     errors->mLast_error = errors->merror;
@@ -16,8 +16,8 @@ void calcPIDMotor(int16_t desiredVelocity, controller_errors* errors, control_va
     else control->turnDirection = FORWARD;   
 }
 
-void calcPIDPos(float desiredAngle, imu_data* imu, position_data* pos, additional_sensor_data* data, controller_errors* errors){
-    int torque = 0;
+void calcPIDPos(float desiredAngle, position_data* pos, additional_sensor_data* data, controller_errors* errors, control_value* control){
+    float velocity = 0;
     float dot_omega_wheel = 0;
     float omega_wheel_temp  = 0;
     errors->perror = desiredAngle - pos->heading;
@@ -25,28 +25,14 @@ void calcPIDPos(float desiredAngle, imu_data* imu, position_data* pos, additiona
     errors->perror_change = (errors->perror - errors->pLast_error) / CONTROLTIME;
     errors->pLast_error = errors->perror;
 
-    torque = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
-
-    dot_omega_wheel = - torque/I_WHEEL;
-    omega_wheel_temp += dot_omega_wheel * CONTROLTIME;
-
-    if(abs(omega_wheel_temp) > MAX_RAD_PER_SEC){
-        if(omega_wheel_temp > MAX_RAD_PER_SEC){
-            data->motorSpeed = MAX_RAD_PER_SEC; //Saturate the speed
-        }else{
-            data->motorSpeed = -MAX_RAD_PER_SEC;
-        }
-        dot_omega_wheel = 0;  //Stop further acceleration
-    }else{
-        data->motorSpeed = omega_wheel_temp; //Update normally if within limits
-    }
+    control->satVelocity = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
 }
 
-void calcPIDVel(float desiredSpeed, imu_data* imu, additional_sensor_data* data, controller_errors* errors){
-    int torque = 0;
+void calcPIDVel(control_value* control, additional_sensor_data* data, controller_errors* errors, imu_data* imu){
+    float torque = 0;
     float dot_omega_wheel = 0;
     float omega_wheel_temp  = 0;
-    errors->verror = desiredSpeed - data->motorSpeed;
+    errors->verror = control->satVelocity - imu->wy;
     errors->vIerror += errors->verror * CONTROLTIME;
     errors->verror_change = (errors->verror - errors->vLast_error) / CONTROLTIME;
     errors->vLast_error = errors->verror;
@@ -56,37 +42,16 @@ void calcPIDVel(float desiredSpeed, imu_data* imu, additional_sensor_data* data,
     dot_omega_wheel = - torque/I_WHEEL;
     omega_wheel_temp += dot_omega_wheel * CONTROLTIME;
 
+
+
     if(abs(omega_wheel_temp) > MAX_RAD_PER_SEC){
         if(omega_wheel_temp > MAX_RAD_PER_SEC){
-            data->motorSpeed = MAX_RAD_PER_SEC; //Saturate the speed
+            control->desiredMotorSpeed = MAX_RPM; //Saturate the speed
         }else{
-            data->motorSpeed = -MAX_RAD_PER_SEC;
+            control->desiredMotorSpeed = -MAX_RPM;
         }
         dot_omega_wheel = 0;  //Stop further acceleration
     }else{
-        data->motorSpeed = omega_wheel_temp; //Update normally if within limits
+        control->desiredMotorSpeed = (int)floor(omega_wheel_temp * 9.549297); //Update normally if within limits
     }
 }
-
-/*
-class PIDPos : StaticThread<>{
-public:
-    PIDPos(const char* name):StaticThread(name){};
-
-    void init(){
-        initialize();
-    }
-
-    void run(){
-        int i = 3;
-        TIME_LOOP(2 * SECONDS, 5 * MILLISECONDS){
-            i++;
-            if(i == 4){
-                speed = calcPIDPos();
-                i = 0;
-            }
-            calcPIDMotor(speed);
-        }
-    }
-};*/
-//PIDPos pidPos("pidPos");

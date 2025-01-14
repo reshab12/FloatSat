@@ -61,6 +61,8 @@ struct control_value
 {
     uint16_t increments;
     direction turnDirection;
+    float satVelocity;
+    uint16_t desiredMotorSpeed;
 };
 
 //

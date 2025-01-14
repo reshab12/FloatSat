@@ -25,6 +25,8 @@ src/readIMU.cpp \
 src/rxtx.cpp \
 src/encoder.cpp \
 src/LSM9DS1.cpp \
+src/pidControl.cpp \
+src/driveMotor.cpp \
 $(main)
 
 

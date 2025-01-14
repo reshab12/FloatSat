@@ -8,9 +8,10 @@
 additional_sensor_data motor;
 controller_errors errors;
 control_value control;
+imu_data data;
+position_data position;
 
-
-float calcVar(){
+/*float calcVar(){
     int16_t xyzGyro[3];
     Offsets offset;
     offsetGyro(&offset);
@@ -54,7 +55,7 @@ public:
         PRINTF("Varianz Gyro: %f", var);
     }
 };
-
+*/
 class MotorControlerTest : StaticThread<>{
 public: 
     MotorControlerTest(const char* name):StaticThread(name){}
@@ -64,13 +65,67 @@ public:
     }
 
     void run(){
-        int rpm = 300; 
-        calcPIDMotor(rpm, &errors, &control, &motor);
-        PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
+        control.desiredMotorSpeed = 300; //Change thist to test different speeds.
+
+        while(1){
+            control.turnDirection = FORWARD; //Change this to change turn direction.
+            calcPIDMotor(&errors, &control, &motor);
+            PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
+            AT(NOW() + 5 * MILLISECONDS);
+        }
+    }
+};
+
+class VelocityControlerTest : StaticThread<>{
+public: 
+    VelocityControlerTest(const char* name):StaticThread(name){}
+
+    void init(){
+        initializeMotor();
+    }
+
+    void run(){
+        control.satVelocity = 5.0;
+        int i = 0;
+        while(1){
+            if(i == 2){
+                calcPIDVel(&control, &motor, &errors, &data);
+                PRINTF("Sat Speed: %f", data.wy);
+                i = 0;
+            }
+            calcPIDMotor(&errors, &control, &motor);
+            i++;
+            AT(NOW() + 5 * MILLISECONDS);
+        }
+    }
+};
+
+class PositionControlerTest : StaticThread<>{
+public:
+    PositionControlerTest(const char* name):StaticThread(name){}
+
+    void init(){
+        initializeMotor();
+    }
+
+    void run(){
+        float pos = 45.0;
+        int i = 0;
+        while(1){
+            if(i == 4){
+                calcPIDPos(pos, &position, &motor, &errors, &control);
+                calcPIDVel(&control, &motor, &errors, &data);
+                i = 0;
+                PRINTF("Sat Angle: %f", position.heading);
+            }else if(i == 2){
+                calcPIDVel(&control, &motor, &errors, &data);
+            }
+            calcPIDMotor(&errors, &control, &motor);
+            AT(NOW() + 5 * MILLISECONDS);
+        }
     }
 };
 
 MotorControlerTest test("Test");
-//VarianzGyro varianzTest("VarianzTest");
-//EncoderTest encoderTest("EncoderTest");
-//MotorTest motorTest("MotorTest");
+//VelocityControlerTest vTest("vTest");
+//PositionControlerTest pTest("pTest");

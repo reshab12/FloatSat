@@ -122,7 +122,7 @@ void calibrateMagneto(Offsets* offsets, int16_t x, int16_t y, int16_t z, float c
 
 void calcHeadingGyro(Attitude* attitude, int16_t gyro, Offsets* offset, float deltaTime){
 	float temp;
-	temp = attitude->headingGyro + (gyro * 0.07 - offset->gyro[0]) * deltaTime;
+	temp = attitude->headingGyro + (gyro * 0.07 - offset->gyro[1]) * deltaTime;
 	if(temp >= 360) temp -= 360;
 	attitude->headingGyro = temp;
 }
@@ -137,7 +137,7 @@ void calcHeadingMagnetoPitchRoll(Attitude* attitude, float magneto[3], float rol
 }
 
 void calcHeadingMagneto(Attitude* attitude, float magneto[3]){
-	attitude->headingMagneto = atan2(magneto[1],magneto[2]) * 180/M_PI + 180;
+	attitude->headingMagneto = atan2(magneto[0],magneto[2]) * 180/M_PI + 180;
 }
 
 
@@ -298,9 +298,9 @@ void Sensor::run() {
 		topic_imu_data.publish(data);
 
 		//Kalman
-		float r2 = data.wz;
+		float r2 = data.wy;
 		float p2 = (data.mx);
-		float y2 = (data.my);
+		float y2 = (data.mz);
 		float cz = atan2(p2,y2) * 180/M_PI + 180;
 		
 		if(cz > 180) cz = -360+cz;
