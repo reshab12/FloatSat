@@ -7,6 +7,7 @@ Topic<telemetry> topic_telemetry_downlink(topic_id_telemetry, "topic_telemetry_d
 
 Topic<failed_telecommand> topic_failed_telecommand_downlink(topic_id_failed_command, "topic_failed_telecommand_downlink");
 
+
 Topic<imu_data> topic_imu_data(topic_id_imu_data,"topic_imu_data");
 
 Topic<position_data> topic_position_data(topic_id_position_data,"topic_position_data");
@@ -17,4 +18,11 @@ Topic<additional_sensor_data> topic_additional_sensor_data(topic_id_additional_s
 
 Topic<satellite_mode> topic_satellite_mode(topic_id_satellite_mode,"topic_satellite_mode");
 
-Topic<variables> topic_variables(topic_id_variables,"topic_variables");
+Topic<requested_conntrol> topic_requested_conntrol(topic_id_requested_conntrol,"topic_requested_conntrol");
+
+
+Topic<raspberry_command> topic_raspberry_command(topic_id_raspberry_command,"topic_raspberry_command");
+
+Topic<raspberry_receive> topic_raspberry_receive(topic_id_raspberry_receive,"topic_raspberry_receive");
+
+Topic<raspberry_settings> topic_raspberry_settings(topic_id_raspberry_settings,"topic_raspberry_settings");

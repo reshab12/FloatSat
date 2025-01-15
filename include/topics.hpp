@@ -6,12 +6,17 @@
 const uint32_t topic_id_telecommand = 1002;
 const uint32_t topic_id_telemetry = 1003;
 const uint32_t topic_id_failed_command = 1004;
+
 const uint32_t topic_id_imu_data = 1010;
 const uint32_t topic_id_position_data = 1011;
 const uint32_t topic_id_control_value = 1012;
 const uint32_t topic_id_additional_sensor_data = 1013;
 const uint32_t topic_id_satellite_mode = 1014;
-const uint32_t topic_id_variables = 1015;
+const uint32_t topic_id_requested_conntrol = 1015;
+
+const uint32_t topic_id_raspberry_command = 1020;
+const uint32_t topic_id_raspberry_receive = 1021;
+const uint32_t topic_id_raspberry_settings = 1022;
 
 // telecommand 
 //from Python Middleware to STM32
@@ -54,6 +59,7 @@ struct position_data
 	float headingGyro = 0;      //-180 to 180 degrees
     float heading = 0;          //-180 to 180 degrees
     float pitch, roll, yaw;     // in radian
+    uint8_t moving;
 };
 
 //the value send to the motor-controller
@@ -94,10 +100,25 @@ struct telemetry
     position_data position; //5f
 };
 
-struct variables
+struct requested_conntrol
 {
     uint32_t requested_angle;
     uint32_t requested_rot_speed;
+};
+
+struct raspberry_command{
+    // 0=standby; 1=ready;
+    uint8_t status; 
+};
+
+struct raspberry_receive{
+    //0=standby; 1=ready;
+    uint8_t status;
+
+};
+
+struct raspberry_settings{
+    uint8_t number_of_pictures;
 };
 
 struct controller_errors
@@ -111,10 +132,15 @@ struct controller_errors
 extern Topic<telecommand> topic_telecommand_uplink;
 extern Topic<telemetry> topic_telemetry_downlink;
 extern Topic<failed_telecommand> topic_failed_telecommand_downlink;
+
 extern Topic<imu_data> topic_imu_data;
 extern Topic<position_data> topic_position_data;
 extern Topic<control_value> topic_control_value;
 extern Topic<additional_sensor_data> topic_additional_sensor_data;
 extern Topic<satellite_mode> topic_satellite_mode;
-extern Topic<variables> topic_variables;
+extern Topic<requested_conntrol> topic_requested_conntrol;
+
+extern Topic<raspberry_command> topic_raspberry_command;
+extern Topic<raspberry_receive> topic_raspberry_receive;
+extern Topic<raspberry_settings> topic_raspberry_settings;
 

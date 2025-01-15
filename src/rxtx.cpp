@@ -57,8 +57,8 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   CommBuffer<satellite_mode> cb_satellite_mode_receiver_thread;
   Subscriber sub_satellite_mode_receiver_thread(topic_satellite_mode, cb_satellite_mode_receiver_thread);
 
-  CommBuffer<variables> cb_variables_receiver_thread;
-  Subscriber sub_variables_receiver_thread(topic_variables, cb_variables_receiver_thread);
+  CommBuffer<requested_conntrol> cb_requested_conntrol_receiver_thread;
+  Subscriber sub_requested_conntrol_receiver_thread(topic_requested_conntrol, cb_requested_conntrol_receiver_thread);
 
 /* ~~~~~ Receiver thread ~~~~~ */
 
@@ -70,20 +70,20 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     
     telecommand *telecom = (telecommand *)msg;
     satellite_mode mode;
-    variables variables;
+    requested_conntrol requested_conntrol;
 
        MW_PRINTF("Python sends command-ID: %d, variable: %ld\n",telecom->command_id,telecom->command_variable);
 
     cb_satellite_mode_receiver_thread.get(mode);
-    cb_variables_receiver_thread.get(variables);
+    cb_requested_conntrol_receiver_thread.get(requested_conntrol);
     switch (telecom->command_id)
     {
     case command_id_abort_mission:
       if(mode.mission_mode != mission_mode_standby){
         mode.mission_mode = mission_mode_standby;
         mode.control_mode = control_mode_vel;
-        variables.requested_rot_speed = 0;
-        topic_variables.publish(variables);
+        requested_conntrol.requested_rot_speed = 0;
+        topic_requested_conntrol.publish(requested_conntrol);
         topic_satellite_mode.publish(mode);
       }
       break;
@@ -109,9 +109,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
           //start object detection
           mode.control_mode = control_mode_vel;
           mode.mission_mode = mission_mode_object_detection;
-          variables.requested_rot_speed = 1;
+          requested_conntrol.requested_rot_speed = 1;
 
-          topic_variables.publish(variables);
+          topic_requested_conntrol.publish(requested_conntrol);
           topic_satellite_mode.publish(mode);
           break;
 
@@ -134,18 +134,18 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       break;
 
     case command_id_move_to:
-      variables.requested_angle = telecom->command_variable;
+      requested_conntrol.requested_angle = telecom->command_variable;
       mode.control_mode = control_mode_pos;
 
-      topic_variables.publish(variables);
+      topic_requested_conntrol.publish(requested_conntrol);
       topic_satellite_mode.publish(mode);
       break;
 
     case command_id_accel_to:
-      variables.requested_rot_speed = telecom->command_variable;
+      requested_conntrol.requested_rot_speed = telecom->command_variable;
       mode.control_mode = control_mode_vel;
 
-      topic_variables.publish(variables);
+      topic_requested_conntrol.publish(requested_conntrol);
       topic_satellite_mode.publish(mode);
       break;
 
