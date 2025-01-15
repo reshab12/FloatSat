@@ -6,12 +6,12 @@
 
 #define I_WHEEL 0.0001175
 #define I_SATELLITE 0.00834099434
-#define KP_P 20000
-#define KI_P 5000
-#define KD_P 35000
-#define KP_V 200
-#define KI_V 50
-#define KD_V 350
+#define KP_P 1
+#define KI_P 0
+#define KD_P 0.001
+#define KP_V 0.03
+#define KI_V 0.003
+#define KD_V 0.002
 #define KP_M 10
 #define KI_M 5
 #define KD_M 0
