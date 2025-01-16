@@ -68,19 +68,19 @@ struct control_value
     uint16_t increments;            //increments set for the motor PWM
     direction turnDirection;        //CW or CCW
     float satVelocity;              //Desired Velocity from the position controler
-    uint16_t desiredMotorSpeed;     //Desired motor RPM from the velocity controler
+    int16_t desiredMotorSpeed;     //Desired motor RPM from the velocity controler
 };
 
 //
 struct additional_sensor_data
 {
-    uint16_t motorSpeed;    //RPM of the motor
+    int16_t motorSpeed;    //RPM of the motor
     float omega_wheel;      //From motor PID calulated change to omega wheel.
+    float mainCurrent;      //Current consumed by the enire satellite.
 };
 
 //
-struct satellite_mode
-{
+struct satellite_mode{
     uint8_t pose_estimation_mode = 0;
     uint8_t control_mode = 0;
     uint8_t mission_mode = 0;
