@@ -20,6 +20,13 @@ Development environment specifics:
 #include "topics.hpp"
 #include "stm32f4xx_conf.h"
 
+/* ADC -------------------------------------------------------------*/
+#define ADC01               ADC_IDX1       			// ADC1
+#define ADCChannel          ADC_CH_001     			// PA1
+#define ADCRes              4095                // ADC full scale resolution of 12 bits = 2^12-1 = 4095
+#define ADCRef              3000.0              // ADC adc reference voltage  = 3V = 3000mV
+#define CurrentVoltageRatio 500                 //Current-sense feedback voltage of approximately 500 mV per amp
+
 
 /* Exported types ------------------------------------------------------------*/
 enum AHRS_Mode

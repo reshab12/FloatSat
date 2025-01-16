@@ -16,3 +16,4 @@
 #include "sateliteModes.hpp"
 #include "pidControl.hpp"
 #include "driveMotor.hpp"
+#include "readCurrent.hpp"

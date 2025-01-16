@@ -11,6 +11,8 @@ control_value control;
 imu_data data;
 position_data position;
 
+HAL_GPIO safetyPin(GPIO_062);
+
 /*float calcVar(){
     int16_t xyzGyro[3];
     Offsets offset;
@@ -56,21 +58,44 @@ public:
     }
 };
 */
+
+class MotorTest : StaticThread<>{
+public:
+    MotorTest(const char* name):StaticThread(name){}
+
+    void init(){
+        EncoderInit();
+        initializeMotor();
+    }
+
+    void run(){
+        control.increments = 0;
+        control.turnDirection = FORWARD;
+        driveMotor(&control);
+        TIME_LOOP(1 * SECONDS, 200 * MILLISECONDS){
+            MotorSpeedUpdate(&motor);
+            PRINTF("RPM %d \n", motor.motorSpeed);
+        }
+    }
+};
+
 class MotorControlerTest : StaticThread<>{
 public: 
     MotorControlerTest(const char* name):StaticThread(name){}
 
     void init(){
+        EncoderInit();
         initializeMotor();
     }
 
     void run(){
-        control.desiredMotorSpeed = 300; //Change thist to test different speeds.
-
+        control.desiredMotorSpeed = -1000;    //Change thist to test different speeds.
+        control.turnDirection = BACKWARD;    //Change this to change turn direction.
         while(1){
-            control.turnDirection = FORWARD; //Change this to change turn direction.
-            calcPIDMotor(&errors, &control, &motor);
+            MotorSpeedUpdate(&motor);
             PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
+            calcPIDMotor(&errors, &control, &motor);
+            driveMotor(&control);
             AT(NOW() + 5 * MILLISECONDS);
         }
     }
@@ -126,6 +151,7 @@ public:
     }
 };
 
+//MotorTest motorTest("MotorTest");
 MotorControlerTest test("Test");
 //VelocityControlerTest vTest("vTest");
 //PositionControlerTest pTest("pTest");

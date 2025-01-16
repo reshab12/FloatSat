@@ -12,13 +12,11 @@
 #define KP_V 0.03
 #define KI_V 0.003
 #define KD_V 0.002
-#define KP_M 10
-#define KI_M 5
-#define KD_M 0
+#define KP_M 12
+#define KI_M 3
+#define KD_M 0.1
 #define INCREMENTS 4000
-#define FREQUENCY 500
-#define MOTORFREQUENCY 200
-#define MOTORCONTROLTIME 1/MOTORFREQUENCY * SECONDS
+#define FREQUENCY 50
 #define CONTROLTIME 1/FREQUENCY * SECONDS
 #define MAX_RPM  9000 // 4100
 #define MIN_RPM 200

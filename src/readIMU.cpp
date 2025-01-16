@@ -316,9 +316,9 @@ void Sensor::run() {
 		PRINTF("%f %f | %f %f | %f |%f %f %f | %f\n",x_hat.r[0][0],x_hat.r[1][0],peter.r[0][0],r2, dt, data.mx,data.my,data.mz, cz);
 		
 		position_data pose;
-		pose.headingMagneto = (((int)x_hat.r[0][0])%360)-180;
-		if(pose.headingMagneto < -180)
-			pose.headingMagneto += 360;
+		pose.heading = (((int)x_hat.r[0][0])%360)-180;
+		if(pose.heading < -180)
+			pose.heading += 360;
 		
 		pose.headingGyro = cz-180;
 		if(pose.headingGyro  < -180)
