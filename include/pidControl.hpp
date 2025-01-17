@@ -12,9 +12,11 @@
 #define KP_V 0.03
 #define KI_V 0.003
 #define KD_V 0.002
+
 #define KP_M 8
 #define KI_M 0.9
 #define KD_M 0.5
+
 #define INCREMENTS 4000
 #define FREQUENCY 50
 #define CONTROLTIME 1/FREQUENCY * SECONDS
@@ -25,6 +27,6 @@
 
 void calcPIDMotor(controller_errors* errors, control_value* control, additional_sensor_data* data);
 
-void calcPIDPos(float desiredAngle, position_data* pos, additional_sensor_data* data, controller_errors* errors, control_value* control);
+void calcPIDPos(requested_conntrol* request, position_data* pos, additional_sensor_data* data, controller_errors* errors, control_value* control);
 
-void calcPIDVel(control_value* control, additional_sensor_data* data, controller_errors* errors, imu_data* imu);
+void calcPIDVel(requested_conntrol* request, additional_sensor_data* data, controller_errors* errors, imu_data* imu, control_value* control);
