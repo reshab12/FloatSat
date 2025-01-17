@@ -17,7 +17,7 @@ void calcPIDMotor(controller_errors* errors, control_value* control, additional_
     
     if(increments_temp > MOTROINCREMENTS) control->increments = MOTROINCREMENTS;
     else if(increments_temp < -MOTROINCREMENTS) control->increments = MOTROINCREMENTS;
-    else{control->increments = increments_temp;}
+    else{control->increments = abs(increments_temp);}
     PRINTF("Increments: %d \n", control->increments);
 
     if(increments_temp < 0) control->turnDirection = BACKWARD;

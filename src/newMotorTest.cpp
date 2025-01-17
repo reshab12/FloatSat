@@ -89,7 +89,7 @@ public:
     }
 
     void run(){
-        control.desiredMotorSpeed = -1000;    //Change thist to test different speeds.
+        control.desiredMotorSpeed = 8000;    //Change thist to test different speeds.
         control.turnDirection = BACKWARD;    //Change this to change turn direction.
         while(1){
             MotorSpeedUpdate(&motor);
@@ -151,7 +151,7 @@ public:
     }
 };
 
-//MotorTest motorTest("MotorTest");
-MotorControlerTest test("Test");
+MotorTest motorTest("MotorTest");
+//MotorControlerTest test("Test");
 //VelocityControlerTest vTest("vTest");
 //PositionControlerTest pTest("pTest");

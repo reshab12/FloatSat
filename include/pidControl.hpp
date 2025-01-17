@@ -12,9 +12,9 @@
 #define KP_V 0.03
 #define KI_V 0.003
 #define KD_V 0.002
-#define KP_M 12
-#define KI_M 3
-#define KD_M 0.1
+#define KP_M 8
+#define KI_M 0.9
+#define KD_M 0.5
 #define INCREMENTS 4000
 #define FREQUENCY 50
 #define CONTROLTIME 1/FREQUENCY * SECONDS
