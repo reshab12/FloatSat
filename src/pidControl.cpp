@@ -2,7 +2,7 @@
 #include "pidControl.hpp"
 #include "driveMotor.hpp"
 
-void calcPIDMotor(controller_errors* errors, control_value* control, additional_sensor_data* data){
+void calcPIDMotor(controller_errors* errors, control_value* control, motor_data* data){
     int16_t increments_temp;
     errors->merror = control->desiredMotorSpeed - data->motorSpeed;
     //PRINTF("error: %f \n", errors->merror);
@@ -24,7 +24,7 @@ void calcPIDMotor(controller_errors* errors, control_value* control, additional_
     else control->turnDirection = FORWARD;   
 }
 
-void calcPIDPos(requested_conntrol* request, position_data* pos, additional_sensor_data* data, controller_errors* errors, control_value* control){
+void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors){
     errors->perror = request->requested_angle - pos->heading;
     errors->pIerror += errors->perror * CONTROLTIME;
     errors->perror_change = (errors->perror - errors->pLast_error) / CONTROLTIME;
@@ -33,10 +33,8 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, additional_sens
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
 }
 
-void calcPIDVel(requested_conntrol* request, additional_sensor_data* data, controller_errors* errors, imu_data* imu, control_value* control){
-    float torque = 0;
-    float dot_omega_wheel = 0;
-    float omega_wheel_temp  = 0;
+float calcPIDVel(requested_conntrol* request, controller_errors* errors, imu_data* imu){
+    float torque;
     errors->verror = request->requested_rot_speed - imu->wy;
     errors->vIerror += errors->verror * CONTROLTIME;
     errors->verror_change = (errors->verror - errors->vLast_error) / CONTROLTIME;
@@ -44,6 +42,12 @@ void calcPIDVel(requested_conntrol* request, additional_sensor_data* data, contr
 
     torque = KP_V * errors->verror + KI_V * errors->vIerror + KD_V * errors->vLast_error;
 
+    return torque;
+}
+
+void calcVel_with_torque(motor_data* motor_data, float torque, control_value* control){
+    float dot_omega_wheel = 0;
+    float omega_wheel_temp  = 0;
     dot_omega_wheel = - torque/I_WHEEL;
     omega_wheel_temp += dot_omega_wheel * CONTROLTIME;
 
@@ -60,3 +64,81 @@ void calcPIDVel(requested_conntrol* request, additional_sensor_data* data, contr
         control->desiredMotorSpeed = (int)floor(omega_wheel_temp * 9.549297); //Update normally if within limits
     }
 }
+
+CommBuffer<imu_data> cb_imu_data_VelocityControler_thread;
+Subscriber sub_imu_data_VelocityControler_thread(topic_imu_data, cb_imu_data_VelocityControler_thread);
+
+CommBuffer<motor_data> cb_motor_data_VelocityControler_thread;
+Subscriber sub_motor_data_VelocityControler_thread(topic_motor_data, cb_motor_data_VelocityControler_thread);
+
+CommBuffer<requested_conntrol> cb_requested_conntrol_VelocityControler_thread;
+Subscriber sub_requested_conntrol_VelocityControler_thread(topic_requested_conntrol, cb_requested_conntrol_VelocityControler_thread);
+
+CommBuffer<satellite_mode> cb_satellite_mode_VelocityControler;
+Subscriber sub_satellite_mode_VelocityControler(topic_satellite_mode, cb_satellite_mode_VelocityControler);
+
+
+VelocityControler::VelocityControler(const char* name):StaticThread(name){}
+
+void VelocityControler::init(){
+    initializeMotor();
+}
+
+void VelocityControler::run(){
+    requested_conntrol requested_conntrol;
+    controller_errors errors;
+    control_value control;
+    imu_data data;
+    satellite_mode mode;
+    motor_data motor_data;
+    float torque;
+    TIME_LOOP(0, 5 * MILLISECONDS)
+    {
+        cb_satellite_mode_VelocityControler.get(mode);
+        if(mode.control_mode==control_mode_pos || mode.control_mode==control_mode_vel ){
+            cb_imu_data_VelocityControler_thread.get(data);
+            cb_requested_conntrol_VelocityControler_thread.get(requested_conntrol);
+            cb_motor_data_VelocityControler_thread.get(motor_data);
+            torque = calcPIDVel(&requested_conntrol, &errors, &data);
+            calcVel_with_torque(&motor_data, torque, &control);
+            topic_control_value.publish(control);
+            PRINTF("Sat Speed: %f", data.wy);
+        }
+    }
+}
+
+
+
+CommBuffer<position_data> cb_position_data_PositionControler;
+Subscriber sub_position_data_PositionControler(topic_position_data, cb_position_data_PositionControler);
+
+CommBuffer<requested_conntrol> cb_requested_conntrol_PositionControler;
+Subscriber sub_requested_conntrol_PositionControler(topic_requested_conntrol, cb_requested_conntrol_PositionControler);
+
+CommBuffer<satellite_mode> cb_satellite_mode_PositionControler;
+Subscriber sub_satellite_mode_PositionControler(topic_satellite_mode, cb_satellite_mode_PositionControler);
+
+
+PositionControler::PositionControler(const char* name):StaticThread(name){}
+
+void PositionControler::init(){
+    initializeMotor();
+}
+
+void PositionControler::run(){
+    controller_errors errors;
+    position_data position;
+    requested_conntrol requested_conntrol;
+    satellite_mode mode;
+    TIME_LOOP(0, 5 * MILLISECONDS)
+    {
+        cb_satellite_mode_PositionControler.get(mode);
+        if(mode.control_mode==control_mode_pos){
+            cb_position_data_PositionControler.get(position);
+            cb_requested_conntrol_PositionControler.get(requested_conntrol);
+            calcPIDPos(&requested_conntrol, &position, &errors);
+            topic_requested_conntrol.publish(requested_conntrol);
+        }
+    }
+}
+

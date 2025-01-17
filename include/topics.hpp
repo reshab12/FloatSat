@@ -13,6 +13,7 @@ const uint32_t topic_id_control_value = 1012;
 const uint32_t topic_id_additional_sensor_data = 1013;
 const uint32_t topic_id_satellite_mode = 1014;
 const uint32_t topic_id_requested_conntrol = 1015;
+const uint32_t topic_id_motor_data = 1016;
 
 const uint32_t topic_id_raspberry_command = 1020;
 const uint32_t topic_id_raspberry_receive = 1021;
@@ -67,7 +68,6 @@ struct control_value
 {
     uint16_t increments;            //increments set for the motor PWM
     direction turnDirection;        //CW or CCW
-    float satVelocity;              //Desired Velocity from the position controler
     int16_t desiredMotorSpeed;     //Desired motor RPM from the velocity controler
 };
 
@@ -77,6 +77,12 @@ struct additional_sensor_data
     int16_t motorSpeed;    //RPM of the motor
     float omega_wheel;      //From motor PID calulated change to omega wheel.
     float mainCurrent;      //Current consumed by the enire satellite.
+};
+
+struct motor_data
+{
+    int16_t motorSpeed;    //RPM of the motor
+    float omega_wheel;      //From motor PID calulated change to omega wheel.
 };
 
 //
@@ -102,8 +108,8 @@ struct telemetry
 
 struct requested_conntrol
 {
-    uint32_t requested_angle;
-    uint32_t requested_rot_speed;
+    float requested_angle;          //degree -180-180
+    float requested_rot_speed;      //dps
 };
 
 struct raspberry_command{
@@ -139,6 +145,7 @@ extern Topic<control_value> topic_control_value;
 extern Topic<additional_sensor_data> topic_additional_sensor_data;
 extern Topic<satellite_mode> topic_satellite_mode;
 extern Topic<requested_conntrol> topic_requested_conntrol;
+extern Topic<motor_data> topic_motor_data;
 
 extern Topic<raspberry_command> topic_raspberry_command;
 extern Topic<raspberry_receive> topic_raspberry_receive;

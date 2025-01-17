@@ -262,7 +262,7 @@ void TIM2_IRQHandler(void)
 }
 }
 
-void MotorSpeedUpdate(additional_sensor_data* motor)
+void MotorSpeedUpdate(motor_data* motor)
 {
 	double SensorTime = ((NOW()-CaptureTime)/(double)MILLISECONDS);
 	if (SensorTime>250) //minimum measured speed is 2 RPS(120 RPM). This can give us 250ms of minimum interval between interrupts (2 interrupts every one revolution).

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "main.hpp"
 
 class Commander : public StaticThread<>,Subscriber {

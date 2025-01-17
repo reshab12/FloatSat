@@ -10,7 +10,9 @@
 
 
 #include "topics.hpp"
+#include "commander.hpp"
 #include "commands.hpp"
+#include "pidControl.hpp"
 #include "readIMU.hpp"
 #include "rxtx.hpp"
 #include "sateliteModes.hpp"

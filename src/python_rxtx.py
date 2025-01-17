@@ -6,18 +6,22 @@ import struct
 import rodosmwinterface as rodos
 rodos.printTopicInit(enable=True)
 
+ready_for_picture = False
+
 # Callback
 def topicHandler(data):
   try:
-    unpacked = struct.unpack("l", data)
-    print("stm sends telemetry: {}".format(unpacked[0]))
+    unpacked = struct.unpack("B", data)
+    print("stm sends data: {}".format(unpacked[0]))
+    if(unpacked[0]):
+      ready_for_picture = True
   except Exception as e:
     print(e)
     print(data)
     print(len(data))
 
-python2rodos = rodos.Topic(1002)
-rodos2python = rodos.Topic(1003)
+python2rodos = rodos.Topic(1021)
+rodos2python = rodos.Topic(1020)
 
 luart = rodos.LinkinterfaceUART(path="/dev/rfcomm0")
 gwUart = rodos.Gateway(luart)
@@ -30,12 +34,14 @@ sensor_index = 0
 
 while True:
   # Dummy sensor data
-  sensor_index += 1
-  x = 3.1415
 
+  
   # Pack sensor data to a struct that RODOS recognizes
-  sensor_struct = struct.pack("Hd",sensor_index, x)
-  print("sending telecom: {}".format(sensor_index))
-  python2rodos.publish(sensor_struct)
+  if(ready_for_picture):
+    #take picture then:
+    sensor_struct = struct.pack("B",1)
+    print("sending telecom: {}".format(sensor_index))
+    python2rodos.publish(sensor_struct)
+    ready_for_picture = False
 
   time.sleep(1)

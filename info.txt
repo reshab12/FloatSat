@@ -7,6 +7,7 @@ sudo rfcomm connect /dev/rfcomm0 00:0E:EA:CF:7C:3C 1 &
 rfcomm -a
 sudo chmod 777 /dev/rfcomm0
 
+
 make flash main=src/main.cpp 
 
 python3 python_gui_test.py

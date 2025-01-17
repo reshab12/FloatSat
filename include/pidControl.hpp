@@ -1,3 +1,5 @@
+#pragma once
+
 //#include "readIMU.hpp"
 #include "math.h"
 
@@ -25,8 +27,28 @@
 #define MAX_RAD_PER_SEC  (MAX_RPM * 2 * M_PI) / 60
 #define MAX_VOLTS 5
 
-void calcPIDMotor(controller_errors* errors, control_value* control, additional_sensor_data* data);
+void calcPIDMotor(controller_errors* errors, control_value* control, motor_data* data);
 
-void calcPIDPos(requested_conntrol* request, position_data* pos, additional_sensor_data* data, controller_errors* errors, control_value* control);
+void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors);
 
-void calcPIDVel(requested_conntrol* request, additional_sensor_data* data, controller_errors* errors, imu_data* imu, control_value* control);
+float calcPIDVel(requested_conntrol* request, controller_errors* errors, imu_data* imu);
+
+void calcVel_with_torque(motor_data* motor_data, float torque, control_value* control);
+
+class VelocityControler: StaticThread<>{
+public: 
+    VelocityControler(const char* name);
+
+    void init();
+
+    void run();
+};
+
+class PositionControler : StaticThread<>{
+public:
+    PositionControler(const char* name);
+
+    void init();
+
+    void run();
+};

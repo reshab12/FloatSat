@@ -20,13 +20,14 @@ RULE_DEST = /etc/udev/rules.d/$(RULE_FILE)
 DEBUG = 1
 
 # C++ source files
-CXX_SOURCES = src/topics.cpp \
-src/readIMU.cpp \
-src/rxtx.cpp \
+CXX_SOURCES = src/commander.cpp \
+src/driveMotor.cpp \
 src/encoder.cpp \
 src/LSM9DS1.cpp \
 src/pidControl.cpp \
-src/driveMotor.cpp \
+src/readIMU.cpp \
+src/rxtx.cpp \
+src/topics.cpp \
 $(main)
 
 
@@ -50,7 +51,6 @@ C_INCLUDES =  \
 -I"rodos/api/hal" \
 -I"rodos/api" \
 -I"include" \
--I"newKalman"\
 -I"/usr/include/eigen3" \
 -I"IMULibrary"
 

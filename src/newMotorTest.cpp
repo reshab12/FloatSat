@@ -5,11 +5,7 @@
 #include "readIMU.hpp"
 #include "main.hpp"
 
-additional_sensor_data motor;
-controller_errors errors;
-control_value control;
-imu_data data;
-position_data position;
+
 
 HAL_GPIO safetyPin(GPIO_062);
 
@@ -60,6 +56,9 @@ public:
 */
 
 class MotorTest : StaticThread<>{
+private:
+    motor_data motor;
+    control_value control;
 public:
     MotorTest(const char* name):StaticThread(name){}
 
@@ -80,6 +79,10 @@ public:
 };
 
 class MotorControlerTest : StaticThread<>{
+private:
+    motor_data motor;
+    controller_errors errors;
+    control_value control;
 public: 
     MotorControlerTest(const char* name):StaticThread(name){}
 
@@ -102,6 +105,12 @@ public:
 };
 
 class VelocityControlerTest : StaticThread<>{
+private:
+    motor_data motor;
+    controller_errors errors;
+    control_value control;
+    imu_data data;
+    position_data position;
 public: 
     VelocityControlerTest(const char* name):StaticThread(name){}
 
@@ -110,11 +119,12 @@ public:
     }
 
     void run(){
-        control.satVelocity = 5.0;
+        requested_conntrol requested_conntrol;
+        requested_conntrol.requested_rot_speed = 5;
         int i = 0;
         while(1){
             if(i == 2){
-                calcPIDVel(&control, &motor, &errors, &data);
+                calcPIDVel(&requested_conntrol, &errors, &data, &control);
                 PRINTF("Sat Speed: %f", data.wy);
                 i = 0;
             }
@@ -134,16 +144,24 @@ public:
     }
 
     void run(){
+        motor_data motor;
+        controller_errors errors;
+        control_value control;
+        imu_data data;
+        position_data position;
+        requested_conntrol requested_conntrol;
+        requested_conntrol.requested_angle = 45;
         float pos = 45.0;
         int i = 0;
         while(1){
+            i++;
             if(i == 4){
-                calcPIDPos(pos, &position, &motor, &errors, &control);
-                calcPIDVel(&control, &motor, &errors, &data);
+                calcPIDPos(&requested_conntrol, &position, &errors);
+                calcPIDVel(&requested_conntrol, &errors, &data, &control);
                 i = 0;
                 PRINTF("Sat Angle: %f", position.heading);
             }else if(i == 2){
-                calcPIDVel(&control, &motor, &errors, &data);
+                calcPIDVel(&requested_conntrol, &errors, &data, &control);
             }
             calcPIDMotor(&errors, &control, &motor);
             AT(NOW() + 5 * MILLISECONDS);
@@ -151,7 +169,7 @@ public:
     }
 };
 
-MotorTest motorTest("MotorTest");
+//MotorTest motorTest("MotorTest");
 //MotorControlerTest test("Test");
 //VelocityControlerTest vTest("vTest");
 //PositionControlerTest pTest("pTest");

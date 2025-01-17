@@ -1,3 +1,5 @@
+#pragma once
+
 #include "main.hpp"
 
 
@@ -8,3 +10,12 @@
 void initializeMotor();
 
 void driveMotor(control_value* control);
+
+class MotorControler : StaticThread<>{
+public: 
+    MotorControler(const char* name);
+
+    void init();
+
+    void run();
+};

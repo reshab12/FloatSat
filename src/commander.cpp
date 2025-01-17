@@ -1,10 +1,6 @@
 #include "commander.hpp"
 
 
-
-
-
-
 CommBuffer<position_data> cb_position_data_commander_thread;
 Subscriber sub_position_data_commander_thread(topic_position_data, cb_position_data_commander_thread);
 
@@ -30,10 +26,14 @@ void Commander::run(){
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
         cb_satellite_mode_commander_thread.get(mode);
-        if(mode.mission_mode != mission_mode_star_mapper)
+        if(mode.mission_mode != mission_mode_star_mapper && status != -1)
             status = 3;//stop mission
         switch (status)
         {
+        case -1:
+            if(mode.mission_mode == mission_mode_star_mapper)
+                status = 0;
+            break;
         case 0://start     
             cb_position_data_commander_thread.get(pose);
             heading=pose.heading;
@@ -71,9 +71,14 @@ void Commander::run(){
             command.status = 0;
             topic_raspberry_command.publish(command);
             status = -1;
+            mode.mission_mode = mission_mode_standby;
+            topic_satellite_mode.publish(mode);
             break;
         case 4://map rady to be used
-
+            mode.mission_mode = mission_mode_standby;
+            topic_satellite_mode.publish(mode);
+            status = -1;
+            break;
         case 10://wait for picture
             break;
 
