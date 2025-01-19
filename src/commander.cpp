@@ -9,7 +9,7 @@ Subscriber sub_satellite_mode_commander_thread(topic_satellite_mode, cb_satellit
 
 
 Commander::Commander():
-        StaticThread<>("raspberryReceiver- StaticThread<>)"),
+        StaticThread<>("raspberryReceiverThread",110),
     	Subscriber(topic_raspberry_receive, "raspberryReceiver") 
 {
 
@@ -23,10 +23,27 @@ void Commander::run(){
     requested_conntrol requested_conntrol;
     position_data pose;
     satellite_mode mode;
+        // 0=start; 1=waiting; 2=setNextStep;
+
+        uint16_t number_of_pictures = 10;
+        float heading = 0.0f;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
         cb_satellite_mode_commander_thread.get(mode);
-        if(mode.mission_mode != mission_mode_star_mapper && status != -1)
+        if(mode.control_mode == control_mode_ai_pos ){
+            raspberry_control_mode control_mode;
+            control_mode.ai_control = 1;
+            control_mode.pos_or_vel = 0;
+            topic_raspberry_control_mode.publish(control_mode);
+        }
+        if(mode.control_mode == control_mode_ai_vel ){
+            raspberry_control_mode control_mode;
+            control_mode.ai_control = 1;
+            control_mode.pos_or_vel = 1;
+            topic_raspberry_control_mode.publish(control_mode);
+        }
+
+        if((mode.mission_mode != mission_mode_star_mapper) && (status != -1))
             status = 3;//stop mission
         switch (status)
         {
@@ -71,8 +88,6 @@ void Commander::run(){
             command.status = 0;
             topic_raspberry_command.publish(command);
             status = -1;
-            mode.mission_mode = mission_mode_standby;
-            topic_satellite_mode.publish(mode);
             break;
         case 4://map rady to be used
             mode.mission_mode = mission_mode_standby;

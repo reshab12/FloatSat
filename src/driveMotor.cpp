@@ -25,7 +25,7 @@ CommBuffer<control_value> cb_control_value_motor_thread;
 Subscriber sub_topic_control_value_motor_thread(topic_control_value, cb_control_value_motor_thread);
 
 
-MotorControler::MotorControler(const char* name):StaticThread(name){}
+MotorControler::MotorControler(const char* name):StaticThread(name,150){}
 
 void MotorControler::init(){
     EncoderInit();
@@ -40,9 +40,9 @@ void MotorControler::run(){
     {
         cb_control_value_motor_thread.get(control);
         MotorSpeedUpdate(&motor);
-        topic_motor_data.publish(motor);
-        PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
+        //PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
         calcPIDMotor(&errors, &control, &motor);
+        topic_motor_data.publish(motor);
         driveMotor(&control);
     }
 }

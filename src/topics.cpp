@@ -20,10 +20,15 @@ Topic<satellite_mode> topic_satellite_mode(topic_id_satellite_mode,"topic_satell
 
 Topic<requested_conntrol> topic_requested_conntrol(topic_id_requested_conntrol,"topic_requested_conntrol");
 
+Topic<requested_conntrol> topic_user_requested_conntrol(topic_id_user_requested_conntrol,"topic_user_requested_conntrol");
+
 Topic<motor_data> topic_motor_data(topic_id_motor_data,"topic_motor_data");
+
 
 Topic<raspberry_command> topic_raspberry_command(topic_id_raspberry_command,"topic_raspberry_command");
 
 Topic<raspberry_receive> topic_raspberry_receive(topic_id_raspberry_receive,"topic_raspberry_receive");
 
 Topic<raspberry_settings> topic_raspberry_settings(topic_id_raspberry_settings,"topic_raspberry_settings");
+
+Topic<raspberry_control_mode> topic_raspberry_control_mode(topic_id_raspberry_control_mode,"topic_raspberry_control_mode");

@@ -18,7 +18,7 @@ void calcPIDMotor(controller_errors* errors, control_value* control, motor_data*
     if(increments_temp > MOTROINCREMENTS) control->increments = MOTROINCREMENTS;
     else if(increments_temp < -MOTROINCREMENTS) control->increments = MOTROINCREMENTS;
     else{control->increments = abs(increments_temp);}
-    PRINTF("Increments: %d \n", control->increments);
+    //PRINTF("Increments: %d \n", control->increments);
 
     if(increments_temp < 0) control->turnDirection = BACKWARD;
     else control->turnDirection = FORWARD;   
@@ -74,11 +74,14 @@ Subscriber sub_motor_data_VelocityControler_thread(topic_motor_data, cb_motor_da
 CommBuffer<requested_conntrol> cb_requested_conntrol_VelocityControler_thread;
 Subscriber sub_requested_conntrol_VelocityControler_thread(topic_requested_conntrol, cb_requested_conntrol_VelocityControler_thread);
 
+CommBuffer<requested_conntrol> cb_user_requested_conntrol_VelocityControler_thread;
+Subscriber sub_user_requested_conntrol_VelocityControler_thread(topic_user_requested_conntrol, cb_user_requested_conntrol_VelocityControler_thread);
+
 CommBuffer<satellite_mode> cb_satellite_mode_VelocityControler;
 Subscriber sub_satellite_mode_VelocityControler(topic_satellite_mode, cb_satellite_mode_VelocityControler);
 
 
-VelocityControler::VelocityControler(const char* name):StaticThread(name){}
+VelocityControler::VelocityControler(const char* name):StaticThread(name,142){}
 
 void VelocityControler::init(){
     initializeMotor();
@@ -97,12 +100,15 @@ void VelocityControler::run(){
         cb_satellite_mode_VelocityControler.get(mode);
         if(mode.control_mode==control_mode_pos || mode.control_mode==control_mode_vel ){
             cb_imu_data_VelocityControler_thread.get(data);
-            cb_requested_conntrol_VelocityControler_thread.get(requested_conntrol);
+            if(mode.control_mode==control_mode_pos)
+                cb_requested_conntrol_VelocityControler_thread.get(requested_conntrol);
+            else
+                cb_user_requested_conntrol_VelocityControler_thread.get(requested_conntrol);
             cb_motor_data_VelocityControler_thread.get(motor_data);
             torque = calcPIDVel(&requested_conntrol, &errors, &data);
             calcVel_with_torque(&motor_data, torque, &control);
             topic_control_value.publish(control);
-            PRINTF("Sat Speed: %f", data.wy);
+            //PRINTF("Sat Speed: %f", data.wy);
         }
     }
 }
@@ -112,14 +118,14 @@ void VelocityControler::run(){
 CommBuffer<position_data> cb_position_data_PositionControler;
 Subscriber sub_position_data_PositionControler(topic_position_data, cb_position_data_PositionControler);
 
-CommBuffer<requested_conntrol> cb_requested_conntrol_PositionControler;
-Subscriber sub_requested_conntrol_PositionControler(topic_requested_conntrol, cb_requested_conntrol_PositionControler);
+CommBuffer<requested_conntrol> cb_user_requested_conntrol_PositionControler;
+Subscriber sub_user_requested_conntrol_PositionControler(topic_user_requested_conntrol, cb_user_requested_conntrol_PositionControler);
 
 CommBuffer<satellite_mode> cb_satellite_mode_PositionControler;
 Subscriber sub_satellite_mode_PositionControler(topic_satellite_mode, cb_satellite_mode_PositionControler);
 
 
-PositionControler::PositionControler(const char* name):StaticThread(name){}
+PositionControler::PositionControler(const char* name):StaticThread(name,141){}
 
 void PositionControler::init(){
     initializeMotor();
@@ -135,7 +141,7 @@ void PositionControler::run(){
         cb_satellite_mode_PositionControler.get(mode);
         if(mode.control_mode==control_mode_pos){
             cb_position_data_PositionControler.get(position);
-            cb_requested_conntrol_PositionControler.get(requested_conntrol);
+            cb_user_requested_conntrol_PositionControler.get(requested_conntrol);
             calcPIDPos(&requested_conntrol, &position, &errors);
             topic_requested_conntrol.publish(requested_conntrol);
         }

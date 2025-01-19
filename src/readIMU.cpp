@@ -316,15 +316,9 @@ void Sensor::run() {
 		PRINTF("%f %f | %f %f | %f |%f %f %f | %f\n",x_hat.r[0][0],x_hat.r[1][0],peter.r[0][0],r2, dt, data.mx,data.my,data.mz, cz);
 		
 		position_data pose;
-		pose.heading = (((int)x_hat.r[0][0])%360)-180;
-		if(pose.heading < -180)
-			pose.heading += 360;
-		
-		pose.headingGyro = cz-180;
-		if(pose.headingGyro  < -180)
-			pose.headingGyro += 360;
-
-		pose.pitch = test;
+		pose.heading = mod(x_hat.r[0][0]);
+		pose.headingMagneto = mod(cz-180);
+		pose.headingGyro = mod(test);
 
 		topic_position_data.publish(pose);
 

@@ -23,7 +23,7 @@ rodos2python = rodos.Topic(1003)
 
 luart = rodos.LinkinterfaceUART(path="/dev/rfcomm0")
 gwUart = rodos.Gateway(luart)
-gwUart.run()
+
 
 
 class MplCanvas(FigureCanvas):
@@ -39,7 +39,8 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 5
+        self.number_of_plots = 7
+        self.datasize = 22
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
         self.plot_refs = [[None for i in range(3)] for j in range(self.number_of_plots)]
         
@@ -53,7 +54,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         n_data = 500
         self.xdata = list(range(n_data))
-        self.ydata = [[0 for i in range(n_data)] for j in range(18)]
+        self.ydata = [[0 for i in range(n_data)] for j in range(self.datasize)]
 
         self.show()
 
@@ -62,7 +63,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     def update_plot(self,data):
         # Drop off the first y element, append a new one.
-        for i in range(18):
+        for i in range(self.datasize):
             self.ydata[i] = self.ydata[i][1:] + [data[i]]
 
         self.counter1 = self.counter1+1 
@@ -81,10 +82,11 @@ class PlotWindow(QtWidgets.QMainWindow):
 
             data_line_count = 1
             #scaling factors for plots
-            scaling = [5,20,5,4,200]
+            scaling = [5,20,5,4,200,10,10]
 
             #redraw
             if self.plot_refs[0][0] == None: 
+                print("=None")
                 for i in range(self.number_of_plots):
                     for j in range(3):
                         match j:
@@ -103,6 +105,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                         data_line_count = data_line_count + 1
             #update data
             else:
+                print("!=None")
                 for i in range(self.number_of_plots):
                     for j in range(3):
                         self.plot_refs[i][j].set_ydata(self.ydata[data_line_count])
@@ -184,13 +187,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def send_button_was_clicked(self):
         print("Sending command:" + str(self.selected_command) + " " + str(self.command_var))
         # Pack sensor data to a struct that RODOS recognizes
-        command_struct = struct.pack("B3xI",self.selected_command, self.command_var)
+        command_struct = struct.pack("B3xi",self.selected_command, self.command_var)
         python2rodos.publish(command_struct)
 
     def abort_mission_button_was_clicked(self):
         print("Abort Mission")
         # Pack sensor data to a struct that RODOS recognizes
-        command_struct = struct.pack("B3xI",0xf0, 0)
+        command_struct = struct.pack("B3xi",0xf0, 0)
         python2rodos.publish(command_struct)
     
     def command_selection_changed(self, i): # i is an int
@@ -255,7 +258,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=l4x3Bx9f5f4x", data)
+    unpacked = struct.unpack("=l4x3Bx9f3fB3x2f3f4x", data)
     #for i in unpacked:
     #    print(i)
     #print()
@@ -270,4 +273,5 @@ def topicHandler(data):
 rodos2python.addSubscriber(topicHandler)
 gwUart.forwardTopic(python2rodos)
 
+gwUart.run()
 app.exec()

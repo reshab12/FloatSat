@@ -16,6 +16,12 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   CommBuffer<position_data> cb_position_data_transmitter_thread;
   Subscriber sub_position_data_transmitter_thread(topic_position_data, cb_position_data_transmitter_thread);
 
+  CommBuffer<motor_data> cb_motor_data_Transmitter;
+  Subscriber sub_motor_data_Transmitter(topic_motor_data, cb_motor_data_Transmitter);
+
+
+  CommBuffer<requested_conntrol> cb_user_requested_conntrol_Transmitter;
+  Subscriber sub_user_requested_conntrol_Transmitter(topic_user_requested_conntrol, cb_user_requested_conntrol_Transmitter);
 
 /* ~~~~~ Transmitter thread ~~~~~ */
 
@@ -31,6 +37,8 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     satellite_mode mode;
     imu_data data;
     position_data pose;
+    motor_data motor_dat;
+    requested_conntrol req_con;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
       telem.time = (NOW() / MICROSECONDS);
@@ -43,6 +51,12 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
 
       cb_position_data_transmitter_thread.get(pose);
       telem.position = pose;
+
+      cb_motor_data_Transmitter.get(motor_dat);
+      telem.motor_dat = motor_dat;
+
+      cb_user_requested_conntrol_Transmitter.get(req_con);
+      telem.req_conntrol = req_con;
 
       //MW_PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
       //PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
@@ -58,7 +72,11 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   Subscriber sub_satellite_mode_receiver_thread(topic_satellite_mode, cb_satellite_mode_receiver_thread);
 
   CommBuffer<requested_conntrol> cb_requested_conntrol_receiver_thread;
-  Subscriber sub_requested_conntrol_receiver_thread(topic_requested_conntrol, cb_requested_conntrol_receiver_thread);
+  Subscriber sub_requested_conntrol_receiver_thread(topic_user_requested_conntrol, cb_requested_conntrol_receiver_thread);
+
+  CommBuffer<position_data> cb_position_data_receiver;
+  Subscriber sub_position_data_receiver(topic_position_data, cb_position_data_receiver);
+
 
 /* ~~~~~ Receiver thread ~~~~~ */
 
@@ -71,11 +89,13 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     telecommand *telecom = (telecommand *)msg;
     satellite_mode mode;
     requested_conntrol requested_conntrol;
+    position_data pose;
 
        MW_PRINTF("Python sends command-ID: %d, variable: %ld\n",telecom->command_id,telecom->command_variable);
 
     cb_satellite_mode_receiver_thread.get(mode);
     cb_requested_conntrol_receiver_thread.get(requested_conntrol);
+    cb_position_data_receiver.get(pose);
     switch (telecom->command_id)
     {
     case command_id_abort_mission:
@@ -83,6 +103,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
         mode.mission_mode = mission_mode_standby;
         mode.control_mode = control_mode_vel;
         requested_conntrol.requested_rot_speed = 0;
+
         topic_requested_conntrol.publish(requested_conntrol);
         topic_satellite_mode.publish(mode);
       }
@@ -99,10 +120,19 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
 
         case mission_mode_hibernation:
           //change mode to hibernation
+          mode.mission_mode = mission_mode_hibernation;
+          topic_satellite_mode.publish(mode);
           break;
 
         case mission_mode_star_mapper:
           //start star mapping
+          if(mode.control_mode != control_mode_pos || mode.control_mode != control_mode_ai_pos)
+            mode.control_mode = control_mode_pos;
+          mode.mission_mode = mission_mode_star_mapper;
+          requested_conntrol.requested_angle = pose.heading;
+
+          topic_user_requested_conntrol.publish(requested_conntrol);
+          topic_satellite_mode.publish(mode);
           break;
 
         case mission_mode_object_detection:
@@ -111,7 +141,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
           mode.mission_mode = mission_mode_object_detection;
           requested_conntrol.requested_rot_speed = 1;
 
-          topic_requested_conntrol.publish(requested_conntrol);
+          topic_user_requested_conntrol.publish(requested_conntrol);
           topic_satellite_mode.publish(mode);
           break;
 
@@ -137,7 +167,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       requested_conntrol.requested_angle = telecom->command_variable;
       mode.control_mode = control_mode_pos;
 
-      topic_requested_conntrol.publish(requested_conntrol);
+      topic_user_requested_conntrol.publish(requested_conntrol);
       topic_satellite_mode.publish(mode);
       break;
 
@@ -145,7 +175,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       requested_conntrol.requested_rot_speed = telecom->command_variable;
       mode.control_mode = control_mode_vel;
 
-      topic_requested_conntrol.publish(requested_conntrol);
+      topic_user_requested_conntrol.publish(requested_conntrol);
       topic_satellite_mode.publish(mode);
       break;
 
