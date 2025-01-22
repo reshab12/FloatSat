@@ -20,6 +20,7 @@ const uint32_t topic_id_raspberry_command = 1020;
 const uint32_t topic_id_raspberry_receive = 1021;
 const uint32_t topic_id_raspberry_settings = 1022;
 const uint32_t topic_id_raspberry_control_mode = 1023;
+const uint32_t topic_id_raspberry_control_value = 1024;
 
 // telecommand 
 //from Python Middleware to STM32
@@ -67,9 +68,14 @@ struct position_data
 //the value send to the motor-controller
 struct control_value
 {
+    float desiredMotorSpeed;     //Desired motor RPM from the velocity controler
+};
+
+//the value used by the motor-controller
+struct motor_control_value
+{
     uint16_t increments;            //increments set for the motor PWM
     direction turnDirection;        //CW or CCW
-    float desiredMotorSpeed;     //Desired motor RPM from the velocity controler
 };
 
 //
@@ -106,11 +112,6 @@ struct raspberry_receive{
     //0=standby; 1=ready;
     uint8_t status;
 
-};
-
-struct raspberry_control_mode{
-    uint8_t ai_control; //0=false
-    uint8_t pos_or_vel; //0=pos-control  1=vel-control
 };
 
 struct raspberry_settings{
@@ -163,5 +164,5 @@ extern Topic<motor_data> topic_motor_data;
 extern Topic<raspberry_command> topic_raspberry_command;
 extern Topic<raspberry_receive> topic_raspberry_receive;
 extern Topic<raspberry_settings> topic_raspberry_settings;
-extern Topic<raspberry_control_mode> topic_raspberry_control_mode;
+extern Topic<float> topic_raspberry_control_value;
 

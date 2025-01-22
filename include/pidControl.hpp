@@ -27,7 +27,7 @@
 #define MAX_RAD_PER_SEC  (MAX_RPM * 2 * M_PI) / 60
 #define MAX_VOLTS 5
 
-void calcPIDMotor(controller_errors* errors, control_value* control, motor_data* data);
+void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data);
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors);
 

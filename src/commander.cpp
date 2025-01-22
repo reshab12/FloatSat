@@ -30,18 +30,6 @@ void Commander::run(){
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
         cb_satellite_mode_commander_thread.get(mode);
-        if(mode.control_mode == control_mode_ai_pos ){
-            raspberry_control_mode control_mode;
-            control_mode.ai_control = 1;
-            control_mode.pos_or_vel = 0;
-            topic_raspberry_control_mode.publish(control_mode);
-        }
-        if(mode.control_mode == control_mode_ai_vel ){
-            raspberry_control_mode control_mode;
-            control_mode.ai_control = 1;
-            control_mode.pos_or_vel = 1;
-            topic_raspberry_control_mode.publish(control_mode);
-        }
 
         if((mode.mission_mode != mission_mode_star_mapper) && (status != -1))
             status = 3;//stop mission

@@ -9,7 +9,7 @@
 
 void initializeMotor();
 
-void driveMotor(control_value* control);
+void driveMotor(motor_control_value* control);
 
 class MotorControler : StaticThread<>{
 public: 

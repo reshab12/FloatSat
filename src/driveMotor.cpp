@@ -8,7 +8,7 @@ void initializeMotor(){
     pwm2.init(MOTORFREQUENCY, MOTROINCREMENTS);
 }
 
-void driveMotor(control_value* control){
+void driveMotor(motor_control_value* control){
     switch(control->turnDirection){
         case BACKWARD:    
             pwm1.write(control->increments);
@@ -36,13 +36,14 @@ void MotorControler::run(){
     motor_data motor;
     controller_errors errors;
     control_value control;
+    motor_control_value motor_control;
     TIME_LOOP(0, 5 * MILLISECONDS)
     {
         cb_control_value_motor_thread.get(control);
         MotorSpeedUpdate(&motor);
         //PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
-        calcPIDMotor(&errors, &control, &motor);
+        calcPIDMotor(&errors, &control,&motor_control, &motor);
         topic_motor_data.publish(motor);
-        driveMotor(&control);
+        driveMotor(&motor_control);
     }
 }

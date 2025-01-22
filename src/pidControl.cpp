@@ -2,7 +2,7 @@
 #include "pidControl.hpp"
 #include "driveMotor.hpp"
 
-void calcPIDMotor(controller_errors* errors, control_value* control, motor_data* data){
+void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data){
     int16_t increments_temp;
     errors->merror = control->desiredMotorSpeed - data->motorSpeed;
     //PRINTF("error: %f \n", errors->merror);
@@ -15,13 +15,13 @@ void calcPIDMotor(controller_errors* errors, control_value* control, motor_data*
     //PRINTF("omega_wheel: %f \n", data->omega_wheel);
     increments_temp = (data->omega_wheel / MAX_RPM) * MOTROINCREMENTS;
     
-    if(increments_temp > MOTROINCREMENTS) control->increments = MOTROINCREMENTS;
-    else if(increments_temp < -MOTROINCREMENTS) control->increments = MOTROINCREMENTS;
-    else{control->increments = abs(increments_temp);}
+    if(increments_temp > MOTROINCREMENTS) motor_control->increments = MOTROINCREMENTS;
+    else if(increments_temp < -MOTROINCREMENTS) motor_control->increments = MOTROINCREMENTS;
+    else{motor_control->increments = abs(increments_temp);}
     //PRINTF("Increments: %d \n", control->increments);
 
-    if(increments_temp < 0) control->turnDirection = BACKWARD;
-    else control->turnDirection = FORWARD;   
+    if(increments_temp < 0) motor_control->turnDirection = BACKWARD;
+    else motor_control->turnDirection = FORWARD;   
 }
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors){
@@ -80,6 +80,8 @@ Subscriber sub_user_requested_conntrol_VelocityControler_thread(topic_user_reque
 CommBuffer<satellite_mode> cb_satellite_mode_VelocityControler;
 Subscriber sub_satellite_mode_VelocityControler(topic_satellite_mode, cb_satellite_mode_VelocityControler);
 
+CommBuffer<float> cb_raspberry_control_value_VelocityController;
+Subscriber sub_raspberry_control_value_VelocityController(topic_raspberry_control_value,cb_raspberry_control_value_VelocityController);
 
 VelocityControler::VelocityControler(const char* name):StaticThread(name,142){}
 
@@ -98,14 +100,23 @@ void VelocityControler::run(){
     TIME_LOOP(0, 5 * MILLISECONDS)
     {
         cb_satellite_mode_VelocityControler.get(mode);
-        if(mode.control_mode==control_mode_pos || mode.control_mode==control_mode_vel ){
+        if( (mode.control_mode==control_mode_pos)||
+            (mode.control_mode==control_mode_vel)||
+            (mode.control_mode==control_mode_ai_pos)||
+            (mode.control_mode==control_mode_ai_vel))
+        {
             cb_imu_data_VelocityControler_thread.get(data);
             if(mode.control_mode==control_mode_pos)
                 cb_requested_conntrol_VelocityControler_thread.get(requested_conntrol);
-            else
+            else if(mode.control_mode==control_mode_vel)
                 cb_user_requested_conntrol_VelocityControler_thread.get(requested_conntrol);
+            
             cb_motor_data_VelocityControler_thread.get(motor_data);
-            torque = calcPIDVel(&requested_conntrol, &errors, &data);
+            if((mode.control_mode==control_mode_ai_pos)||(mode.control_mode==control_mode_ai_vel))
+                cb_raspberry_control_value_VelocityController.get(torque);
+            else
+                torque = calcPIDVel(&requested_conntrol, &errors, &data);
+            
             calcVel_with_torque(&motor_data, torque, &control);
             topic_control_value.publish(control);
             //PRINTF("Sat Speed: %f", data.wy);
