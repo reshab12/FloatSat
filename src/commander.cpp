@@ -1,5 +1,8 @@
 #include "commander.hpp"
 
+static HAL_UART ras_stm(UART_IDX1); // Rx: PB7 (PA10)  Tx: PB6 (PA9)
+static LinkinterfaceUART link_name_not_imp_2(&ras_stm, 115200, 3, 10);
+static Gateway gw_name_not_imp_2(&link_name_not_imp_2, true);
 
 CommBuffer<position_data> cb_position_data_commander_thread;
 Subscriber sub_position_data_commander_thread(topic_position_data, cb_position_data_commander_thread);
@@ -8,15 +11,15 @@ CommBuffer<satellite_mode> cb_satellite_mode_commander_thread;
 Subscriber sub_satellite_mode_commander_thread(topic_satellite_mode, cb_satellite_mode_commander_thread);
 
 
-Commander::Commander():
-        StaticThread<>("raspberryReceiverThread",110),
+Commander::Commander(int32_t priority):
+        StaticThread<>("raspberryReceiverThread",priority),
     	Subscriber(topic_raspberry_receive, "raspberryReceiver") 
 {
 
 };
 
 void Commander::init(){
-
+        ras_stm.init(115200);
 };
 
 void Commander::run(){

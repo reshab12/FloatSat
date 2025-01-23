@@ -10,15 +10,18 @@ void adcUpdate(additional_sensor_data* data){
 
 class TestADC : StaticThread<>{
 public:
-    TestADC(const char* name):StaticThread(name){}
+    TestADC(const char* name,int32_t priority):StaticThread(name,priority){}
 
     void init(){}
 
     void run(){
         additional_sensor_data data;
-        adcUpdate(&data);
-        PRINTF("Current: %f A", data.mainCurrent);
+        TIME_LOOP(0, 100 * MILLISECONDS)
+        {
+            adcUpdate(&data);
+            PRINTF("Current: %f A\n", data.mainCurrent);
+        }
     }
 };
 
-TestADC test("TestADC");
+//TestADC test("TestADC");

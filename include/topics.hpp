@@ -62,7 +62,7 @@ struct position_data
     float headingMagneto = 0;   //-180 to 180 degrees
 	float headingGyro = 0;      //-180 to 180 degrees
     float heading = 0;          //-180 to 180 degrees
-    uint8_t moving;
+    uint8_t moving = 0;
 };
 
 //the value send to the motor-controller

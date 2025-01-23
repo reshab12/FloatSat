@@ -13,7 +13,7 @@ void driveMotor(motor_control_value* control);
 
 class MotorControler : StaticThread<>{
 public: 
-    MotorControler(const char* name);
+    MotorControler(const char* name,int32_t priority);
 
     void init();
 

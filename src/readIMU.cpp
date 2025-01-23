@@ -141,7 +141,7 @@ void calcHeadingMagneto(Attitude* attitude, float magneto[3]){
 }
 
 
-Sensor::Sensor(const char* name) : StaticThread(name,200){};
+Sensor::Sensor(const char* name, int32_t priority) : StaticThread(name, priority){};
 
 void Sensor::updateDt(){
 	dt= (RODOS::NOW()-t)/ SECONDS;

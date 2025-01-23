@@ -25,7 +25,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
 
 /* ~~~~~ Transmitter thread ~~~~~ */
 
-  Transmitter::Transmitter() : StaticThread("STM32 transmitter",210) {}
+  Transmitter::Transmitter(int32_t priority) : StaticThread("STM32 transmitter", priority) {}
 
   void Transmitter::init()
   {
@@ -90,6 +90,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     satellite_mode mode;
     requested_conntrol requested_conntrol;
     position_data pose;
+    control_value control;
 
        MW_PRINTF("Python sends command-ID: %d, variable: %ld\n",telecom->command_id,telecom->command_variable);
 
@@ -174,8 +175,11 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     case command_id_accel_to:
       requested_conntrol.requested_rot_speed = telecom->command_variable;
       mode.control_mode = control_mode_vel;
+      
+      control.desiredMotorSpeed = telecom->command_variable;
+      topic_control_value.publish(control);
 
-      topic_user_requested_conntrol.publish(requested_conntrol);
+      //topic_user_requested_conntrol.publish(requested_conntrol);
       topic_satellite_mode.publish(mode);
       break;
 

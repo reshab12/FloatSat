@@ -37,7 +37,7 @@ void calcVel_with_torque(motor_data* motor_data, float torque, control_value* co
 
 class VelocityControler: StaticThread<>{
 public: 
-    VelocityControler(const char* name);
+    VelocityControler(const char* name, int32_t priority);
 
     void init();
 
@@ -46,7 +46,7 @@ public:
 
 class PositionControler : StaticThread<>{
 public:
-    PositionControler(const char* name);
+    PositionControler(const char* name, int32_t priority);
 
     void init();
 

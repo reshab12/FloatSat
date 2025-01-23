@@ -105,7 +105,7 @@ private:
     struct SensorData sensorData;
 
 public:
-	Sensor(const char* name);
+	Sensor(const char* name, int32_t priority);
 
 	void init();
 

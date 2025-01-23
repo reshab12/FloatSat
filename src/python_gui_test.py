@@ -44,17 +44,49 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
         self.plot_refs = [[None for i in range(3)] for j in range(self.number_of_plots)]
         
+        self.dataNames = ["Time",
+                          "pose_estimation_mode",
+                          "control_mode",
+                          "mission_mode",
+                          "wx","wy","wz",
+                          "mx","my","mz",
+                          "ax","ay","az",
+                          "headingMagneto",
+                          "headingGyro",
+                          "heading",
+                          "moving",
+                          "motorSpeed",
+                          "omega_wheel",
+                          "requested_angle",
+                          "requested_rot_speed",
+                          "",
+                          "",
+                          ""
+                          ]
+
         layout = QtWidgets.QVBoxLayout()
         for i in range(self.number_of_plots):
             layout.addWidget(self.canvasss[i])
 
+        layout2 = QtWidgets.QVBoxLayout()
+
+        self.text_box =  [QtWidgets.QPushButton(self.dataNames[j])for j in range(self.datasize)]
+        for i in range(self.datasize):
+            self.text_box[i].setCheckable(False)
+            self.text_box[i].setText(self.dataNames[i])
+            layout2.addWidget(self.text_box[i])
+
+        h_layout = QtWidgets.QHBoxLayout()
+        h_layout.addLayout(layout2)
+        h_layout.addLayout(layout)
+
         widget = QtWidgets.QWidget()
-        widget.setLayout(layout)
+        widget.setLayout(h_layout)
         self.setCentralWidget(widget)
 
-        n_data = 500
-        self.xdata = list(range(n_data))
-        self.ydata = [[0 for i in range(n_data)] for j in range(self.datasize)]
+        self.n_data = 100
+        self.xdata = list(range(self.n_data))
+        self.ydata = [[0 for i in range(self.n_data)] for j in range(self.datasize)]
 
         self.show()
 
@@ -66,8 +98,9 @@ class PlotWindow(QtWidgets.QMainWindow):
         for i in range(self.datasize):
             self.ydata[i] = self.ydata[i][1:] + [data[i]]
 
+        self.ydata[18][self.n_data-1]=0
         self.counter1 = self.counter1+1 
-
+        self.counter2 = self.counter2+1
         if self.counter1 > 4:
             self.counter1 = 0
 
@@ -79,14 +112,16 @@ class PlotWindow(QtWidgets.QMainWindow):
                         self.plot_refs[i][j] = None
 
                 self.counter2 = 0
-
+            for i in range(self.datasize):
+                self.text_box[i].setText(self.dataNames[i]+": "+"{:.2f}".format(data[i]))
+       
             data_line_count = 1
             #scaling factors for plots
             scaling = [5,20,5,4,200,10,10]
 
             #redraw
             if self.plot_refs[0][0] == None: 
-                print("=None")
+                #print("=None")
                 for i in range(self.number_of_plots):
                     for j in range(3):
                         match j:
@@ -95,17 +130,18 @@ class PlotWindow(QtWidgets.QMainWindow):
 
                             case 1:
                                 temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'g')
-
                             case 2:
                                 temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'b')
  
                         self.plot_refs[i][j] = temp_plot_refs[0] 
-                        self.plot_refs[i][j].axes.set_ylim(-scaling[i], scaling[i]) 
+                        
+                        self.plot_refs[i][j].axes.autoscale()
+                        #self.plot_refs[i][j].axes.set_ylim(-scaling[i], scaling[i]) 
 
                         data_line_count = data_line_count + 1
             #update data
             else:
-                print("!=None")
+                #print("!=None")
                 for i in range(self.number_of_plots):
                     for j in range(3):
                         self.plot_refs[i][j].set_ydata(self.ydata[data_line_count])
@@ -161,7 +197,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
 
         self.command_speed_slider = QtWidgets.QSlider()
-        self.command_speed_slider.setRange(-10,10)
+        self.command_speed_slider.setRange(-1000,1000)
         self.command_speed_slider.sliderReleased.connect(self.speed_slider_released)
 
     #layout--------------------------------------------------------------------------------

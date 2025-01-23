@@ -83,7 +83,7 @@ Subscriber sub_satellite_mode_VelocityControler(topic_satellite_mode, cb_satelli
 CommBuffer<float> cb_raspberry_control_value_VelocityController;
 Subscriber sub_raspberry_control_value_VelocityController(topic_raspberry_control_value,cb_raspberry_control_value_VelocityController);
 
-VelocityControler::VelocityControler(const char* name):StaticThread(name,142){}
+VelocityControler::VelocityControler(const char* name, int32_t priority):StaticThread(name, priority){}
 
 void VelocityControler::init(){
     initializeMotor();
@@ -136,7 +136,7 @@ CommBuffer<satellite_mode> cb_satellite_mode_PositionControler;
 Subscriber sub_satellite_mode_PositionControler(topic_satellite_mode, cb_satellite_mode_PositionControler);
 
 
-PositionControler::PositionControler(const char* name):StaticThread(name,141){}
+PositionControler::PositionControler(const char* name, int32_t priority):StaticThread(name, priority){}
 
 void PositionControler::init(){
     initializeMotor();

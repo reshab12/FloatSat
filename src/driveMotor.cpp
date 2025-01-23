@@ -25,7 +25,7 @@ CommBuffer<control_value> cb_control_value_motor_thread;
 Subscriber sub_topic_control_value_motor_thread(topic_control_value, cb_control_value_motor_thread);
 
 
-MotorControler::MotorControler(const char* name):StaticThread(name,150){}
+MotorControler::MotorControler(const char* name,int32_t priority):StaticThread(name, priority){}
 
 void MotorControler::init(){
     EncoderInit();

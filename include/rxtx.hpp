@@ -15,7 +15,7 @@ class Transmitter : public StaticThread<>
 private:
   telemetry telem;
 public:
-  Transmitter();
+  Transmitter(int32_t priority);
 
   void init();
 
