@@ -3,7 +3,7 @@
 HAL_ADC mainCurrent(ADC_IDX0);
 
 void adcUpdate(additional_sensor_data* data){
-	uint16_t ADCValue = mainCurrent.read(ADC_CH_000);
+	uint16_t ADCValue = mainCurrent.read(ADC_CH_004);
 
 	data->mainCurrent = (ADCValue / ADCRes) * (ADCRef / CurrentVoltageRatio) * 1000;
 }
