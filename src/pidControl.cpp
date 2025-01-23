@@ -35,7 +35,7 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, controller_erro
 
 float calcPIDVel(requested_conntrol* request, controller_errors* errors, imu_data* imu){
     float torque;
-    errors->verror = request->requested_rot_speed - imu->wy;
+    errors->verror = request->requested_rot_speed - imu->wz;
     errors->vIerror += errors->verror * CONTROLTIME;
     errors->verror_change = (errors->verror - errors->vLast_error) / CONTROLTIME;
     errors->vLast_error = errors->verror;
@@ -60,6 +60,12 @@ void calcVel_with_torque(motor_data* motor_data, float torque, control_value* co
             control->desiredMotorSpeed = -MAX_RPM;
         }
         dot_omega_wheel = 0;  //Stop further acceleration
+    }else if(abs(omega_wheel_temp) < MIN_RAD_PER_SECOND){
+        if(omega_wheel_temp < MIN_RAD_PER_SECOND){
+            control->desiredMotorSpeed = MIN_RPM;
+        }else{
+            control->desiredMotorSpeed = -MIN_RPM;
+        }
     }else{
         control->desiredMotorSpeed = (int)floor(omega_wheel_temp * 9.549297); //Update normally if within limits
     }
