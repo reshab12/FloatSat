@@ -92,7 +92,6 @@ Subscriber sub_raspberry_control_value_VelocityController(topic_raspberry_contro
 VelocityControler::VelocityControler(const char* name, int32_t priority):StaticThread(name, priority){}
 
 void VelocityControler::init(){
-    initializeMotor();
 }
 
 void VelocityControler::run(){
