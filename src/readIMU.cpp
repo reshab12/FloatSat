@@ -298,7 +298,7 @@ void Sensor::run() {
 		topic_imu_data.publish(data);
 
 		//Kalman
-		float r2 = data.wy;
+		float r2 = data.wz;
 		float p2 = (data.mx);
 		float y2 = (data.mz);
 		float cz = atan2(p2,y2) * 180/M_PI + 180;
@@ -313,7 +313,7 @@ void Sensor::run() {
 		update(peter,r2);
 		test += r2 * dt;
 		
-		PRINTF("%f %f | %f %f | %f |%f %f %f | %f\n",x_hat.r[0][0],x_hat.r[1][0],peter.r[0][0],r2, dt, data.mx,data.my,data.mz, cz);
+		
 		
 		position_data pose;
 		pose.heading = mod(x_hat.r[0][0]);

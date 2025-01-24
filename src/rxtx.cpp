@@ -23,6 +23,14 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   CommBuffer<requested_conntrol> cb_user_requested_conntrol_Transmitter;
   Subscriber sub_user_requested_conntrol_Transmitter(topic_user_requested_conntrol, cb_user_requested_conntrol_Transmitter);
 
+  CommBuffer<requested_conntrol> cb_requested_conntrol_Transmitter;
+  Subscriber sub_requested_conntrol_Transmitter(topic_requested_conntrol, cb_requested_conntrol_Transmitter);
+
+  
+  CommBuffer<control_value> cb_control_value_Transmitter;
+  Subscriber sub_control_value_Transmitter(topic_control_value, cb_control_value_Transmitter);
+
+
 /* ~~~~~ Transmitter thread ~~~~~ */
 
   Transmitter::Transmitter(int32_t priority) : StaticThread("STM32 transmitter", priority) {}
@@ -38,7 +46,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     imu_data data;
     position_data pose;
     motor_data motor_dat;
+    requested_conntrol user_req_con;
     requested_conntrol req_con;
+    control_value control;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
       telem.time = (NOW() / MICROSECONDS);
@@ -55,8 +65,14 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       cb_motor_data_Transmitter.get(motor_dat);
       telem.motor_dat = motor_dat;
 
-      cb_user_requested_conntrol_Transmitter.get(req_con);
+      cb_requested_conntrol_Transmitter.get(req_con);
+
+      cb_user_requested_conntrol_Transmitter.get(user_req_con);
       telem.req_conntrol = req_con;
+      telem.user_req_conntrol = user_req_con;
+
+      cb_control_value_Transmitter.get(control);
+      telem.control = control;
 
       //MW_PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
       //PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
@@ -176,10 +192,12 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       requested_conntrol.requested_rot_speed = telecom->command_variable;
       mode.control_mode = control_mode_vel;
       
-      control.desiredMotorSpeed = telecom->command_variable;
-      topic_control_value.publish(control);
+      //for motor testing
+      //control.desiredMotorSpeed = telecom->command_variable;
+      //topic_control_value.publish(control);
 
-      //topic_user_requested_conntrol.publish(requested_conntrol);
+      //normal operation
+      topic_user_requested_conntrol.publish(requested_conntrol);
       topic_satellite_mode.publish(mode);
       break;
 

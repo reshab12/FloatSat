@@ -68,7 +68,7 @@ struct position_data
 //the value send to the motor-controller
 struct control_value
 {
-    float desiredMotorSpeed;     //Desired motor RPM from the velocity controler
+    int32_t desiredMotorSpeed;     //Desired motor RPM from the velocity controler
 };
 
 //the value used by the motor-controller
@@ -86,7 +86,7 @@ struct additional_sensor_data
 
 struct motor_data
 {
-    float motorSpeed;    //RPM of the motor
+    int32_t motorSpeed;    //RPM of the motor
     float omega_wheel;      //From motor PID calulated change to omega wheel.
 };
 
@@ -138,13 +138,13 @@ struct telemetry
     //position_data
     position_data position; //3fB
 
-    motor_data motor_dat; //2f
+    motor_data motor_dat; //lf
 
-    //control_value ccontrol_value;
+    control_value control;   //l
 
     requested_conntrol req_conntrol; //2f
+    requested_conntrol user_req_conntrol; //2f
 
-    float f;
 };
 
 

@@ -54,7 +54,8 @@ void Commander::run(){
 
         case 1://check pose
             cb_position_data_commander_thread.get(pose);
-            if(!pose.moving && (pose.heading-heading)<1){
+            if(!pose.moving && (pose.heading-heading)<5){
+                MW_PRINTF("pose.heading-heading: %d\n",(pose.heading-heading));
                 status = 10;
                 //send command to raspberry:
                 raspberry_command command;
@@ -96,6 +97,7 @@ void Commander::run(){
 
 uint32_t Commander::put(const uint32_t topic_id, const size_t len, void *msg, const NetMsgInfo &) {
         raspberry_receive *received = (raspberry_receive *)msg;
+        MW_PRINTF("raspb: %d\n",received->status);
         switch (received->status)
         {
         case 0://map rady to be used

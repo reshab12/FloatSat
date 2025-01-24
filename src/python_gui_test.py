@@ -40,7 +40,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
 
         self.number_of_plots = 7
-        self.datasize = 22
+        self.datasize = 24
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
         self.plot_refs = [[None for i in range(3)] for j in range(self.number_of_plots)]
         
@@ -57,10 +57,11 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "moving",
                           "motorSpeed",
                           "omega_wheel",
+                          "control value",
                           "requested_angle",
                           "requested_rot_speed",
-                          "",
-                          "",
+                          "user_requested_angle",
+                          "user_requested_rot_speed",
                           ""
                           ]
 
@@ -294,7 +295,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=l4x3Bx9f3fB3x2f3f4x", data)
+    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4x", data)
     #for i in unpacked:
     #    print(i)
     #print()
