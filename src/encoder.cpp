@@ -277,8 +277,8 @@ void MotorSpeedUpdate(motor_data* motor)
 	else {motor->motorSpeed  = ((float)TIM2Freq / 16) * 60;}  //CW
 }
 
-
-/*void ADCUpdate()
+/*
+void ADCUpdate()
 {
 	float ADCVaule = CurrentADC.read(ADCChannel);
 

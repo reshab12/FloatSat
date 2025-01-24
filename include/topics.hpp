@@ -81,7 +81,11 @@ struct motor_control_value
 //
 struct additional_sensor_data
 {
-    float mainCurrent;      //Current consumed by the enire satellite.
+    float motorCurrent;         //Current consumed by the motor.
+    float magTorquerCurrent;    //Current consumed by the mag torquers
+    float boardCurrent;         //Current consumed by the boards and LEDs.
+    float batterieVoltage;      //Voltage in the batteries.
+    float boardVoltage;         //Voltage after the voltage devider.
 };
 
 struct motor_data

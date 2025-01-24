@@ -17,5 +17,6 @@
 #include "rxtx.hpp"
 #include "sateliteModes.hpp"
 #include "pidControl.hpp"
+#include "magTorquers.hpp"
 #include "driveMotor.hpp"
 #include "readCurrent.hpp"

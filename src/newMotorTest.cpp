@@ -5,10 +5,6 @@
 #include "readIMU.hpp"
 #include "main.hpp"
 
-
-
-HAL_GPIO safetyPin(GPIO_062);
-
 /*float calcVar(){
     int16_t xyzGyro[3];
     Offsets offset;

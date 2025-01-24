@@ -28,6 +28,8 @@ src/pidControl.cpp \
 src/readIMU.cpp \
 src/rxtx.cpp \
 src/topics.cpp \
+src/readCurrent.cpp \
+src/magTorquers.cpp \
 $(main)
 
 
