@@ -25,22 +25,25 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
 }
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors){
+    float eb = 0;
     errors->perror = request->requested_angle - pos->heading;
-    errors->pIerror += errors->perror * CONTROLTIME;
+    errors->pIerror += errors->perror * CONTROLTIME + eb;
     errors->perror_change = (errors->perror - errors->pLast_error) / CONTROLTIME;
+    if(errors->pIerrer >= MAX_RAD_PER_SEC) eb += 1* (MAX_RAD_PER_SEC - errors->pIerror);
     errors->pLast_error = errors->perror;
 
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
 }
 
 float calcPIDVel(requested_conntrol* request, controller_errors* errors, position_data* pose,float last_heading){
-    float torque;
+    float torque = 0;
+    float eb = 0;
     errors->vLast_error = errors->verror;
     errors->verror = request->requested_rot_speed - (pose->heading-last_heading) / CONTROLTIME;
-    errors->vIerror += errors->verror * CONTROLTIME;
+    errors->vIerror += errors->verror * CONTROLTIME + eb;
+    if(errors->vIerrer >= MAX_RAD_PER_SEC) eb += 1* (MAX_RAD_PER_SEC - errors->vIerror);
     errors->verror_change = (errors->verror - errors->vLast_error) / CONTROLTIME;
     
-
     torque = KP_V * errors->verror + KI_V * errors->vIerror + KD_V * errors->vLast_error;
 
     return torque;
