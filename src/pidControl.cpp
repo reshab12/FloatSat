@@ -26,11 +26,11 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors){
     float eb = 0;
+    errors->pLast_error = errors->perror;
     errors->perror = request->requested_angle - pos->heading;
     errors->pIerror += errors->perror * CONTROLTIME + eb;
     errors->perror_change = (errors->perror - errors->pLast_error) / CONTROLTIME;
     if(errors->pIerrer >= MAX_RAD_PER_SEC) eb += 1* (MAX_RAD_PER_SEC - errors->pIerror);
-    errors->pLast_error = errors->perror;
 
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
 }
