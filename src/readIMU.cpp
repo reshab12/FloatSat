@@ -20,6 +20,8 @@ void initialize(){
 	imu.write(LSM9DS1_M, LSM9DS1_CTRL_REG2_M, 2);
 	imu.write(LSM9DS1_M, LSM9DS1_CTRL_REG3_M, 2);
 	imu.write(LSM9DS1_M, LSM9DS1_CTRL_REG4_M, 2);
+	pin_green_led.init(true,1,0);
+	pin_blue_led.init(true,1,0);
 }
 
 void readAccel(int16_t* xyzCoordinates){
