@@ -33,12 +33,13 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, controller_erro
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
 }
 
-float calcPIDVel(requested_conntrol* request, controller_errors* errors, imu_data* imu){
+float calcPIDVel(requested_conntrol* request, controller_errors* errors, position_data* pose,float last_heading){
     float torque;
-    errors->verror = request->requested_rot_speed - imu->wz;
+    errors->vLast_error = errors->verror;
+    errors->verror = request->requested_rot_speed - (pose->heading-last_heading) / CONTROLTIME;
     errors->vIerror += errors->verror * CONTROLTIME;
     errors->verror_change = (errors->verror - errors->vLast_error) / CONTROLTIME;
-    errors->vLast_error = errors->verror;
+    
 
     torque = KP_V * errors->verror + KI_V * errors->vIerror + KD_V * errors->vLast_error;
 
@@ -47,7 +48,7 @@ float calcPIDVel(requested_conntrol* request, controller_errors* errors, imu_dat
 
 void calcVel_with_torque(motor_data* motor_data, float torque, control_value* control){
     float dot_omega_wheel = 0;
-    float omega_wheel_temp  = 0;
+    float omega_wheel_temp  = motor_data->motorSpeed;
     dot_omega_wheel = - torque/I_WHEEL;
     omega_wheel_temp += dot_omega_wheel * CONTROLTIME;
 
@@ -61,7 +62,7 @@ void calcVel_with_torque(motor_data* motor_data, float torque, control_value* co
         }
         dot_omega_wheel = 0;  //Stop further acceleration
     }else if(abs(omega_wheel_temp) < MIN_RAD_PER_SECOND){
-        if(omega_wheel_temp < MIN_RAD_PER_SECOND){
+        if(omega_wheel_temp > 0){
             control->desiredMotorSpeed = MIN_RPM;
         }else{
             control->desiredMotorSpeed = -MIN_RPM;
@@ -73,6 +74,9 @@ void calcVel_with_torque(motor_data* motor_data, float torque, control_value* co
 
 CommBuffer<imu_data> cb_imu_data_VelocityControler_thread;
 Subscriber sub_imu_data_VelocityControler_thread(topic_imu_data, cb_imu_data_VelocityControler_thread);
+
+CommBuffer<position_data> cb_position_data_VelocityControler;
+Subscriber sub_position_data_VelocityControler(topic_position_data, cb_position_data_VelocityControler);
 
 CommBuffer<motor_data> cb_motor_data_VelocityControler_thread;
 Subscriber sub_motor_data_VelocityControler_thread(topic_motor_data, cb_motor_data_VelocityControler_thread);
@@ -99,9 +103,11 @@ void VelocityControler::run(){
     controller_errors errors;
     control_value control;
     imu_data data;
+    position_data pose;
     satellite_mode mode;
     motor_data motor_data;
     float torque;
+    float last_heading = 0;
     TIME_LOOP(0, 5 * MILLISECONDS)
     {
         cb_satellite_mode_VelocityControler.get(mode);
@@ -111,6 +117,8 @@ void VelocityControler::run(){
             (mode.control_mode==control_mode_ai_vel))
         {
             cb_imu_data_VelocityControler_thread.get(data);
+            last_heading = pose.heading;
+            cb_position_data_VelocityControler.get(pose);
             if(mode.control_mode==control_mode_pos)
                 cb_requested_conntrol_VelocityControler_thread.get(requested_conntrol);
             else if(mode.control_mode==control_mode_vel)
@@ -119,12 +127,21 @@ void VelocityControler::run(){
             cb_motor_data_VelocityControler_thread.get(motor_data);
             if((mode.control_mode==control_mode_ai_pos)||(mode.control_mode==control_mode_ai_vel))
                 cb_raspberry_control_value_VelocityController.get(torque);
-            else
-                torque = calcPIDVel(&requested_conntrol, &errors, &data);
-            
+            else{
+                torque = calcPIDVel(&requested_conntrol, &errors, &pose, last_heading);
+                controller_errors_s vel_errors;
+                vel_errors.error = errors.verror;
+                vel_errors.error_change = errors.verror_change;
+                vel_errors.Ierror = errors.vIerror;
+                vel_errors.Last_error = errors.vLast_error;
+                topic_vel_errors.publish(vel_errors);
+            }
             calcVel_with_torque(&motor_data, torque, &control);
             topic_control_value.publish(control);
             //PRINTF("Sat Speed: %f", data.wy);
+        }else{
+            control.desiredMotorSpeed = 0.0;
+            topic_control_value.publish(control);
         }
     }
 }

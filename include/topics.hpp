@@ -15,6 +15,7 @@ const uint32_t topic_id_satellite_mode = 1014;
 const uint32_t topic_id_requested_conntrol = 1015;
 const uint32_t topic_id_motor_data = 1016;
 const uint32_t topic_id_user_requested_conntrol = 1017;
+const uint32_t topic_id_vel_errors = 1018;
 
 const uint32_t topic_id_raspberry_command = 1020;
 const uint32_t topic_id_raspberry_receive = 1021;
@@ -129,6 +130,11 @@ struct controller_errors
     float perror, pIerror, perror_change, pLast_error = 0;  //errors for the position controler
 };
 
+struct controller_errors_s
+{
+    float error, Ierror, error_change, Last_error = 0;  //errors
+};
+
 struct telemetry
 {
     int64_t time; //l
@@ -149,6 +155,8 @@ struct telemetry
     requested_conntrol req_conntrol; //2f
     requested_conntrol user_req_conntrol; //2f
 
+    controller_errors_s vel_errors;//4f
+
 };
 
 
@@ -164,6 +172,7 @@ extern Topic<satellite_mode> topic_satellite_mode;
 extern Topic<requested_conntrol> topic_requested_conntrol;
 extern Topic<requested_conntrol> topic_user_requested_conntrol;
 extern Topic<motor_data> topic_motor_data;
+extern Topic<controller_errors_s> topic_vel_errors;
 
 extern Topic<raspberry_command> topic_raspberry_command;
 extern Topic<raspberry_receive> topic_raspberry_receive;

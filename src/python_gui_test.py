@@ -39,8 +39,8 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 7
-        self.datasize = 24
+        self.number_of_plots = 8
+        self.datasize = 28
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
         self.plot_refs = [[None for i in range(3)] for j in range(self.number_of_plots)]
         
@@ -62,7 +62,10 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "requested_rot_speed",
                           "user_requested_angle",
                           "user_requested_rot_speed",
-                          ""
+                          "error", 
+                          "Ierror", 
+                          "error_change", 
+                          "Last_error"
                           ]
 
         layout = QtWidgets.QVBoxLayout()
@@ -118,7 +121,7 @@ class PlotWindow(QtWidgets.QMainWindow):
        
             data_line_count = 1
             #scaling factors for plots
-            scaling = [5,20,5,4,200,10,10]
+            scaling = [5,20,5,4,200,10,10,10,10,10,10]
 
             #redraw
             if self.plot_refs[0][0] == None: 
@@ -188,6 +191,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.abort_mission_button.setCheckable(True)
         self.abort_mission_button.clicked.connect(self.abort_mission_button_was_clicked)
 
+        self.reboot_button = QtWidgets.QPushButton("Reboot")
+        self.reboot_button.setCheckable(True)
+        self.reboot_button.clicked.connect(self.reboot_button_was_clicked)
+
         self.command_angle_dial = QtWidgets.QDial()
         self.command_angle_dial.setRange(-180, 180)
         self.command_angle_dial.setSingleStep(1)
@@ -213,6 +220,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.layoutV = QtWidgets.QVBoxLayout()
         self.layoutV.addWidget(self.abort_mission_button)
+        self.layoutV.addWidget(self.reboot_button)
         self.layoutV.addLayout(layoutH1)
         self.layoutV.addLayout(layoutH2)
 
@@ -231,6 +239,12 @@ class MainWindow(QtWidgets.QMainWindow):
         print("Abort Mission")
         # Pack sensor data to a struct that RODOS recognizes
         command_struct = struct.pack("B3xi",0xf0, 0)
+        python2rodos.publish(command_struct)
+
+    def reboot_button_was_clicked(self):
+        print("reboot")
+        # Pack sensor data to a struct that RODOS recognizes
+        command_struct = struct.pack("B3xi",0xf1, 0)
         python2rodos.publish(command_struct)
     
     def command_selection_changed(self, i): # i is an int
@@ -295,7 +309,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4x", data)
+    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4f4x", data)
     #for i in unpacked:
     #    print(i)
     #print()

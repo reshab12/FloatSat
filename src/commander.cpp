@@ -1,8 +1,8 @@
 #include "commander.hpp"
 
 static HAL_UART ras_stm(UART_IDX1); // Rx: PB7 (PA10)  Tx: PB6 (PA9)
-static LinkinterfaceUART link_name_not_imp_2(&ras_stm, 115200, 3, 10);
-static Gateway gw_name_not_imp_2(&link_name_not_imp_2, true);
+//static LinkinterfaceUART link_name_not_imp_2(&ras_stm, 115200, 4, 10);
+//static Gateway gw_name_not_imp_2(&link_name_not_imp_2, true);
 
 CommBuffer<position_data> cb_position_data_commander_thread;
 Subscriber sub_position_data_commander_thread(topic_position_data, cb_position_data_commander_thread);
@@ -28,14 +28,21 @@ void Commander::run(){
     satellite_mode mode;
         // 0=start; 1=waiting; 2=setNextStep;
 
-        uint16_t number_of_pictures = 10;
-        float heading = 0.0f;
+    uint16_t number_of_pictures = 10;
+    float heading = 0.0f;
+    int lastStatus = 0;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
         cb_satellite_mode_commander_thread.get(mode);
 
         if((mode.mission_mode != mission_mode_star_mapper) && (status != -1))
             status = 3;//stop mission
+        
+        if(lastStatus != status){
+            MW_PRINTF("Commander: new status: %d; old status: %d",status,lastStatus);
+            PRINTF("Commander: new status: %d; old status: %d",status,lastStatus);
+            lastStatus = status;
+        }
         switch (status)
         {
         case -1:
@@ -87,6 +94,7 @@ void Commander::run(){
             status = -1;
             break;
         case 10://wait for picture
+            //status = 2;
             break;
 
         default:
@@ -98,6 +106,7 @@ void Commander::run(){
 uint32_t Commander::put(const uint32_t topic_id, const size_t len, void *msg, const NetMsgInfo &) {
         raspberry_receive *received = (raspberry_receive *)msg;
         MW_PRINTF("raspb: %d\n",received->status);
+        PRINTF("raspb: %d\n",received->status);
         switch (received->status)
         {
         case 0://map rady to be used
@@ -105,7 +114,7 @@ uint32_t Commander::put(const uint32_t topic_id, const size_t len, void *msg, co
             break;
         
         case 1://picture made
-            if(status=10)
+            if(status==10)
                 status=2;
             break;
 

@@ -30,6 +30,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   CommBuffer<control_value> cb_control_value_Transmitter;
   Subscriber sub_control_value_Transmitter(topic_control_value, cb_control_value_Transmitter);
 
+   CommBuffer<controller_errors_s> cb_vel_errors_Transmitter;
+  Subscriber sub_vel_errors_Transmitter(topic_vel_errors, cb_vel_errors_Transmitter);
+
 
 /* ~~~~~ Transmitter thread ~~~~~ */
 
@@ -49,6 +52,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     requested_conntrol user_req_con;
     requested_conntrol req_con;
     control_value control;
+    controller_errors_s vel_errors;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
       telem.time = (NOW() / MICROSECONDS);
@@ -73,6 +77,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
 
       cb_control_value_Transmitter.get(control);
       telem.control = control;
+
+      cb_vel_errors_Transmitter.get(vel_errors);
+      telem.vel_errors = vel_errors;
 
       //MW_PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
       //PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
@@ -108,7 +115,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     position_data pose;
     control_value control;
 
-       MW_PRINTF("Python sends command-ID: %d, variable: %ld\n",telecom->command_id,telecom->command_variable);
+       PRINTF("Python sends command-ID: %d, variable: %ld\n",telecom->command_id,telecom->command_variable);
 
     cb_satellite_mode_receiver_thread.get(mode);
     cb_requested_conntrol_receiver_thread.get(requested_conntrol);
@@ -124,6 +131,11 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
         topic_requested_conntrol.publish(requested_conntrol);
         topic_satellite_mode.publish(mode);
       }
+      break;
+
+    case command_id_reboot:
+      PRINTF("Reboot");
+      RODOS::hwResetAndReboot();
       break;
 
     case command_id_mission_mode:      

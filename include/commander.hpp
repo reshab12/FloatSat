@@ -4,7 +4,7 @@
 
 class Commander : public StaticThread<>,Subscriber {
     private:
-        uint8_t status = -1;
+        int8_t status = -1;
     public:
         void init();
 

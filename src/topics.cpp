@@ -24,6 +24,8 @@ Topic<requested_conntrol> topic_user_requested_conntrol(topic_id_user_requested_
 
 Topic<motor_data> topic_motor_data(topic_id_motor_data,"topic_motor_data");
 
+Topic<controller_errors_s> topic_vel_errors(topic_id_vel_errors,"topic_vel_errors");
+
 
 Topic<raspberry_command> topic_raspberry_command(topic_id_raspberry_command,"topic_raspberry_command");
 

@@ -256,6 +256,7 @@ void Sensor::run() {
 	int16_t xyzGyro[3];
 	int16_t xyzMagneto[3];
 	int16_t xyzAccel[3];
+	AT(NOW()+ 2 * SECONDS);
 	offsetGyro(&offsets);
 	//offsetMagneto(&offsets);
 	float calibratedMagneto[3];
@@ -265,7 +266,7 @@ void Sensor::run() {
 	float test=0;
 
 	imu_data data;
-	TIME_LOOP(1 * SECONDS, 100 * MILLISECONDS){
+	TIME_LOOP(1 * SECONDS, 5 * MILLISECONDS){
 
 		readGyro(xyzGyro);
 		readMagneto(xyzMagneto);
@@ -300,7 +301,7 @@ void Sensor::run() {
 		//Kalman
 		float r2 = data.wz;
 		float p2 = (data.mx);
-		float y2 = (data.mz);
+		float y2 = (data.my);
 		float cz = atan2(p2,y2) * 180/M_PI + 180;
 		
 		if(cz > 180) cz = -360+cz;
@@ -319,6 +320,8 @@ void Sensor::run() {
 		pose.heading = mod(x_hat.r[0][0]);
 		pose.headingMagneto = mod(cz-180);
 		pose.headingGyro = mod(test);
+
+		pose.moving = true;
 
 		topic_position_data.publish(pose);
 

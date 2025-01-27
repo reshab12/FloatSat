@@ -22,7 +22,7 @@
 #define INCREMENTS 4000
 #define FREQUENCY 50
 #define CONTROLTIME 0.005
-#define MAX_RPM  9000 // 4100
+#define MAX_RPM  7000 // 4100
 #define MIN_RPM 200
 #define MAX_RAD_PER_SEC (MAX_RPM * 2 * M_PI) / 60
 #define MIN_RAD_PER_SECOND (MIN_RPM * 2 * M_PI) / 60
@@ -32,7 +32,7 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors);
 
-float calcPIDVel(requested_conntrol* request, controller_errors* errors, imu_data* imu);
+float calcPIDVel(requested_conntrol* request, controller_errors* errors, position_data* pose,float last_heading);
 
 void calcVel_with_torque(motor_data* motor_data, float torque, control_value* control);
 
