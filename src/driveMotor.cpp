@@ -18,6 +18,9 @@ void driveMotor(motor_control_value* control){
             pwm1.write(0);
             pwm2.write(control->increments);
             break;
+        case BREAK:
+            pwm1.write(5000);
+            pwm2.write(5000);
     }
 }
 
@@ -44,6 +47,5 @@ void MotorControler::run(){
         //PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
         calcPIDMotor(&errors, &control,&motor_control, &motor);
         topic_motor_data.publish(motor);
-        driveMotor(&motor_control);
     }
 }

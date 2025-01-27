@@ -34,7 +34,8 @@ struct telecommand
 enum direction
 {
     FORWARD,
-    BACKWARD
+    BACKWARD,
+    BREAK
 };
 
 struct failed_telecommand 

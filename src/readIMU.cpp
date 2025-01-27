@@ -3,6 +3,9 @@
 
 HAL_I2C imu(I2C_IDX1);
 
+HAL_GPIO pin_green_led(GPIO_060);
+HAL_GPIO pin_blue_led(GPIO_063);
+
 void i2cerror(){
 	imu.reset();
 	AT(NOW() + 5*MILLISECONDS);
@@ -60,7 +63,7 @@ void readGyro(int16_t* xyzCoordinates){
 }
 
 void offsetGyro(Offsets* offset){
-
+	pin_green_led.setPins(1);
 	int16_t xyzCoordinates[3];
 	for(int i = 0; i<10000; i++){
 		readGyro(xyzCoordinates);
@@ -71,6 +74,7 @@ void offsetGyro(Offsets* offset){
 	offset->gyro[0] = (offset->gyro[0]/10000)*0.07;
 	offset->gyro[1] = (offset->gyro[1]/10000)*0.07;
 	offset->gyro[2] = (offset->gyro[2]/10000)*0.07;
+	pin_green_led.setPins(0);
 }
 
 void readMagneto(int16_t* xyzCoordinates){
@@ -84,6 +88,7 @@ void readMagneto(int16_t* xyzCoordinates){
 }
 
 void offsetMagneto(Offsets* offset){
+	pin_blue_led.setPins(1);
     int16_t xyzCoordinates[3];
 	MW_PRINTF("Rotate about x-Axis");
 	for(int i = 0; i<1000; i++){
@@ -109,6 +114,7 @@ void offsetMagneto(Offsets* offset){
 		AT(NOW()+ 10 * MILLISECONDS);
 	}
 	MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[2], offset->magnetoMin[2]);
+	pin_blue_led.setPins(0);
 }
 
 void calibrateMagneto(Offsets* offsets, int16_t x, int16_t y, int16_t z, float calibratedMagneto[3]){
@@ -137,7 +143,7 @@ void calcHeadingMagnetoPitchRoll(Attitude* attitude, float magneto[3], float rol
 }
 
 void calcHeadingMagneto(Attitude* attitude, float magneto[3]){
-	attitude->headingMagneto = atan2(magneto[0],magneto[2]) * 180/M_PI + 180;
+	attitude->headingMagneto = atan2(magneto[0],magneto[1]) * 180/M_PI + 180;
 }
 
 
@@ -258,7 +264,7 @@ void Sensor::run() {
 	int16_t xyzAccel[3];
 	AT(NOW()+ 2 * SECONDS);
 	offsetGyro(&offsets);
-	//offsetMagneto(&offsets);
+	offsetMagneto(&offsets);
 	float calibratedMagneto[3];
 	float pitch;
 	float roll;

@@ -20,7 +20,7 @@ void MagTorquer::init(){
 }
 
 void MagTorquer::run(){
-    driveTorquers(2500);
+    driveTorquers(5000);
     PRINTF("Torquers are on! \n");
     AT(NOW() + 5 * SECONDS);
     driveTorquers(0);
