@@ -66,7 +66,11 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "Ierror",                     #25
                           "error_change",               #26
                           "Last_error",                 #27
-                          "motorCurrent",               #28
+                          "error",                      #28
+                          "Ierror",                     #29
+                          "error_change",               #30
+                          "Last_error",                 #31
+                          "motorCurrent",               #32
                           "magTorquerCurrent",
                           "boardCurrent",
                           "batterieVoltage",
@@ -85,7 +89,8 @@ class PlotWindow(QtWidgets.QMainWindow):
                         [19,1],
                         [20,4],
                         [24,4],
-                        [28,5],
+                        [28,4],
+                        [32,5],
                         [-1,0],
                         [-1,0],
                         [-1,0]
@@ -343,7 +348,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4f5f", data)
+    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4f4f5f", data)
     #for i in unpacked:
     #    print(i)
     #print()

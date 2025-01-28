@@ -26,6 +26,8 @@ Topic<motor_data> topic_motor_data(topic_id_motor_data,"topic_motor_data");
 
 Topic<controller_errors_s> topic_vel_errors(topic_id_vel_errors,"topic_vel_errors");
 
+Topic<controller_errors_s> topic_mot_errors(topic_id_mot_errors,"topic_mot_errors");
+
 
 Topic<raspberry_command> topic_raspberry_command(topic_id_raspberry_command,"topic_raspberry_command");
 

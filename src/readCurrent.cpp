@@ -15,19 +15,19 @@ void initADCPins(){
 void readADCPins(additional_sensor_data* data){
     uint16_t voltageADC = voltage.read(ADC_CH_012);
     data->boardVoltage = (voltageADC/ADCRes) * ADCRef;
-    data->batterieVoltage = data->boardVoltage/0.1037;
-    AT(NOW() + 1 * MILLISECONDS);
+    data->batterieVoltage = data->boardVoltage/0.105;
+    AT(NOW() + 10 * MILLISECONDS);
 
     uint16_t motorADCValue = mainCurrent.read(ADC_CH_004);
-	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef));/// CurrentVoltageRatio;
-    AT(NOW() + 1*MILLISECONDS);
+	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef -2.5))/ CurrentVoltageRatio;
+    AT(NOW() + 10*MILLISECONDS);
 
     uint16_t magADCValue = mainCurrent.read(ADC_CH_000);
-	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef)/ CurrentVoltageRatio;
-    AT(NOW()+1*MILLISECONDS);
+	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
+    AT(NOW() + 10*MILLISECONDS);
 
     uint16_t boardADCValue = mainCurrent.read(ADC_CH_010);
-	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef) /CurrentVoltageRatio;
+	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
 }
 
 ReadADCPins::ReadADCPins(const char* name, int32_t priority):StaticThread(name, priority){}

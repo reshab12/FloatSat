@@ -265,8 +265,8 @@ void Sensor::run() {
 	int16_t xyzMagneto[3];
 	int16_t xyzAccel[3];
 	AT(NOW()+ 2 * SECONDS);
-	offsetGyro(&offsets);
-	offsetMagneto(&offsets);
+	//offsetGyro(&offsets);
+	//offsetMagneto(&offsets);
 	float calibratedMagneto[3];
 	float pitch;
 	float roll;
@@ -303,6 +303,11 @@ void Sensor::run() {
 		data.mx = calibratedMagneto[0];
 		data.my = calibratedMagneto[1];
 		data.mz = calibratedMagneto[2];
+
+		//for testing direct imu value
+		data.mx = xyzMagneto[0];
+		data.my = xyzMagneto[1];
+		data.mz = xyzMagneto[2];
 
 		topic_imu_data.publish(data);
 

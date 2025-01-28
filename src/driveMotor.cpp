@@ -40,12 +40,19 @@ void MotorControler::run(){
     controller_errors errors;
     control_value control;
     motor_control_value motor_control;
+    controller_errors_s mot_errors;
     TIME_LOOP(0, 5 * MILLISECONDS)
     {
         cb_control_value_motor_thread.get(control);
         MotorSpeedUpdate(&motor);
-        //PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
+        MW_PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
         calcPIDMotor(&errors, &control,&motor_control, &motor);
+        mot_errors.error = errors.merror;
+        mot_errors.error_change = errors.merror_change;
+        mot_errors.Ierror = errors.mIerror;
+        mot_errors.Last_error = errors.mLast_error;
+        topic_mot_errors.publish(mot_errors);
         topic_motor_data.publish(motor);
+        driveMotor(&motor_control);
     }
 }

@@ -33,6 +33,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   CommBuffer<controller_errors_s> cb_vel_errors_Transmitter;
   Subscriber sub_vel_errors_Transmitter(topic_vel_errors, cb_vel_errors_Transmitter);
 
+  CommBuffer<controller_errors_s> cb_mot_errors_Transmitter;
+  Subscriber sub_mot_errors_Transmitter(topic_mot_errors, cb_mot_errors_Transmitter);
+
   CommBuffer<additional_sensor_data> cb_additional_sensor_data_Transmitter;
   Subscriber sub_additional_sensor_data_Transmitter(topic_additional_sensor_data, cb_additional_sensor_data_Transmitter);
 
@@ -55,6 +58,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     requested_conntrol req_con;
     control_value control;
     controller_errors_s vel_errors;
+    controller_errors_s mot_errors;
     additional_sensor_data sensor_data;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
@@ -84,8 +88,13 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       cb_vel_errors_Transmitter.get(vel_errors);
       telem.vel_errors = vel_errors;
 
+      cb_mot_errors_Transmitter.get(mot_errors);
+      telem.mot_errors = mot_errors;
+
       cb_additional_sensor_data_Transmitter.get(sensor_data);
       telem.sensor_data = sensor_data;
+
+
 
       //MW_PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
       //PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
@@ -211,12 +220,12 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       mode.control_mode = control_mode_vel;
       
       //for motor testing
-      //control.desiredMotorSpeed = telecom->command_variable;
-      //topic_control_value.publish(control);
+      control.desiredMotorSpeed = telecom->command_variable;
+      topic_control_value.publish(control);
 
       //normal operation
-      topic_user_requested_conntrol.publish(requested_conntrol);
-      topic_satellite_mode.publish(mode);
+      //topic_user_requested_conntrol.publish(requested_conntrol);
+      //topic_satellite_mode.publish(mode);
       break;
 
     default:
