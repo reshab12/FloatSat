@@ -39,34 +39,57 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 8
-        self.datasize = 28
+        self.number_of_plots = 9
+        self.datasize = 33
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
-        self.plot_refs = [[None for i in range(3)] for j in range(self.number_of_plots)]
+        self.plot_refs = [[None for i in range(5)] for j in range(self.number_of_plots)]#5=Max number of lines in one plot
         
-        self.dataNames = ["Time",
-                          "pose_estimation_mode",
-                          "control_mode",
-                          "mission_mode",
-                          "wx","wy","wz",
-                          "mx","my","mz",
-                          "ax","ay","az",
-                          "headingMagneto",
-                          "headingGyro",
-                          "heading",
-                          "moving",
-                          "motorSpeed",
-                          "omega_wheel",
-                          "control value",
-                          "requested_angle",
-                          "requested_rot_speed",
-                          "user_requested_angle",
-                          "user_requested_rot_speed",
-                          "error", 
-                          "Ierror", 
-                          "error_change", 
-                          "Last_error"
+        self.dataNames = ["Time",                       #0
+                          "pose_estimation_mode",       #1
+                          "control_mode",               #2
+                          "mission_mode",               #3
+                          "wx","wy","wz",               #4
+                          "mx","my","mz",               #7
+                          "ax","ay","az",               #10
+                          "headingMagneto",             #13
+                          "headingGyro",                #14
+                          "heading",                    #15
+                          "moving",                     #16
+                          "motorSpeed",                 #17
+                          "omega_wheel",                #18
+                          "control value",              #19
+                          "requested_angle",            #20
+                          "requested_rot_speed",        #21
+                          "user_requested_angle",       #22
+                          "user_requested_rot_speed",   #23
+                          "error",                      #24
+                          "Ierror",                     #25
+                          "error_change",               #26
+                          "Last_error",                 #27
+                          "motorCurrent",               #28
+                          "magTorquerCurrent",
+                          "boardCurrent",
+                          "batterieVoltage",
+                          "boardVoltage",
+                          ""
+                          "",
+                          ""
                           ]
+        self.dataFormat = [
+                        #[1,3],
+                        [4,3],
+                        [7,3],
+                        [10,3],
+                        [13,3],
+                        [17,2],
+                        [19,1],
+                        [20,4],
+                        [24,4],
+                        [28,5],
+                        [-1,0],
+                        [-1,0],
+                        [-1,0]
+                        ]
 
         layout = QtWidgets.QVBoxLayout()
         for i in range(self.number_of_plots):
@@ -108,46 +131,56 @@ class PlotWindow(QtWidgets.QMainWindow):
         if self.counter1 > 4:
             self.counter1 = 0
 
-            if self.counter2 > 39:  #trigger redraw:
-
-                for i in range(self.number_of_plots):
-                    for j in range(3):
-                        self.plot_refs[i][j].axes.cla()
-                        self.plot_refs[i][j] = None
-
-                self.counter2 = 0
+            #textbox:
             for i in range(self.datasize):
                 self.text_box[i].setText(self.dataNames[i]+": "+"{:.2f}".format(data[i]))
        
-            data_line_count = 1
-            #scaling factors for plots
+            #scaling factors for plots not used (autoscale)
             scaling = [5,20,5,4,200,10,10,10,10,10,10]
 
+            data_line_count = 1
+                
             #redraw
-            if self.plot_refs[0][0] == None: 
+            if self.counter2 > 39: 
+                self.counter2 = 0
+                for i in range(self.number_of_plots):
+                    for j in range(self.dataFormat[i][1]):
+                        self.plot_refs[i][j].axes.clear()
+                        self.plot_refs[i][j] = None
+                
+            if self.plot_refs[0][0] == None:
                 #print("=None")
                 for i in range(self.number_of_plots):
-                    for j in range(3):
+                    if self.dataFormat[i][0] >= 0:
+                        data_line_count= self.dataFormat[i][0]
+                    for j in range(self.dataFormat[i][1]):
                         match j:
                             case 0:
-                                temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'r')
-
+                                temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'r',label=self.dataNames[data_line_count])
                             case 1:
-                                temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'g')
+                                temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'g',label=self.dataNames[data_line_count])
                             case 2:
-                                temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'b')
- 
+                                temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'b',label=self.dataNames[data_line_count])
+                            case 3:
+                                temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'c',label=self.dataNames[data_line_count])
+                            case 4:
+                                temp_plot_refs = self.canvasss[i].axes.plot(self.xdata, self.ydata[data_line_count], 'm',label=self.dataNames[data_line_count])
+                                
+
                         self.plot_refs[i][j] = temp_plot_refs[0] 
                         
                         self.plot_refs[i][j].axes.autoscale()
                         #self.plot_refs[i][j].axes.set_ylim(-scaling[i], scaling[i]) 
 
                         data_line_count = data_line_count + 1
+                    self.plot_refs[i][0].axes.legend(loc="upper left")
             #update data
             else:
                 #print("!=None")
                 for i in range(self.number_of_plots):
-                    for j in range(3):
+                    if self.dataFormat[i][0] >= 0:
+                        data_line_count= self.dataFormat[i][0]
+                    for j in range(self.dataFormat[i][1]):
                         self.plot_refs[i][j].set_ydata(self.ydata[data_line_count])
 
                         data_line_count = data_line_count + 1
@@ -155,6 +188,7 @@ class PlotWindow(QtWidgets.QMainWindow):
             #update plot
             for i in range(self.number_of_plots):
                 self.canvasss[i].draw()
+      
       
             
 class MainWindow(QtWidgets.QMainWindow):
@@ -309,7 +343,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4f4x", data)
+    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4f5f", data)
     #for i in unpacked:
     #    print(i)
     #print()

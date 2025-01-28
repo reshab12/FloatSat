@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-//static ReadADCPins readPins("ReadPins", 120);
+static ReadADCPins readPins("ReadPins", 120);
 static Transmitter transmitter(250);
 static Receiver receiver;
 static Sensor sensorThread("readIMU",200);

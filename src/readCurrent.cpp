@@ -45,8 +45,9 @@ void ReadADCPins::run(){
     motor.increments = 1000;
     motor.turnDirection = FORWARD;
     //driveMotor(&motor);
-    TIME_LOOP(0, 1000 * MILLISECONDS){
+    TIME_LOOP(0, 100 * MILLISECONDS){
         readADCPins(&data);
-        PRINTF("Motor Current: %f A\n Board Current: %f A\n Torquer Current: %f A\n Board Voltage: %f V\n Batterie Voltage: %f V\n", data.motorCurrent, data.boardCurrent, data.magTorquerCurrent, data.boardVoltage, data.batterieVoltage);
+        topic_additional_sensor_data.publish(data);
+        //PRINTF("Motor Current: %f A\n Board Current: %f A\n Torquer Current: %f A\n Board Voltage: %f V\n Batterie Voltage: %f V\n", data.motorCurrent, data.boardCurrent, data.magTorquerCurrent, data.boardVoltage, data.batterieVoltage);
     }
 }

@@ -158,6 +158,8 @@ struct telemetry
 
     controller_errors_s vel_errors;//4f
 
+    additional_sensor_data sensor_data;//5f
+
 };
 
 
