@@ -10,10 +10,6 @@ void initializeMotor(){
 
 void driveMotor(motor_control_value* control){
     switch(control->turnDirection){
-        case BACKWARD:    
-            pwm1.write(control->increments);
-            pwm2.write(0);
-            break;
         case FORWARD:
             pwm1.write(0);
             pwm2.write(control->increments);

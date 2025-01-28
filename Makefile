@@ -21,8 +21,8 @@ DEBUG = 1
 
 # C++ source files
 CXX_SOURCES = src/commander.cpp \
-src/driveMotor.cpp \
 src/encoder.cpp \
+src/driveMotor.cpp \
 src/LSM9DS1.cpp \
 src/pidControl.cpp \
 src/readIMU.cpp \
