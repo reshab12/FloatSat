@@ -15,7 +15,7 @@ mission_star_mapper = False
 def starSensorCommandReceiver(data):
   try:
     unpacked = struct.unpack("B", data)
-    print("stm sends data: {}".format(unpacked[0]))
+    print("stm sends command data: {}".format(unpacked[0]))
     if(unpacked[0]):
       ready_for_picture = True
   except Exception as e:
@@ -26,7 +26,7 @@ def starSensorCommandReceiver(data):
 def satellite_mode_receiver(data):
   try:
     unpacked = struct.unpack("BBB", data)
-    print("stm sends data: {} {} {}".format(unpacked[0],unpacked[1],unpacked[2]))
+    print("stm sends mode data: {} {} {}".format(unpacked[0],unpacked[1],unpacked[2]))
     if(unpacked[1]==3):
       control_mode_ai_vel = True
     else:
@@ -83,7 +83,7 @@ while True:
     if(ready_for_picture):
       #take picture then:
       sensor_struct = struct.pack("B",1)
-      stm2rasCommands.publish(sensor_struct)#command "picture made"
+      ras2stmCommands.publish(sensor_struct)#command "picture made"
       ready_for_picture = False
 
   if(control_mode_ai_vel | control_mode_ai_pos):

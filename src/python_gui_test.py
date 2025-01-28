@@ -39,7 +39,7 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 9
+        self.number_of_plots = 5
         self.datasize = 33
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
         self.plot_refs = [[None for i in range(5)] for j in range(self.number_of_plots)]#5=Max number of lines in one plot
@@ -82,13 +82,14 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.dataFormat = [
                         #[1,3],
                         [4,3],
-                        [7,3],
-                        [10,3],
+                        #[7,3],
+                        #[10,3],
                         [13,3],
-                        [17,2],
-                        [19,1],
-                        [20,4],
-                        [24,4],
+                        [17,1],
+                        [18,1],
+                        #[19,1],
+                        #[20,4],
+                        #[24,4],
                         [28,4],
                         [32,5],
                         [-1,0],
@@ -105,6 +106,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.text_box =  [QtWidgets.QPushButton(self.dataNames[j])for j in range(self.datasize)]
         for i in range(self.datasize):
             self.text_box[i].setCheckable(False)
+            self.text_box[i].setMaximumWidth(300)
             self.text_box[i].setText(self.dataNames[i])
             layout2.addWidget(self.text_box[i])
 
@@ -116,7 +118,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         widget.setLayout(h_layout)
         self.setCentralWidget(widget)
 
-        self.n_data = 100
+        self.n_data = 300
         self.xdata = list(range(self.n_data))
         self.ydata = [[0 for i in range(self.n_data)] for j in range(self.datasize)]
 
@@ -130,7 +132,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         for i in range(self.datasize):
             self.ydata[i] = self.ydata[i][1:] + [data[i]]
 
-        self.ydata[18][self.n_data-1]=0
+        #self.ydata[18][self.n_data-1]=0
         self.counter1 = self.counter1+1 
         self.counter2 = self.counter2+1
         if self.counter1 > 4:
@@ -244,7 +246,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
 
         self.command_speed_slider = QtWidgets.QSlider()
-        self.command_speed_slider.setRange(-1000,1000)
+        self.command_speed_slider.setRange(0,5000)
         self.command_speed_slider.sliderReleased.connect(self.speed_slider_released)
 
     #layout--------------------------------------------------------------------------------
