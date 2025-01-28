@@ -22,8 +22,9 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
     else{motor_control->increments = abs(increments_temp);}
     //PRINTF("Increments: %d \n", control->increments);
 
-    if(increments_temp < 0) motor_control->turnDirection = BACKWARD;
-    else motor_control->turnDirection = FORWARD;   
+    //if(increments_temp < 0) motor_control->turnDirection = BACKWARD;
+    //else 
+    motor_control->turnDirection = FORWARD;   
 }
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors){
@@ -60,18 +61,10 @@ void calcVel_with_torque(motor_data* motor_data, float torque, control_value* co
 
 
     if(abs(omega_wheel_temp) > MAX_RAD_PER_SEC){
-        if(omega_wheel_temp > MAX_RAD_PER_SEC){
-            control->desiredMotorSpeed = MAX_RPM; //Saturate the speed
-        }else{
-            control->desiredMotorSpeed = -MAX_RPM;
-        }
+        control->desiredMotorSpeed = MAX_RPM; //Saturate the speed
         dot_omega_wheel = 0;  //Stop further acceleration
     }else if(abs(omega_wheel_temp) < MIN_RAD_PER_SECOND){
-        if(omega_wheel_temp > 0){
-            control->desiredMotorSpeed = MIN_RPM;
-        }else{
-            control->desiredMotorSpeed = -MIN_RPM;
-        }
+        control->desiredMotorSpeed = MIN_RPM;
     }else{
         control->desiredMotorSpeed = (int)floor(omega_wheel_temp * 9.549297); //Update normally if within limits
     }

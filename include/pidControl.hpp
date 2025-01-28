@@ -11,6 +11,7 @@
 #define KP_P 1
 #define KI_P 0
 #define KD_P 0.001
+
 #define KP_V 0.03
 #define KI_V 0.003
 #define KD_V 0.002
@@ -22,8 +23,8 @@
 #define INCREMENTS 4000
 #define FREQUENCY 50
 #define CONTROLTIME 0.005
-#define MAX_RPM  7000 // 4100
-#define MIN_RPM 200
+#define MAX_RPM  5000 // 4100
+#define MIN_RPM 1000
 #define MAX_RAD_PER_SEC (MAX_RPM * 2 * M_PI) / 60
 #define MIN_RAD_PER_SECOND (MIN_RPM * 2 * M_PI) / 60
 #define MAX_VOLTS 5
