@@ -19,15 +19,15 @@ void readADCPins(additional_sensor_data* data){
     AT(NOW() + 1 * MILLISECONDS);
 
     uint16_t motorADCValue = mainCurrent.read(ADC_CH_004);
-	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef -2.5))/ CurrentVoltageRatio;
+	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef));/// CurrentVoltageRatio;
     AT(NOW() + 1*MILLISECONDS);
 
     uint16_t magADCValue = mainCurrent.read(ADC_CH_000);
-	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
+	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef)/ CurrentVoltageRatio;
     AT(NOW()+1*MILLISECONDS);
 
     uint16_t boardADCValue = mainCurrent.read(ADC_CH_010);
-	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
+	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef) /CurrentVoltageRatio;
 }
 
 ReadADCPins::ReadADCPins(const char* name, int32_t priority):StaticThread(name, priority){}
