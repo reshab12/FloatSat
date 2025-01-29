@@ -109,7 +109,7 @@ uint32_t Commander::put(const uint32_t topic_id, const size_t len, void *msg, co
         PRINTF("raspb: %d\n",received->status);
         switch (received->status)
         {
-        case 0://map rady to be used
+        case 0://map ready to be used
             status = 4;
             break;
         

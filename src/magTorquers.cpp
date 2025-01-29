@@ -13,10 +13,20 @@ void driveTorquers(uint16_t value){
     pwmT2.write(value);
 }
 
+void desaturate(motor_data* motor, controller_errors* errors, control_value* control, motor_control_value* motor_control, double deltaT){
+    motor->motorSpeed = 3000;
+    driveTorquers(5000);
+    while(abs(motor->motorSpeed)-3000>100){
+        MotorSpeedUpdate(motor);
+        calcPIDMotor(errors, control, motor_control, motor, deltaT);
+    }
+}
+
 MagTorquer::MagTorquer(const char* name, int32_t priority):StaticThread(name,priority){}
 
 void MagTorquer::init(){
     initializeTorquers();
+    initializeMotor();
 }
 
 void MagTorquer::run(){
