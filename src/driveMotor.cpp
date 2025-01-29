@@ -14,6 +14,9 @@ void driveMotor(motor_control_value* control){
             pwm1.write(0);
             pwm2.write(control->increments);
             break;
+        case BACKWARD:
+            pwm1.write(control->increments);
+            pwm2.write(0);
         case BREAK:
             pwm1.write(5000);
             pwm2.write(5000);
@@ -41,7 +44,6 @@ void MotorControler::run(){
     {
         cb_control_value_motor_thread.get(control);
         MotorSpeedUpdate(&motor);
-        MW_PRINTF("MotorSpeed: %d \n", motor.motorSpeed);
         calcPIDMotor(&errors, &control,&motor_control, &motor);
         mot_errors.error = errors.merror;
         mot_errors.error_change = errors.merror_change;

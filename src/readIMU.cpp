@@ -265,8 +265,8 @@ void Sensor::run() {
 	int16_t xyzMagneto[3];
 	int16_t xyzAccel[3];
 	AT(NOW()+ 2 * SECONDS);
-	//offsetGyro(&offsets);
-	//offsetMagneto(&offsets);
+	offsetGyro(&offsets);
+	offsetMagneto(&offsets);
 	float calibratedMagneto[3];
 	float pitch;
 	float roll;
@@ -274,7 +274,7 @@ void Sensor::run() {
 	float test=0;
 
 	imu_data data;
-	TIME_LOOP(1 * SECONDS, 5 * MILLISECONDS){
+	TIME_LOOP(1 * SECONDS, 100 * MILLISECONDS){
 
 		readGyro(xyzGyro);
 		readMagneto(xyzMagneto);

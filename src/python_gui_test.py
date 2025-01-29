@@ -71,10 +71,10 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "error_change",               #30
                           "Last_error",                 #31
                           "motorCurrent",               #32
-                          "magTorquerCurrent",
-                          "boardCurrent",
-                          "batterieVoltage",
-                          "boardVoltage",
+                          "magTorquerCurrent",          #33
+                          "boardCurrent",               #34
+                          "batterieVoltage",            #35
+                          "boardVoltage",               #36
                           ""
                           "",
                           ""
