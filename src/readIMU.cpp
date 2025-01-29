@@ -92,30 +92,20 @@ void readMagneto(int16_t* xyzCoordinates){
 void offsetMagneto(Offsets* offset){
 	pin_blue_led.setPins(1);
     int16_t xyzCoordinates[3];
-	MW_PRINTF("Rotate about x-Axis");
-	for(int i = 0; i<1000; i++){
-		readMagneto(xyzCoordinates);
-		if(xyzCoordinates[0] < offset->magnetoMin[0]) offset->magnetoMin[0] = xyzCoordinates[0];
-		else if(xyzCoordinates[0] > offset->magnetoMax[0]) offset->magnetoMax[0] = xyzCoordinates[0];
-		AT(NOW()+ 10 * MILLISECONDS);
-	}
-	MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[0], offset->magnetoMin[0]);
-	MW_PRINTF("Rotate about y-Axis");
-	for(int i = 0; i<1000; i++){
-		readMagneto(xyzCoordinates);
-		if(xyzCoordinates[1] < offset->magnetoMin[1]) offset->magnetoMin[1] = xyzCoordinates[1];
-		else if(xyzCoordinates[1] > offset->magnetoMax[1]) offset->magnetoMax[1] = xyzCoordinates[1];
-		AT(NOW()+ 10 * MILLISECONDS);
-	}
-	MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[1], offset->magnetoMin[1]);
+
 	MW_PRINTF("Rotate about z-Axis");
 	for(int i = 0; i<1000; i++){
 		readMagneto(xyzCoordinates);
 		if(xyzCoordinates[2] < offset->magnetoMin[2]) offset->magnetoMin[2] = xyzCoordinates[2];
 		else if(xyzCoordinates[2] > offset->magnetoMax[2]) offset->magnetoMax[2] = xyzCoordinates[2];
+		if(xyzCoordinates[1] < offset->magnetoMin[1]) offset->magnetoMin[1] = xyzCoordinates[1];
+		else if(xyzCoordinates[1] > offset->magnetoMax[1]) offset->magnetoMax[1] = xyzCoordinates[1];
+		if(xyzCoordinates[0] < offset->magnetoMin[0]) offset->magnetoMin[0] = xyzCoordinates[0];
+		else if(xyzCoordinates[0] > offset->magnetoMax[0]) offset->magnetoMax[0] = xyzCoordinates[0];
 		AT(NOW()+ 10 * MILLISECONDS);
 	}
-	MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[2], offset->magnetoMin[2]);
+	MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[0], offset->magnetoMin[0]);
+	MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[1], offset->magnetoMin[1]);
 	pin_blue_led.setPins(0);
 }
 
@@ -266,7 +256,7 @@ void Sensor::run() {
 	int16_t xyzAccel[3];
 	//AT(NOW()+ 2 * SECONDS);
 	offsetGyro(&offsets);
-	//offsetMagneto(&offsets);
+	offsetMagneto(&offsets);
 	float calibratedMagneto[3];
 	float pitch;
 	float roll;
@@ -305,9 +295,9 @@ void Sensor::run() {
 		data.mz = calibratedMagneto[2];
 
 		//for testing direct imu value
-		data.mx = xyzMagneto[0];
-		data.my = xyzMagneto[1];
-		data.mz = xyzMagneto[2];
+		//data.mx = xyzMagneto[0];
+		//data.my = xyzMagneto[1];
+		//data.mz = xyzMagneto[2];
 
 		topic_imu_data.publish(data);
 
@@ -330,7 +320,7 @@ void Sensor::run() {
 		
 		position_data pose;
 		pose.heading = mod(x_hat.r[0][0]);
-		pose.headingMagneto = mod(cz);
+		pose.headingMagneto = cz;
 		pose.headingGyro = test;
 
 		pose.moving = true;
