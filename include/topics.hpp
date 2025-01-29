@@ -35,7 +35,6 @@ struct telecommand
 enum direction
 {
     FORWARD,
-    BACKWARD,
     BREAK
 };
 
@@ -134,6 +133,9 @@ struct controller_errors
     float mIerror = 0;
     float vIerror = 0;
     float pIerror = 0;
+    float meb = 0;
+    float veb = 0;
+    float peb = 0;
 };
 
 struct controller_errors_s

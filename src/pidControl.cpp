@@ -4,14 +4,13 @@
 
 void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data, double deltaT){
     int16_t increments_temp;
-    float eb = 0;
 
     errors->merror = control->desiredMotorSpeed - data->motorSpeed;
-    errors->mIerror += errors->merror * 0.005;// + eb;
+    errors->mIerror += errors->merror * 0.005;// + errors->meb;
     errors->merror_change = (errors->mLast_error - errors->merror)/ 0.005;
     errors->mLast_error = errors->merror;
     //if((errors->mIerror >= MAX_RAD_PER_SEC) || (errors->mIerror <= -MAX_RAD_PER_SEC)) 
-        //eb += 1* (MAX_RAD_PER_SEC - errors->mIerror);
+        //errors->meb += 1* (MAX_RAD_PER_SEC - errors->mIerror);
 
     data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
     increments_temp = (data->omega_wheel / MAX_RPM) * MOTROINCREMENTS;
@@ -24,21 +23,19 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
         motor_control->increments = abs(increments_temp);
     }
     
-    if(increments_temp < 0) 
-        motor_control->turnDirection = BACKWARD;
-    else 
-        motor_control->turnDirection = FORWARD;   
-    //PRINTF("Increments: %d \n", motor_control->increments);
+  //  if(increments_temp < 0) 
+  //      motor_control->turnDirection = BACKWARD;
+    //else 
+    motor_control->turnDirection = FORWARD;   
 }
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors, double deltaT){
-    float eb = 0;
     errors->pLast_error = errors->perror;
     errors->perror = request->requested_angle - pos->heading;
-    errors->pIerror += errors->perror * deltaT + eb;
+    errors->pIerror += errors->perror * deltaT + errors->peb;
     errors->perror_change = (errors->perror - errors->pLast_error) / deltaT;
-    //if(errors->pIerror >= MAX_RAD_PER_SEC) eb += 1* (MAX_RAD_PER_SEC - errors->pIerror);
-    if((errors->pIerror >= max_sat_dps) || (errors->pIerror <= -max_sat_dps)) eb += 1* (max_sat_dps - errors->pIerror);
+    
+    if((errors->pIerror >= max_sat_dps) || (errors->pIerror <= -max_sat_dps)) errors->peb += 1* (max_sat_dps - errors->pIerror);
 
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
     /*if(request->requested_rot_speed >= 0)
@@ -49,16 +46,15 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, controller_erro
 
 float calcPIDVel(requested_conntrol* request, controller_errors* errors, position_data* pose,float last_heading, double deltaT){
     float torque = 0;
-    float eb = 0;
     if(request->requested_rot_speed >= 0)
         request->requested_rot_speed = min(request->requested_rot_speed,max_sat_dps);
     else
         request->requested_rot_speed = max(request->requested_rot_speed,-max_sat_dps);
     errors->vLast_error = errors->verror;
     errors->verror = request->requested_rot_speed - (pose->heading-last_heading) / deltaT;
-    errors->vIerror += errors->verror * deltaT + eb;
+    errors->vIerror += errors->verror * deltaT + errors->veb;
     if((errors->vIerror >= max_dot_omega_wheel*I_WHEEL) || (errors->vIerror <= -max_dot_omega_wheel*I_WHEEL)) 
-        eb += 1* (max_dot_omega_wheel*I_WHEEL - errors->vIerror);
+        errors->veb += 1* (max_dot_omega_wheel*I_WHEEL - errors->vIerror);
     errors->verror_change = (errors->verror - errors->vLast_error) / deltaT;
     
     torque = KP_V * errors->verror + KI_V * errors->vIerror + KD_V * errors->vLast_error;
@@ -68,21 +64,22 @@ float calcPIDVel(requested_conntrol* request, controller_errors* errors, positio
 
 void calcVel_with_torque(motor_data* motor_data, float torque, control_value* control, double deltaT){
     float dot_omega_wheel = 0;
-    float omega_wheel_temp  = motor_data->motorSpeed;
+    float omega_wheel_temp = motor_data->motorSpeed;
+
     dot_omega_wheel = - torque/I_WHEEL;
+
     if(dot_omega_wheel >= 0)
         dot_omega_wheel = min(dot_omega_wheel,max_dot_omega_wheel);
     else
         dot_omega_wheel = max(dot_omega_wheel,-max_dot_omega_wheel);
     omega_wheel_temp += dot_omega_wheel * deltaT;
 
-    
-        if(omega_wheel_temp > max_rad_ps_contr){
-            control->desiredMotorSpeed = max_rpm_contr; //Saturate the speed
-        }else if(omega_wheel_temp < min_rad_ps_contr){
-            control->desiredMotorSpeed = min_rpm_contr;
-        }else
-            control->desiredMotorSpeed = (int)floor(omega_wheel_temp * 9.549297); //Update normally if within limits
+    if(omega_wheel_temp > max_rad_ps_contr){
+        control->desiredMotorSpeed = max_rpm_contr; //Saturate the speed
+    }else if(omega_wheel_temp < min_rad_ps_contr){
+        control->desiredMotorSpeed = min_rpm_contr;
+    }else
+        control->desiredMotorSpeed = (int32_t)floor(omega_wheel_temp * 9.549297); //Update normally if within limits
 }
 
 CommBuffer<imu_data> cb_imu_data_VelocityControler_thread;

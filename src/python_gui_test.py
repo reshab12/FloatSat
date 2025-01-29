@@ -246,7 +246,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
 
         self.command_speed_slider = QtWidgets.QSlider()
-        self.command_speed_slider.setRange(0,5000)
+        self.command_speed_slider.setRange(1000,5000)
         self.command_speed_slider.sliderReleased.connect(self.speed_slider_released)
 
     #layout--------------------------------------------------------------------------------

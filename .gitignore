@@ -1,3 +1,10 @@
 build
 rodos
 src/test
+Control
+Datasheets
+Presentation
+hello_encoder.cpp
+Task4.cpp
+Kalman
+.vscode
