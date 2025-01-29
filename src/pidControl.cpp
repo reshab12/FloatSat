@@ -78,22 +78,13 @@ void calcVel_with_torque(motor_data* motor_data, float torque, control_value* co
         dot_omega_wheel = max(dot_omega_wheel,-max_dot_omega_wheel);
     omega_wheel_temp += dot_omega_wheel * deltaT;
 
-    if(abs(omega_wheel_temp) > MAX_RAD_PER_SEC){
-        if(omega_wheel_temp > MAX_RAD_PER_SEC){
-            control->desiredMotorSpeed = MAX_RPM; //Saturate the speed
-        }else{
-            control->desiredMotorSpeed = -MAX_RPM;
-        }
-        dot_omega_wheel = 0;  //Stop further acceleration
-    }else if(abs(omega_wheel_temp) < MIN_RAD_PER_SECOND){
-        if(omega_wheel_temp > 0){
-            control->desiredMotorSpeed = MIN_RPM;
-        }else{
-            control->desiredMotorSpeed = -MIN_RPM;
-        }
-    }else{
-        control->desiredMotorSpeed = (int)floor(omega_wheel_temp * 9.549297); //Update normally if within limits
-    }
+    
+        if(omega_wheel_temp > max_rad_ps_contr){
+            control->desiredMotorSpeed = max_rpm_contr; //Saturate the speed
+        }else if(omega_wheel_temp < min_rad_ps_contr){
+            control->desiredMotorSpeed = min_rpm_contr;
+        }else
+            control->desiredMotorSpeed = (int)floor(omega_wheel_temp * 9.549297); //Update normally if within limits
 }
 
 CommBuffer<imu_data> cb_imu_data_VelocityControler_thread;
@@ -170,7 +161,7 @@ void VelocityControler::run(){
             topic_control_value.publish(control);
             //PRINTF("Sat Speed: %f", data.wy);
         }else{
-            control.desiredMotorSpeed = 0.0;
+            control.desiredMotorSpeed = 3000.0;
             topic_control_value.publish(control);
         }
     }

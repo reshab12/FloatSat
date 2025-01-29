@@ -32,7 +32,7 @@ void readADCPins(additional_sensor_data* data){
     AT(NOW() + 10 * MILLISECONDS);
 
     uint16_t solarPanel = mainCurrent.read(ADC_CH_002);
-    data->solarPanel = ((solarPanel / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
+    //data->solarPanel = ((solarPanel / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
 }
 
 ReadADCPins::ReadADCPins(const char* name, int32_t priority):StaticThread(name, priority){}
@@ -50,7 +50,7 @@ void ReadADCPins::run(){
     TIME_LOOP(0, 500 * MILLISECONDS){
         readADCPins(&data);
         topic_additional_sensor_data.publish(data);
-        if(data.batterieVoltage < 13.0) safetyPin.setPins(1);
+        //if(data.batterieVoltage < 11.0) safetyPin.setPins(1);
         //PRINTF("Motor Current: %f A\n Board Current: %f A\n Torquer Current: %f A\n Board Voltage: %f V\n Batterie Voltage: %f V\n", data.motorCurrent, data.boardCurrent, data.magTorquerCurrent, data.boardVoltage, data.batterieVoltage);
     }
 }

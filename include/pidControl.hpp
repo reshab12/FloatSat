@@ -27,6 +27,10 @@
 #define MIN_RPM 200
 #define MAX_RAD_PER_SEC (MAX_RPM * 2 * M_PI) / 60
 #define MIN_RAD_PER_SECOND (MIN_RPM * 2 * M_PI) / 60
+const float max_rpm_contr = 5000;
+const float min_rpm_contr = 1000;
+const float max_rad_ps_contr = 5000*2*M_PI/60;
+const float min_rad_ps_contr = 1000*2*M_PI/60;
 const float max_sat_dps = 20; 
 const float max_dot_omega_wheel = 1000;
 #define MAX_VOLTS 5
