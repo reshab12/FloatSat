@@ -2,14 +2,14 @@
 #include "pidControl.hpp"
 #include "driveMotor.hpp"
 
-void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data){
+void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data, double deltaT){
     int16_t increments_temp;
     float eb = 0;
     errors->merror = control->desiredMotorSpeed - data->motorSpeed;
     //PRINTF("error: %f \n", errors->merror);
-    errors->mIerror += errors->merror * 0.005 + eb;
+    errors->mIerror += errors->merror * deltaT + eb;
     //PRINTF("Integral Error: %f \n", errors->mIerror);
-    errors->merror_change = (errors->mLast_error - errors->merror)/ 0.005;
+    errors->merror_change = (errors->mLast_error - errors->merror)/ deltaT;
     errors->mLast_error = errors->merror;
     if(errors->mIerror >= MAX_RAD_PER_SEC) eb += 1* (MAX_RAD_PER_SEC - errors->mIerror);
 
@@ -26,36 +26,36 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
     else motor_control->turnDirection = FORWARD;   
 }
 
-void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors){
+void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors, double deltaT){
     float eb = 0;
     errors->pLast_error = errors->perror;
     errors->perror = request->requested_angle - pos->heading;
-    errors->pIerror += errors->perror * CONTROLTIME + eb;
-    errors->perror_change = (errors->perror - errors->pLast_error) / CONTROLTIME;
+    errors->pIerror += errors->perror * deltaT + eb;
+    errors->perror_change = (errors->perror - errors->pLast_error) / deltaT;
     if(errors->pIerror >= MAX_RAD_PER_SEC) eb += 1* (MAX_RAD_PER_SEC - errors->pIerror);
 
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
 }
 
-float calcPIDVel(requested_conntrol* request, controller_errors* errors, position_data* pose,float last_heading){
+float calcPIDVel(requested_conntrol* request, controller_errors* errors, position_data* pose,float last_heading, double deltaT){
     float torque = 0;
     float eb = 0;
     errors->vLast_error = errors->verror;
-    errors->verror = request->requested_rot_speed - (pose->heading-last_heading) / CONTROLTIME;
-    errors->vIerror += errors->verror * CONTROLTIME + eb;
+    errors->verror = request->requested_rot_speed - (pose->heading-last_heading) / deltaT;
+    errors->vIerror += errors->verror * deltaT + eb;
     if(errors->vIerror >= MAX_RAD_PER_SEC) eb += 1* (MAX_RAD_PER_SEC - errors->vIerror);
-    errors->verror_change = (errors->verror - errors->vLast_error) / CONTROLTIME;
+    errors->verror_change = (errors->verror - errors->vLast_error) / deltaT;
     
     torque = KP_V * errors->verror + KI_V * errors->vIerror + KD_V * errors->vLast_error;
 
     return torque;
 }
 
-void calcVel_with_torque(motor_data* motor_data, float torque, control_value* control){
+void calcVel_with_torque(motor_data* motor_data, float torque, control_value* control, double deltaT){
     float dot_omega_wheel = 0;
     float omega_wheel_temp  = motor_data->motorSpeed;
     dot_omega_wheel = - torque/I_WHEEL;
-    omega_wheel_temp += dot_omega_wheel * CONTROLTIME;
+    omega_wheel_temp += dot_omega_wheel * deltaT;
 
 
 
@@ -113,8 +113,13 @@ void VelocityControler::run(){
     motor_data motor_data;
     float torque;
     float last_heading = 0;
+    double time = 1.0*NOW()/SECONDS;
+    double deltaT;
     TIME_LOOP(0, 25 * MILLISECONDS)
     {
+        double tempT = 1.0*NOW()/SECONDS;
+        deltaT = tempT - time; 
+        time = tempT;
         cb_satellite_mode_VelocityControler.get(mode);
         if( (mode.control_mode==control_mode_pos)||
             (mode.control_mode==control_mode_vel)||
@@ -130,10 +135,11 @@ void VelocityControler::run(){
                 cb_user_requested_conntrol_VelocityControler_thread.get(requested_conntrol);
             
             cb_motor_data_VelocityControler_thread.get(motor_data);
+
             if((mode.control_mode==control_mode_ai_pos)||(mode.control_mode==control_mode_ai_vel))
                 cb_raspberry_control_value_VelocityController.get(torque);
             else{
-                torque = calcPIDVel(&requested_conntrol, &errors, &pose, last_heading);
+                torque = calcPIDVel(&requested_conntrol, &errors, &pose, last_heading, deltaT);
                 controller_errors_s vel_errors;
                 vel_errors.error = errors.verror;
                 vel_errors.error_change = errors.verror_change;
@@ -141,7 +147,7 @@ void VelocityControler::run(){
                 vel_errors.Last_error = errors.vLast_error;
                 topic_vel_errors.publish(vel_errors);
             }
-            calcVel_with_torque(&motor_data, torque, &control);
+            calcVel_with_torque(&motor_data, torque, &control, deltaT);
             topic_control_value.publish(control);
             //PRINTF("Sat Speed: %f", data.wy);
         }else{
@@ -174,13 +180,18 @@ void PositionControler::run(){
     position_data position;
     requested_conntrol requested_conntrol;
     satellite_mode mode;
+    double deltaT;
+    double time = 1.0*NOW()/SECONDS;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
+        double tempT = 1.0*NOW()/SECONDS;
+        deltaT = tempT - time; 
+        time = tempT;
         cb_satellite_mode_PositionControler.get(mode);
         if(mode.control_mode==control_mode_pos){
             cb_position_data_PositionControler.get(position);
             cb_user_requested_conntrol_PositionControler.get(requested_conntrol);
-            calcPIDPos(&requested_conntrol, &position, &errors);
+            calcPIDPos(&requested_conntrol, &position, &errors, deltaT);
             topic_requested_conntrol.publish(requested_conntrol);
         }
     }
