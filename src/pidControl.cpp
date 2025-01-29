@@ -5,17 +5,15 @@
 void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data, double deltaT){
     int16_t increments_temp;
     float eb = 0;
+
     errors->merror = control->desiredMotorSpeed - data->motorSpeed;
-    //PRINTF("error: %f \n", errors->merror);
-    errors->mIerror += errors->merror * deltaT + eb;
-    //PRINTF("Integral Error: %f \n", errors->mIerror);
-    errors->merror_change = (errors->mLast_error - errors->merror)/ deltaT;
+    errors->mIerror += errors->merror * 0.005;// + eb;
+    errors->merror_change = (errors->mLast_error - errors->merror)/ 0.005;
     errors->mLast_error = errors->merror;
-    if((errors->mIerror >= MAX_RAD_PER_SEC) || (errors->mIerror <= -MAX_RAD_PER_SEC)) 
-        eb += 1* (MAX_RAD_PER_SEC - errors->mIerror);
+    //if((errors->mIerror >= MAX_RAD_PER_SEC) || (errors->mIerror <= -MAX_RAD_PER_SEC)) 
+        //eb += 1* (MAX_RAD_PER_SEC - errors->mIerror);
 
     data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
-    //PRINTF("omega_wheel: %f \n", data->omega_wheel);
     increments_temp = (data->omega_wheel / MAX_RPM) * MOTROINCREMENTS;
     
     if(increments_temp > MOTROINCREMENTS) 
@@ -25,12 +23,12 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
     else{
         motor_control->increments = abs(increments_temp);
     }
-    //PRINTF("Increments: %d \n", control->increments);
-
+    
     if(increments_temp < 0) 
         motor_control->turnDirection = BACKWARD;
     else 
         motor_control->turnDirection = FORWARD;   
+    //PRINTF("Increments: %d \n", motor_control->increments);
 }
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors, double deltaT){

@@ -71,7 +71,7 @@ struct position_data
 //the value send to the motor-controller
 struct control_value
 {
-    int32_t desiredMotorSpeed;     //Desired motor RPM from the velocity controler
+    int32_t desiredMotorSpeed = 3000;     //Desired motor RPM from the velocity controler
 };
 
 //the value used by the motor-controller
@@ -128,9 +128,12 @@ struct raspberry_settings{
 
 struct controller_errors
 {
-    float merror, mIerror, merror_change, mLast_error = 0;  //errors for the motor controler
-    float verror, vIerror, verror_change, vLast_error = 0;  //errors for the velocity controler
-    float perror, pIerror, perror_change, pLast_error = 0;  //errors for the position controler
+    float merror, merror_change, mLast_error = 0;  //errors for the motor controler
+    float verror, verror_change, vLast_error = 0;  //errors for the velocity controler
+    float perror, perror_change, pLast_error = 0;  //errors for the position controler
+    float mIerror = 0;
+    float vIerror = 0;
+    float pIerror = 0;
 };
 
 struct controller_errors_s
