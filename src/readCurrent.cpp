@@ -7,7 +7,7 @@ HAL_GPIO safetyPin(GPIO_062);
 
 void initADCPins(){
     mainCurrent.init(ADC_CH_000);
-    mainCurrent.init(ADC_CH_004);
+    //mainCurrent.init(ADC_CH_004);
     mainCurrent.init(ADC_CH_010);
     mainCurrent.init(ADC_CH_002);
     voltage.init(ADC_CH_012);
@@ -23,9 +23,9 @@ void readADCPins(additional_sensor_data* data){
 	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef))/ NewCurrentVoltage;
     AT(NOW() + 10*MILLISECONDS);
 
-    uint16_t magADCValue = mainCurrent.read(ADC_CH_004);
-	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
-    AT(NOW() + 10*MILLISECONDS);
+    //uint16_t magADCValue = mainCurrent.read(ADC_CH_004);
+	//data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
+    //AT(NOW() + 10*MILLISECONDS);
 
     uint16_t boardADCValue = mainCurrent.read(ADC_CH_010);
 	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
