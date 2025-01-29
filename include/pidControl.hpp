@@ -27,6 +27,8 @@
 #define MIN_RPM 200
 #define MAX_RAD_PER_SEC (MAX_RPM * 2 * M_PI) / 60
 #define MIN_RAD_PER_SECOND (MIN_RPM * 2 * M_PI) / 60
+const float max_sat_dps = 20; 
+const float max_dot_omega_wheel = 1000;
 #define MAX_VOLTS 5
 
 void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data, double deltaT);
