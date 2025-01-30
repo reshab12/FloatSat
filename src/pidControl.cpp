@@ -6,11 +6,11 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
     int16_t increments_temp;
 
     errors->merror = control->desiredMotorSpeed - data->motorSpeed;
-    errors->mIerror += errors->merror * 0.005;// + errors->meb;
+    errors->mIerror += errors->merror * 0.005 + errors->meb;
     errors->merror_change = (errors->merror - errors->mLast_error)/ 0.005;
     errors->mLast_error = errors->merror;
-    //if((errors->mIerror >= MAX_RAD_PER_SEC) || (errors->mIerror <= -MAX_RAD_PER_SEC)) 
-        //errors->meb += 1* (MAX_RAD_PER_SEC - errors->mIerror);
+    if((errors->mIerror >= max_rpm_contr) || (errors->mIerror <= -max_rpm_contr)) 
+        errors->meb += 1* (max_rpm_contr - errors->mIerror);
 
     data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
     if(data->omega_wheel < MIN_RPM && data->omega_wheel > -MIN_RPM){
@@ -32,7 +32,9 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
             motor_control->turnDirection = FORWARD;   
         }
 
-        if((control->desiredMotorSpeed < 0 && data->motorSpeed < 0) || (control->desiredMotorSpeed > 0 && data->motorSpeed > 0)) motor_control->turnDirection = BREAK;
+        if((data->omega_wheel < 0 && data->motorSpeed > 500) || (data->omega_wheel > 0 && data->motorSpeed < -500)){
+            motor_control->turnDirection = BREAK;
+        }
     }
 }
 
