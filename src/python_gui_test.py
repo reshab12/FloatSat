@@ -39,8 +39,9 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 5
-        self.datasize = 33
+        self.number_of_plots = 6
+        self.datasize = 39
+        self.number_of_boxes = 24
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
         self.plot_refs = [[None for i in range(5)] for j in range(self.number_of_plots)]#5=Max number of lines in one plot
         
@@ -54,7 +55,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "headingMagneto",             #13
                           "headingGyro",                #14
                           "heading",                    #15
-                          "moving",                     #16
+                          "speed",                     #16
                           "motorSpeed",                 #17
                           "omega_wheel",                #18
                           "control value",              #19
@@ -75,24 +76,28 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "boardCurrent",               #34
                           "batterieVoltage",            #35
                           "boardVoltage",               #36
-                          ""
+                          "increments",                  #37
+                          "turnDirection",              #38
+                          "",
+                          "",
                           "",
                           ""
                           ]
+
         self.dataFormat = [
                         #[1,3],
                         [4,3],
                         #[7,3],
                         #[10,3],
-                        [13,3],
+                        [13,4],
                         [17,1],
                         [18,1],
                         #[19,1],
                         #[20,4],
                         #[24,4],
                         [28,4],
-                        [32,5],
-                        [-1,0],
+                        #[32,5],
+                        [37,1],
                         [-1,0],
                         [-1,0]
                         ]
@@ -103,8 +108,8 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         layout2 = QtWidgets.QVBoxLayout()
 
-        self.text_box =  [QtWidgets.QPushButton(self.dataNames[j])for j in range(self.datasize)]
-        for i in range(self.datasize):
+        self.text_box =  [QtWidgets.QPushButton(self.dataNames[j])for j in range(self.number_of_boxes)]
+        for i in range(self.number_of_boxes):
             self.text_box[i].setCheckable(False)
             self.text_box[i].setMaximumWidth(300)
             self.text_box[i].setText(self.dataNames[i])
@@ -139,8 +144,12 @@ class PlotWindow(QtWidgets.QMainWindow):
             self.counter1 = 0
 
             #textbox:
-            for i in range(self.datasize):
-                self.text_box[i].setText(self.dataNames[i]+": "+"{:.2f}".format(data[i]))
+            j=0
+            for i in range(self.number_of_boxes):
+                if(j==4):
+                    j=19
+                self.text_box[i].setText(self.dataNames[j]+": "+"{:.2f}".format(data[j]))
+                j=j+1
        
             #scaling factors for plots not used (autoscale)
             scaling = [5,20,5,4,200,10,10,10,10,10,10]
@@ -246,7 +255,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
 
         self.command_speed_slider = QtWidgets.QSlider()
-        self.command_speed_slider.setRange(1000,5000)
+        self.command_speed_slider.setRange(-20,20)
         self.command_speed_slider.sliderReleased.connect(self.speed_slider_released)
 
     #layout--------------------------------------------------------------------------------
@@ -350,7 +359,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4f4f5f", data)
+    unpacked = struct.unpack("=q3Bx9f3fB3xlfl2f2f4f4f5fHi2x", data)
     #for i in unpacked:
     #    print(i)
     #print()

@@ -311,19 +311,18 @@ void Sensor::run() {
 		Matrix_<1,1,float> peter;
 		peter.r[0][0]=cz;
 
+		float last_pose = mod(x_hat.r[0][0]);
 		
 		update(peter,r2);
 		test += r2 * dt;
 		test = mod(test);
 		
 		
-		
 		position_data pose;
 		pose.heading = mod(x_hat.r[0][0]);
 		pose.headingMagneto = cz;
 		pose.headingGyro = test;
-
-		pose.moving = true;
+		pose.moving = mod(pose.heading-last_pose)/dt;
 
 		topic_position_data.publish(pose);
 
