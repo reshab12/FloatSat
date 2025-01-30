@@ -39,12 +39,13 @@ void MotorControler::run(){
     controller_errors_s mot_errors;
     double deltaT;
     double time = 1.0*NOW()/SECONDS;
+    control.desiredMotorSpeed = 3000;
     TIME_LOOP(0, 5 * MILLISECONDS)
     {
         double tempT = 1.0*NOW()/SECONDS;
         deltaT = tempT - time; 
         time = tempT;
-        cb_control_value_motor_thread.get(control);
+        cb_control_value_motor_thread.getOnlyIfNewData(control);
         MotorSpeedUpdate(&motor);
         calcPIDMotor(&errors, &control,&motor_control, &motor, deltaT);
         mot_errors.error = errors.merror;
