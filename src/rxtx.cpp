@@ -39,6 +39,10 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   CommBuffer<additional_sensor_data> cb_additional_sensor_data_Transmitter;
   Subscriber sub_additional_sensor_data_Transmitter(topic_additional_sensor_data, cb_additional_sensor_data_Transmitter);
 
+  CommBuffer<motor_control_value> cb_motor_control_value_Transmitter;
+  Subscriber sub_motor_control_value_Transmitter(topic_motor_control_value, cb_motor_control_value_Transmitter);
+
+
 /* ~~~~~ Transmitter thread ~~~~~ */
 
   Transmitter::Transmitter(int32_t priority) : StaticThread("STM32 transmitter", priority) {}
@@ -60,6 +64,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     controller_errors_s vel_errors;
     controller_errors_s mot_errors;
     additional_sensor_data sensor_data;
+    motor_control_value motor_control;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
       telem.time = (NOW() / MICROSECONDS);
@@ -94,7 +99,8 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       cb_additional_sensor_data_Transmitter.get(sensor_data);
       telem.sensor_data = sensor_data;
 
-
+      cb_motor_control_value_Transmitter.get(motor_control);
+      telem.motor_control = motor_control;
 
       //MW_PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
       //PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));

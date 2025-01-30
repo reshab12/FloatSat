@@ -54,6 +54,7 @@ void MotorControler::run(){
         mot_errors.Last_error = errors.mLast_error;
         topic_mot_errors.publish(mot_errors);
         topic_motor_data.publish(motor);
+        topic_motor_control_value.publish(motor_control);
         driveMotor(&motor_control);
     }
 }

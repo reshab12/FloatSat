@@ -17,6 +17,7 @@ const uint32_t topic_id_motor_data = 1016;
 const uint32_t topic_id_user_requested_conntrol = 1017;
 const uint32_t topic_id_vel_errors = 1018;
 const uint32_t topic_id_mot_errors = 1019;
+const uint32_t topic_id_motor_control_value = 1020;
 
 const uint32_t topic_id_raspberry_command = 1020;
 const uint32_t topic_id_raspberry_receive = 1021;
@@ -169,6 +170,8 @@ struct telemetry
 
     additional_sensor_data sensor_data;//5f
 
+    motor_control_value motor_control;
+
 };
 
 
@@ -186,6 +189,7 @@ extern Topic<requested_conntrol> topic_user_requested_conntrol;
 extern Topic<motor_data> topic_motor_data;
 extern Topic<controller_errors_s> topic_vel_errors;
 extern Topic<controller_errors_s> topic_mot_errors;
+extern Topic<motor_control_value> topic_motor_control_value;
 
 extern Topic<raspberry_command> topic_raspberry_command;
 extern Topic<raspberry_receive> topic_raspberry_receive;

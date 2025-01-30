@@ -28,6 +28,8 @@ Topic<controller_errors_s> topic_vel_errors(topic_id_vel_errors,"topic_vel_error
 
 Topic<controller_errors_s> topic_mot_errors(topic_id_mot_errors,"topic_mot_errors");
 
+Topic<motor_control_value> topic_motor_control_value(topic_id_motor_control_value,"topic_motor_control_value");
+
 
 Topic<raspberry_command> topic_raspberry_command(topic_id_raspberry_command,"topic_raspberry_command");
 
