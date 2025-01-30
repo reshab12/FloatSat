@@ -13,27 +13,27 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
         //errors->meb += 1* (MAX_RAD_PER_SEC - errors->mIerror);
 
     data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
-    increments_temp = (data->omega_wheel / MAX_RPM) * MOTROINCREMENTS;
-    
-    if(increments_temp > MOTROINCREMENTS) 
-        motor_control->increments = MOTROINCREMENTS;
-    else if(increments_temp < -MOTROINCREMENTS) 
-        motor_control->increments = MOTROINCREMENTS;
-    else{
-        motor_control->increments = abs(increments_temp);
-    }
-
-    if(increments_temp < MIN_RPM && increments_temp > -MIN_RPM){
+    if(data->omega_wheel < MIN_RPM && data->omega_wheel > -MIN_RPM){
         motor_control->increments = 0;
-    }
-    
-    if(data->omega_wheel < 0){
-        motor_control->turnDirection = BACKWARD;
     }else{
-        motor_control->turnDirection = FORWARD;   
-    }
+        increments_temp = (data->omega_wheel / MAX_RPM) * MOTROINCREMENTS;
 
-    if((control->desiredMotorSpeed < 0 && data->motorSpeed < 0) || (control->desiredMotorSpeed > 0 && data->motorSpeed > 0)) motor_control->turnDirection = BREAK;
+        if(increments_temp > MOTROINCREMENTS) 
+            motor_control->increments = MOTROINCREMENTS;
+        else if(increments_temp < -MOTROINCREMENTS) 
+            motor_control->increments = MOTROINCREMENTS;
+        else{
+            motor_control->increments = abs(increments_temp);
+        }
+
+        if(data->omega_wheel < 0){
+            motor_control->turnDirection = BACKWARD;
+        }else{
+            motor_control->turnDirection = FORWARD;   
+        }
+
+        if((control->desiredMotorSpeed < 0 && data->motorSpeed < 0) || (control->desiredMotorSpeed > 0 && data->motorSpeed > 0)) motor_control->turnDirection = BREAK;
+    }
 }
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors, double deltaT){
