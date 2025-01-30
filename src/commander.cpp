@@ -1,7 +1,7 @@
 #include "commander.hpp"
 
-static HAL_UART ras_stm(UART_IDX1); // Rx: PB7 (PA10)  Tx: PB6 (PA9)
-static LinkinterfaceUART link_name_not_imp_2(&ras_stm, 115200, 3, 10);
+static HAL_UART ras_stm(UART_IDX4); // Rx: TC10 Tx: TC11
+static LinkinterfaceUART link_name_not_imp_2(&ras_stm, 115200, 4, 10);
 static Gateway gw_name_not_imp_2(&link_name_not_imp_2, true);
 
 CommBuffer<position_data> cb_position_data_commander_thread;
@@ -39,8 +39,8 @@ void Commander::run(){
             status = 3;//stop mission
         
         if(lastStatus != status){
-            MW_PRINTF("Commander: new status: %d; old status: %d",status,lastStatus);
-            PRINTF("Commander: new status: %d; old status: %d",status,lastStatus);
+            MW_PRINTF("Commander: new status: %d\n",status);
+            PRINTF("Commander: new status: %d\n",status);
             lastStatus = status;
         }
         switch (status)
@@ -81,6 +81,7 @@ void Commander::run(){
             requested_conntrol.requested_angle = heading;
             topic_requested_conntrol.publish(requested_conntrol); 
             status = 1;
+            break;
         case 3://stop
             //send command to raspberry:
             raspberry_command command;
@@ -105,8 +106,8 @@ void Commander::run(){
 
 uint32_t Commander::put(const uint32_t topic_id, const size_t len, void *msg, const NetMsgInfo &) {
         raspberry_receive *received = (raspberry_receive *)msg;
-        MW_PRINTF("raspb: %d\n",received->status);
-        PRINTF("raspb: %d\n",received->status);
+        //MW_PRINTF("raspb: %d\n",received->status);
+        //PRINTF("raspb: %d\n",received->status);
         switch (received->status)
         {
         case 0://map ready to be used
