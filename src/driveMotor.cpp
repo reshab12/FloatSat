@@ -43,8 +43,7 @@ void MotorControler::run(){
     controller_errors_s mot_errors;
     double deltaT;
     double time = 1.0*NOW()/SECONDS;
-    //control.desiredMotorSpeed = 3000;
-    TIME_LOOP(0, 5 * MILLISECONDS)
+    TIME_LOOP(0, 10 * MILLISECONDS)
     {
         double tempT = 1.0*NOW()/SECONDS;
         deltaT = tempT - time; 

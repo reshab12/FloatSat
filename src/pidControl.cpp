@@ -4,20 +4,23 @@
 
 void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data, double deltaT){
     int16_t increments_temp;
-
-    errors->merror = control->desiredMotorSpeed - data->motorSpeed;
-    errors->mIerror += errors->merror * 0.005 + errors->meb;
-    errors->merror_change = (errors->merror - errors->mLast_error)/ 0.005;
-    errors->mLast_error = errors->merror;
-    if((errors->mIerror >= max_rpm_contr) || (errors->mIerror <= -max_rpm_contr)) 
-        errors->meb += 1* (max_rpm_contr - errors->mIerror);
-
-    data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
-    if(data->omega_wheel < MIN_RPM && data->omega_wheel > -MIN_RPM){
+    if(control->desiredMotorSpeed < MIN_RPM && control->desiredMotorSpeed > -MIN_RPM){
+        motor_control->turnDirection = BREAK;
         motor_control->increments = 0;
     }else{
-        increments_temp = (data->omega_wheel / MAX_RPM) * MOTROINCREMENTS;
+        errors->merror = control->desiredMotorSpeed - data->motorSpeed;
+        errors->mIerror += errors->merror * deltaT + errors->meb;
+        errors->merror_change = (errors->merror - errors->mLast_error)/ deltaT;
+        errors->mLast_error = errors->merror;
+        if((errors->mIerror >= MAX_RPM)){ 
+            errors->meb = 1* (MAX_RPM - errors->mIerror);
+        }else if((errors->mIerror <= -MAX_RPM)){
+            errors->meb = 1* (-MAX_RPM - errors->mIerror);
+        }
 
+        data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change;
+
+        increments_temp = (data->omega_wheel / MAX_RPM) * MOTROINCREMENTS;
         if(increments_temp > MOTROINCREMENTS) 
             motor_control->increments = MOTROINCREMENTS;
         else if(increments_temp < -MOTROINCREMENTS) 
@@ -25,13 +28,11 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
         else{
             motor_control->increments = abs(increments_temp);
         }
-
         if(data->omega_wheel < 0){
             motor_control->turnDirection = BACKWARD;
         }else{
             motor_control->turnDirection = FORWARD;   
         }
-
         if((data->omega_wheel < 0 && data->motorSpeed > 500) || (data->omega_wheel > 0 && data->motorSpeed < -500)){
             motor_control->turnDirection = BREAK;
         }
@@ -163,9 +164,8 @@ void VelocityControler::run(){
             }
             calcVel_with_torque(&motor_data, torque, &control, deltaT);
             topic_control_value.publish(control);
-            //PRINTF("Sat Speed: %f", data.wy);
         }else{
-            control.desiredMotorSpeed = 3000.0;
+            control.desiredMotorSpeed = 0.0;
             topic_control_value.publish(control);
         }
     }
