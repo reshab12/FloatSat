@@ -7,7 +7,7 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
 
     errors->merror = control->desiredMotorSpeed - data->motorSpeed;
     errors->mIerror += errors->merror * 0.005;// + errors->meb;
-    errors->merror_change = (errors->mLast_error - errors->merror)/ 0.005;
+    errors->merror_change = (errors->merror - errors->mLast_error)/ 0.005;
     errors->mLast_error = errors->merror;
     //if((errors->mIerror >= MAX_RAD_PER_SEC) || (errors->mIerror <= -MAX_RAD_PER_SEC)) 
         //errors->meb += 1* (MAX_RAD_PER_SEC - errors->mIerror);
@@ -22,11 +22,18 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
     else{
         motor_control->increments = abs(increments_temp);
     }
+
+    if(increments_temp < MIN_RPM && increments_temp > -MIN_RPM){
+        motor_control->increments = 0;
+    }
     
-  //  if(increments_temp < 0) 
-  //      motor_control->turnDirection = BACKWARD;
-    //else 
-    motor_control->turnDirection = FORWARD;   
+    if(data->omega_wheel < 0){
+        motor_control->turnDirection = BACKWARD;
+    }else{
+        motor_control->turnDirection = FORWARD;   
+    }
+
+    if((control->desiredMotorSpeed < 0 && data->motorSpeed < 0) || (control->desiredMotorSpeed > 0 && data->motorSpeed > 0)) motor_control->turnDirection = BREAK;
 }
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors, double deltaT){

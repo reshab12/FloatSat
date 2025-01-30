@@ -256,7 +256,7 @@ void Sensor::run() {
 	int16_t xyzAccel[3];
 	//AT(NOW()+ 2 * SECONDS);
 	offsetGyro(&offsets);
-	offsetMagneto(&offsets);
+	//offsetMagneto(&offsets);
 	float calibratedMagneto[3];
 	float pitch;
 	float roll;

@@ -14,6 +14,10 @@ void driveMotor(motor_control_value* control){
             pwm1.write(0);
             pwm2.write(control->increments);
             break;
+        case BACKWARD:
+            pwm1.write(control->increments);
+            pwm2.write(0);
+            break;
         case BREAK:
             pwm1.write(5000);
             pwm2.write(5000);
@@ -39,7 +43,7 @@ void MotorControler::run(){
     controller_errors_s mot_errors;
     double deltaT;
     double time = 1.0*NOW()/SECONDS;
-    control.desiredMotorSpeed = 3000;
+    //control.desiredMotorSpeed = 3000;
     TIME_LOOP(0, 5 * MILLISECONDS)
     {
         double tempT = 1.0*NOW()/SECONDS;
