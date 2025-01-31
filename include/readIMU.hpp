@@ -52,6 +52,8 @@ void i2cerror();
 
 void initialize();
 
+float mod(float in);
+
 void readAccel(int16_t* xyzCoordinates);
 
 void calcAccel(SensorData* data);

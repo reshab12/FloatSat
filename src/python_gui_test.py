@@ -39,7 +39,7 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 8
+        self.number_of_plots = 5
         self.datasize = 39
         self.number_of_boxes = 24
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
@@ -55,7 +55,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "headingMagneto",             #13
                           "headingGyro",                #14
                           "heading",                    #15
-                          "speed",                     #16
+                          "speed",                      #16
                           "motorSpeed",                 #17
                           "omega_wheel",                #18
                           "control value",              #19
@@ -76,7 +76,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "boardCurrent",               #34
                           "batterieVoltage",            #35
                           "boardVoltage",               #36
-                          "increments",                  #37
+                          "increments",                 #37
                           "turnDirection",              #38
                           "",
                           "",
@@ -93,12 +93,12 @@ class PlotWindow(QtWidgets.QMainWindow):
                         [17,1],
                         #[18,1],
                         #[19,1],
-                        [20,4],
+                        #[20,4],
                         [24,3],
                         [27,1],
-                        [28,4],
+                        #[28,4],
                         #[32,5],
-                        [37,1],
+                        #[37,1],
                         [-1,0],
                         [-1,0]
                         ]
@@ -256,7 +256,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
 
         self.command_speed_slider = QtWidgets.QSlider()
-        self.command_speed_slider.setRange(-20,20)
+        self.command_speed_slider.setRange(-200,200)
         self.command_speed_slider.sliderReleased.connect(self.speed_slider_released)
 
     #layout--------------------------------------------------------------------------------

@@ -41,13 +41,19 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
 }
 
 void calcPIDPos(requested_conntrol* request, position_data* pos, controller_errors* errors, double deltaT){
-    errors->perror = request->requested_angle - pos->heading;
+    errors->perror = mod(request->requested_angle - pos->heading);
     errors->pIerror += errors->perror * deltaT + errors->peb;
     errors->perror_change = (errors->perror - errors->pLast_error) / deltaT;
     errors->pLast_error = errors->perror;
-    if((errors->pIerror >= max_sat_dps) || (errors->pIerror <= -max_sat_dps)) errors->peb += 1* (max_sat_dps - errors->pIerror);
+    if((errors->pIerror >= max_sat_dps)){ 
+        errors->peb = 1* (max_sat_dps - errors->pIerror);
+    }else if(errors->pIerror <= -max_sat_dps){
+        errors->peb = 1* (-max_sat_dps - errors->pIerror);
+    }
 
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
+
+    //MW_PRINTF("Req Sat Speed: %f \n", request->requested_rot_speed);
     /*if(request->requested_rot_speed >= 0)
         request->requested_rot_speed = min(request->requested_rot_speed,max_sat_dps);
     else
@@ -67,6 +73,11 @@ float calcPIDVel(requested_conntrol* request, controller_errors* errors, positio
         errors->veb = 1* (max_dot_omega_wheel*I_WHEEL - errors->vIerror);
     else if(errors->vIerror <= -max_dot_omega_wheel*I_WHEEL)
         errors->veb = 1* (-max_dot_omega_wheel*I_WHEEL - errors->vIerror);
+    
+    if((errors->verror < 4 && errors->verror > -4) && (errors->vIerror > 100 || errors->vIerror < -100)){
+        errors->vIerror = 0;
+    }
+
     errors->verror_change = (errors->verror - errors->vLast_error) / deltaT;
     errors->vLast_error = errors->verror;
 
@@ -85,7 +96,7 @@ void calcVel_with_torque(motor_data* motor_data, float torque, control_value* co
 
     float dot_omega_wheel = torque/I_WHEEL;
 
-    MW_PRINTF("%f, %f, %f\n",omega_wheel_temp,dot_omega_wheel, dot_omega_wheel*deltaT);
+    //MW_PRINTF("%f, %f, %f\n",omega_wheel_temp,dot_omega_wheel, dot_omega_wheel*deltaT);
 
     if(dot_omega_wheel >= 0)
         dot_omega_wheel = min(dot_omega_wheel,max_dot_omega_wheel);
@@ -164,12 +175,6 @@ void VelocityControler::run(){
                 cb_raspberry_control_value_VelocityController.get(torque);
             else{
                 torque = calcPIDVel(&requested_conntrol, &errors, &pose, last_heading, deltaT);
-                controller_errors_s vel_errors;
-                vel_errors.error = errors.verror;
-                vel_errors.error_change = errors.verror_change;
-                vel_errors.Ierror = errors.vIerror;
-                vel_errors.Last_error = torque;
-                topic_vel_errors.publish(vel_errors);
             }
             calcVel_with_torque(&motor_data, torque, &control, deltaT);
             topic_control_value.publish(control);
@@ -203,6 +208,7 @@ void PositionControler::run(){
     position_data position;
     requested_conntrol requested_conntrol;
     satellite_mode mode;
+    controller_errors_s vel_errors;
     double deltaT;
     double time = 1.0*NOW()/SECONDS;
     TIME_LOOP(0, 100 * MILLISECONDS)
@@ -210,12 +216,17 @@ void PositionControler::run(){
         double tempT = 1.0*NOW()/SECONDS;
         deltaT = tempT - time; 
         time = tempT;
-        cb_satellite_mode_PositionControler.get(mode);
+        cb_satellite_mode_PositionControler.getOnlyIfNewData(mode);
         if(mode.control_mode==control_mode_pos){
-            cb_position_data_PositionControler.get(position);
-            cb_user_requested_conntrol_PositionControler.get(requested_conntrol);
+            cb_position_data_PositionControler.getOnlyIfNewData(position);
+            cb_user_requested_conntrol_PositionControler.getOnlyIfNewData(requested_conntrol);
             calcPIDPos(&requested_conntrol, &position, &errors, deltaT);
             topic_requested_conntrol.publish(requested_conntrol);
+            vel_errors.error = errors.perror;
+            vel_errors.error_change = errors.perror_change;
+            vel_errors.Ierror = errors.pIerror;
+            vel_errors.Last_error = requested_conntrol.requested_rot_speed;
+            topic_vel_errors.publish(vel_errors);
         }
     }
 }

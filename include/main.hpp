@@ -20,3 +20,4 @@
 #include "magTorquers.hpp"
 #include "driveMotor.hpp"
 #include "readCurrent.hpp"
+#include "ringbuffer.h"

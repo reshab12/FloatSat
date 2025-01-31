@@ -8,13 +8,14 @@
 
 #define I_WHEEL 0.0001175
 #define I_SATELLITE 0.00834099434
-#define KP_P 1
-#define KI_P 0
+
+#define KP_P 0.5
+#define KI_P 0.001
 #define KD_P 0.001
 
-#define KP_V 0.03
-#define KI_V 0.003
-#define KD_V 0.002
+#define KP_V 0.002
+#define KI_V 0.0006
+#define KD_V 0.0002
 
 #define KP_M 8
 #define KI_M 1.1
@@ -29,7 +30,7 @@
 #define MIN_RAD_PER_SECOND (MIN_RPM * 2 * M_PI) / 60
 const int32_t max_rpm_contr = 5000;
 const float max_rad_ps_contr = 5000*2*M_PI/60;
-const float max_sat_dps = 20; 
+const float max_sat_dps = 200; 
 const float max_dot_omega_wheel = 1000000;
 const float rpm2radps = 0.1047197551;
 #define MAX_VOLTS 5

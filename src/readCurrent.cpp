@@ -14,14 +14,18 @@ void initADCPins(){
 }
 
 void readADCPins(additional_sensor_data* data){
+    //float motorCurrent = 0;
+    //float magCurrent = 0;
+    //float boardCurrent = 0;
+    float boardVoltage = 0;
     uint16_t voltageADC = voltage.read(ADC_CH_012);
-    data->boardVoltage = (voltageADC/ADCRes) * ADCRef;
-    data->batterieVoltage = data->boardVoltage/0.105;
-    AT(NOW() + 10 * MILLISECONDS);
+    boardVoltage = (voltageADC/ADCRes) * ADCRef;
+    data->batterieVoltage = boardVoltage/0.108712121;
+    AT(NOW() + 3 * MILLISECONDS);
 
     uint16_t motorADCValue = mainCurrent.read(ADC_CH_004);
 	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef))/ NewCurrentVoltage;
-    AT(NOW() + 10*MILLISECONDS);
+    AT(NOW() + 3 * MILLISECONDS);
 
     //uint16_t magADCValue = mainCurrent.read(ADC_CH_000);
 	//data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
@@ -29,10 +33,12 @@ void readADCPins(additional_sensor_data* data){
 
     uint16_t boardADCValue = mainCurrent.read(ADC_CH_010);
 	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
-    AT(NOW() + 10 * MILLISECONDS);
+    AT(NOW() + 3 * MILLISECONDS);
 
-    uint16_t solarPanel = mainCurrent.read(ADC_CH_002);
-    //data->solarPanel = ((solarPanel / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
+    //uint16_t solarPanel = mainCurrent.read(ADC_CH_002);
+    //data->solarPanel = ((solarPanel / ADCRes) * ADCRef);
+
+    //data->allCurrent = motorCurrent + magCurrent + boardCurrent;
 }
 
 ReadADCPins::ReadADCPins(const char* name, int32_t priority):StaticThread(name, priority){}
@@ -51,6 +57,6 @@ void ReadADCPins::run(){
         readADCPins(&data);
         topic_additional_sensor_data.publish(data);
         //if(data.batterieVoltage < 11.0) safetyPin.setPins(1);
-        //PRINTF("Motor Current: %f A\n Board Current: %f A\n Torquer Current: %f A\n Board Voltage: %f V\n Batterie Voltage: %f V\n", data.motorCurrent, data.boardCurrent, data.magTorquerCurrent, data.boardVoltage, data.batterieVoltage);
+        PRINTF("Board Current: %f A \n Board Voltage: %f V\n Batterie Voltage: %f V\n", data.boardCurrent, data.boardVoltage, data.batterieVoltage);
     }
 }
