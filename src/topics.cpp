@@ -37,4 +37,6 @@ Topic<raspberry_receive> topic_raspberry_receive(topic_id_raspberry_receive,"top
 
 Topic<raspberry_settings> topic_raspberry_settings(topic_id_raspberry_settings,"topic_raspberry_settings");
 
+Topic<float> topic_raspberry_attitude(topic_id_raspberry_attitude,"topic_raspberry_attitude");
+
 Topic<float> topic_raspberry_control_value(topic_id_raspberry_control_value,"topic_raspberry_control_value");

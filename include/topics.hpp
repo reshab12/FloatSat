@@ -22,7 +22,7 @@ const uint32_t topic_id_motor_control_value = 1020;
 const uint32_t topic_id_raspberry_command = 1020;
 const uint32_t topic_id_raspberry_receive = 1021;
 const uint32_t topic_id_raspberry_settings = 1022;
-const uint32_t topic_id_raspberry_control_mode = 1023;
+const uint32_t topic_id_raspberry_attitude = 1023;
 const uint32_t topic_id_raspberry_control_value = 1024;
 
 // telecommand 
@@ -72,7 +72,7 @@ struct position_data
 //the value send to the motor-controller
 struct control_value
 {
-    int32_t desiredMotorSpeed = 3000;     //Desired motor RPM from the velocity controler
+    int32_t desiredMotorSpeed = 0;     //Desired motor RPM from the velocity controler
 };
 
 //the value used by the motor-controller
@@ -125,7 +125,7 @@ struct raspberry_receive{
 };
 
 struct raspberry_settings{
-    uint8_t number_of_pictures;
+    uint8_t new_folder_number;
 };
 
 struct controller_errors
@@ -196,5 +196,6 @@ extern Topic<motor_control_value> topic_motor_control_value;
 extern Topic<raspberry_command> topic_raspberry_command;
 extern Topic<raspberry_receive> topic_raspberry_receive;
 extern Topic<raspberry_settings> topic_raspberry_settings;
+extern Topic<float> topic_raspberry_attitude;
 extern Topic<float> topic_raspberry_control_value;
 

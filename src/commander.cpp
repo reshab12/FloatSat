@@ -28,7 +28,8 @@ void Commander::run(){
     satellite_mode mode;
         // 0=start; 1=waiting; 2=setNextStep;
 
-    uint16_t number_of_pictures = 10;
+    uint16_t number_of_pictures = 24;
+    uint16_t picture_counter = 0;
     float heading = 0.0f;
     int lastStatus = 0;
     TIME_LOOP(0, 100 * MILLISECONDS)
@@ -61,9 +62,9 @@ void Commander::run(){
 
         case 1://check pose
             cb_position_data_commander_thread.get(pose);
-            if(!pose.moving && (pose.heading-heading)<5){
-                MW_PRINTF("pose.heading-heading: %d\n",(pose.heading-heading));
+            if(!pose.moving && pose.moving < 0.5){//change value ------------------------------------------------------
                 status = 10;
+                picture_counter++;
                 //send command to raspberry:
                 raspberry_command command;
                 command.status = 1;
@@ -73,14 +74,16 @@ void Commander::run(){
             break;
 
         case 2://set new reqested pose
-            heading += 360/number_of_pictures;
-            if(heading>180)
-                heading-=360;
-            else if(heading<-180)
-                heading+=360;
-            requested_conntrol.requested_angle = heading;
-            topic_requested_conntrol.publish(requested_conntrol); 
-            status = 1;
+            if(picture_counter < number_of_pictures){
+                heading += 360/number_of_pictures;
+                if(heading>180)
+                    heading-=360;
+                else if(heading<-180)
+                    heading+=360;
+                requested_conntrol.requested_angle = heading;
+                topic_requested_conntrol.publish(requested_conntrol); 
+                status = 1;
+            }
             break;
         case 3://stop
             //send command to raspberry:
