@@ -93,7 +93,7 @@ void offsetMagneto(Offsets* offset){
 	pin_blue_led.setPins(1);
     int16_t xyzCoordinates[3];
 
-	MW_PRINTF("Rotate about z-Axis");
+	//MW_PRINTF("Rotate about z-Axis");
 	for(int i = 0; i<1000; i++){
 		readMagneto(xyzCoordinates);
 		if(xyzCoordinates[2] < offset->magnetoMin[2]) offset->magnetoMin[2] = xyzCoordinates[2];
@@ -104,8 +104,8 @@ void offsetMagneto(Offsets* offset){
 		else if(xyzCoordinates[0] > offset->magnetoMax[0]) offset->magnetoMax[0] = xyzCoordinates[0];
 		AT(NOW()+ 10 * MILLISECONDS);
 	}
-	MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[0], offset->magnetoMin[0]);
-	MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[1], offset->magnetoMin[1]);
+	//MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[0], offset->magnetoMin[0]);
+	//MW_PRINTF("Max: %f \r\n Min: %f \r\n", offset->magnetoMax[1], offset->magnetoMin[1]);
 	pin_blue_led.setPins(0);
 }
 

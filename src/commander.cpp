@@ -36,11 +36,11 @@ void Commander::run(){
     {
         cb_satellite_mode_commander_thread.get(mode);
 
-        if((mode.mission_mode != mission_mode_star_mapper) && (status != -1))
+        if((mode.mission_mode != mission_mode_star_mapper) && (status != -1)){
             status = 3;//stop mission
-        
+        }
         if(lastStatus != status){
-            MW_PRINTF("Commander: new status: %d\n",status);
+            //MW_PRINTF("Commander: new status: %d\n",status);
             PRINTF("Commander: new status: %d\n",status);
             lastStatus = status;
         }
@@ -62,7 +62,7 @@ void Commander::run(){
 
         case 1://check pose
             cb_position_data_commander_thread.get(pose);
-            if(!pose.moving && pose.moving < 0.5){//change value ------------------------------------------------------
+            if(!pose.moving && pose.moving < 5){//change value ------------------------------------------------------
                 status = 10;
                 picture_counter++;
                 //send command to raspberry:

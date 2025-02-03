@@ -39,7 +39,7 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 5
+        self.number_of_plots = 3
         self.datasize = 39
         self.number_of_boxes = 24
         self.canvasss = [MplCanvas(self, width=5, height=4, dpi=100) for i in range(self.number_of_plots)]
@@ -78,7 +78,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                           "boardVoltage",               #36
                           "increments",                 #37
                           "turnDirection",              #38
-                          "",
+                          "raspberry_attitude",         #39
                           "",
                           "",
                           ""
@@ -94,12 +94,12 @@ class PlotWindow(QtWidgets.QMainWindow):
                         #[18,1],
                         #[19,1],
                         #[20,4],
-                        [24,3],
-                        [27,1],
+                        #[24,3],
+                        #[27,1],
                         #[28,4],
                         #[32,5],
                         #[37,1],
-                        [-1,0],
+                        #[39,1],
                         [-1,0]
                         ]
 
@@ -124,7 +124,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         widget.setLayout(h_layout)
         self.setCentralWidget(widget)
 
-        self.n_data = 300
+        self.n_data = 100
         self.xdata = list(range(self.n_data))
         self.ydata = [[0 for i in range(self.n_data)] for j in range(self.datasize)]
 

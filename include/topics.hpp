@@ -19,11 +19,11 @@ const uint32_t topic_id_vel_errors = 1018;
 const uint32_t topic_id_mot_errors = 1019;
 const uint32_t topic_id_motor_control_value = 1020;
 
-const uint32_t topic_id_raspberry_command = 1020;
-const uint32_t topic_id_raspberry_receive = 1021;
-const uint32_t topic_id_raspberry_settings = 1022;
-const uint32_t topic_id_raspberry_attitude = 1023;
-const uint32_t topic_id_raspberry_control_value = 1024;
+const uint32_t topic_id_raspberry_command = 1120;
+const uint32_t topic_id_raspberry_receive = 1121;
+const uint32_t topic_id_raspberry_settings = 1122;
+const uint32_t topic_id_raspberry_attitude = 1123;
+const uint32_t topic_id_raspberry_control_value = 1124;
 
 // telecommand 
 //from Python Middleware to STM32
@@ -173,6 +173,8 @@ struct telemetry
     additional_sensor_data sensor_data;//5f
 
     motor_control_value motor_control;
+
+    //float raspberry_attitude;
 
 };
 
