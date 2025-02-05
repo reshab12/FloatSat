@@ -19,3 +19,5 @@ make flash main=src/main.cpp
 python3 python_gui_test.py
 
 pyuic6 mainwindow.ui -o MainWindow.py
+
+hallo 
