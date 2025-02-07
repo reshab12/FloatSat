@@ -29,7 +29,7 @@
 #define MAX_RAD_PER_SEC (MAX_RPM * 2 * M_PI) / 60
 #define MIN_RAD_PER_SECOND (MIN_RPM * 2 * M_PI) / 60
 const int32_t max_rpm_contr = 5000;
-const float max_rad_ps_contr = 5000*2*M_PI/60;
+const float max_rad_ps_contr = max_rpm_contr*2*M_PI/60;
 const float max_sat_dps = 200; 
 const float max_dot_omega_wheel = 1000000;
 const float rpm2radps = 0.1047197551;
