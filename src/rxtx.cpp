@@ -160,12 +160,12 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       break;
 
     case command_id_mission_mode:      
-      if(mode.mission_mode == mission_mode_standby){
         //whitch mission should be started:
         switch (telecom->command_variable)
         {
         case mission_mode_standby:
-          //do nothing mode is in standby
+          mode.mission_mode = mission_mode_standby;
+          topic_satellite_mode.publish(mode);
           break;
 
         case mission_mode_hibernation:
@@ -198,9 +198,6 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
         default:
           break;
         }
-      }else{
-        MW_PRINTF("mission not in standby");
-      }
       break;
     
     case command_id_control_mode:

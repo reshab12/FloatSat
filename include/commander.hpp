@@ -2,7 +2,8 @@
 
 #include "main.hpp"
 
-class Commander : public StaticThread<>,Subscriber {
+class Commander : public StaticThread<>//,Subscriber 
+{
     private:
         int8_t status = -1;
     public:
@@ -12,6 +13,6 @@ class Commander : public StaticThread<>,Subscriber {
     
         Commander(int32_t priority);
 
-        uint32_t put(const uint32_t topic_id, const size_t len, void *msg, const NetMsgInfo &) override;
+        //uint32_t put(const uint32_t topic_id, const size_t len, void *msg, const NetMsgInfo &) override;
 
 };
