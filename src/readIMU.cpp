@@ -252,8 +252,9 @@ void Sensor::run() {
 		PRINTF("I am %d! \r\n", data);
 	*/
 	int16_t xyzGyro[3];
+	float xyzGyro_buffer[10][3];
 	int16_t xyzMagneto[3];
-	int16_t xyzAccel[3];
+	//int16_t xyzAccel[3];
 	//AT(NOW()+ 2 * SECONDS);
 	offsetGyro(&offsets);
 	offsetMagneto(&offsets);
@@ -262,72 +263,75 @@ void Sensor::run() {
 	float roll;
 
 	float test=0;
-
+	int counter = 0;
 	imu_data data;
-	TIME_LOOP(1 * SECONDS, 100 * MILLISECONDS){
-
+	TIME_LOOP(1 * SECONDS, 10 * MILLISECONDS){
 		readGyro(xyzGyro);
-		readMagneto(xyzMagneto);
-		readAccel(xyzAccel);
-		calcAccel(&sensorData);
-
-		updateDt();
-
-		calcHeadingGyro(&attitude, xyzGyro[0], &offsets, dt);
-		calibrateMagneto(&offsets, xyzMagneto[0], xyzMagneto[1], xyzMagneto[2], calibratedMagneto);
+		for (size_t i = 0; i < 3; i++)
+		{
+			xyzGyro_buffer[counter][i] = (xyzGyro[i] * 0.07 - offsets.gyro[i]);;
+		}
 		
 		/*pitch = calcPitch(&sensorData);
 		roll = calcRoll(&sensorData);
 		calcHeadingMagnetoPitchRoll(&attitude, calibratedMagneto, roll, pitch);*/
-		
-		calcHeadingMagneto(&attitude, calibratedMagneto);
+		//calcHeadingMagneto(&attitude, calibratedMagneto);
 
-		data.wx = (xyzGyro[0] * 0.07 - offsets.gyro[0]);
-		data.wy = (xyzGyro[1] * 0.07 - offsets.gyro[1]);
-		data.wz = (xyzGyro[2] * 0.07 - offsets.gyro[2]);
+		counter++;
+		if(counter >= 10){
+			counter = 0;
 
-		data.ax = sensorData.accel[0];
-		data.ay = sensorData.accel[1];
-		data.az = sensorData.accel[2];
+			readMagneto(xyzMagneto);
 
-		data.mx = calibratedMagneto[0];
-		data.my = calibratedMagneto[1];
-		data.mz = calibratedMagneto[2];
+			updateDt();
 
-		//for testing direct imu value
-		//data.mx = xyzMagneto[0];
-		//data.my = xyzMagneto[1];
-		//data.mz = xyzMagneto[2];
+			//calcHeadingGyro(&attitude, xyzGyro[0], &offsets, dt);
+			calibrateMagneto(&offsets, xyzMagneto[0], xyzMagneto[1], xyzMagneto[2], calibratedMagneto);
 
-		topic_imu_data.publish(data);
+			for (size_t i = 0; i < 10; i++)
+			{
+				for (size_t j = 0; j < 3; i++)
+				{
+					data.w[j] += xyzGyro_buffer[i][j];
+				}
+			}
+			
+			for (size_t i = 0; i < 3; i++)
+			{
+				data.w[i] /= 10;
+				data.m[i] = calibratedMagneto[i];
+			}
 
-		//Kalman
-		float r2 = data.wz;
-		float p2 = (data.mx);
-		float y2 = (data.my);
-		float cz = mod(atan2(p2,y2) * 180/M_PI);
-		
-		
-		Matrix_<1,1,float> peter;
-		peter.r[0][0]=cz;
+			topic_imu_data.publish(data);
 
-		float last_pose = mod(x_hat.r[0][0]);
-		
-		update(peter,r2);
-		test += r2 * dt;
-		test = mod(test);
-		
-		
-		position_data pose;
-		pose.heading = mod(x_hat.r[0][0]);
-		pose.headingMagneto = cz;
-		pose.headingGyro = test;
-		pose.moving = mod(pose.heading-last_pose)/dt;
+			//Kalman
+			float r2 = data.w[2];
+			float p2 = (data.m[0]);
+			float y2 = (data.m[1]);
+			float cz = mod(atan2(p2,y2) * 180/M_PI);
+			
+			
+			Matrix_<1,1,float> peter;
+			peter.r[0][0]=cz;
 
-		topic_position_data.publish(pose);
+			float last_pose = mod(x_hat.r[0][0]);
+			
+			update(peter,r2);
+			test += r2 * dt;
+			test = mod(test);
+			
+			
+			position_data pose;
+			pose.heading = mod(x_hat.r[0][0]);
+			pose.headingMagneto = cz;
+			pose.headingGyro = test;
+			pose.moving = mod(pose.heading-last_pose)/dt;
 
-		//PRINTF("heading: %f degrees \r\n", attitude.headingMagneto);
-		//MW_PRINTF("gx: %f Gauss  gy: %f Gauss  gz: %f Gauss \r\n", (xyzMagneto[0]*0.00014), (xyzMagneto[1]*0.00014), (xyzMagneto[2]*0.00014));
+			topic_position_data.publish(pose);
+
+			//PRINTF("heading: %f degrees \r\n", attitude.headingMagneto);
+			//MW_PRINTF("gx: %f Gauss  gy: %f Gauss  gz: %f Gauss \r\n", (xyzMagneto[0]*0.00014), (xyzMagneto[1]*0.00014), (xyzMagneto[2]*0.00014));
+		}
 	}
 }
 
