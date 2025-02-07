@@ -57,6 +57,6 @@ void ReadADCPins::run(){
         readADCPins(&data);
         topic_additional_sensor_data.publish(data);
         //if(data.batterieVoltage < 11.0) safetyPin.setPins(1);
-        PRINTF("Board Current: %f A \n Board Voltage: %f V\n Batterie Voltage: %f V\n", data.boardCurrent, data.boardVoltage, data.batterieVoltage);
+        //PRINTF("Board Current: %f A \n Board Voltage: %f V\n Batterie Voltage: %f V\n", data.boardCurrent, data.boardVoltage, data.batterieVoltage);
     }
 }

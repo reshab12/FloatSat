@@ -290,7 +290,7 @@ void Sensor::run() {
 
 			for (size_t i = 0; i < 10; i++)
 			{
-				for (size_t j = 0; j < 3; i++)
+				for (size_t j = 0; j < 3; j++)
 				{
 					data.w[j] += xyzGyro_buffer[i][j];
 				}
