@@ -264,6 +264,7 @@ void Sensor::run() {
 
 	float test=0;
 	int counter = 0;
+	int buffer_size = 10;
 	imu_data data;
 	TIME_LOOP(1 * SECONDS, 10 * MILLISECONDS){
 		readGyro(xyzGyro);
@@ -278,7 +279,7 @@ void Sensor::run() {
 		//calcHeadingMagneto(&attitude, calibratedMagneto);
 
 		counter++;
-		if(counter >= 10){
+		if(counter >= buffer_size){
 			counter = 0;
 
 			readMagneto(xyzMagneto);
@@ -288,7 +289,7 @@ void Sensor::run() {
 			//calcHeadingGyro(&attitude, xyzGyro[0], &offsets, dt);
 			calibrateMagneto(&offsets, xyzMagneto[0], xyzMagneto[1], xyzMagneto[2], calibratedMagneto);
 
-			for (size_t i = 0; i < 10; i++)
+			for (size_t i = 0; i < buffer_size; i++)
 			{
 				for (size_t j = 0; j < 3; j++)
 				{
@@ -298,7 +299,7 @@ void Sensor::run() {
 			
 			for (size_t i = 0; i < 3; i++)
 			{
-				data.w[i] /= 10;
+				data.w[i] /= buffer_size;
 				data.m[i] = calibratedMagneto[i];
 			}
 
