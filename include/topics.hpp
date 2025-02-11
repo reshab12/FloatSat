@@ -176,7 +176,7 @@ struct telemetry
 
     motor_control_value motor_control;
 
-    //float raspberry_attitude;
+    float raspberry_attitude;
 
 };
 

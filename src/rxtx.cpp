@@ -42,6 +42,8 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   CommBuffer<motor_control_value> cb_motor_control_value_Transmitter;
   Subscriber sub_motor_control_value_Transmitter(topic_motor_control_value, cb_motor_control_value_Transmitter);
 
+  CommBuffer<float> cb_raspberry_attitude_Transmitter;
+  Subscriber sub_raspberry_attitude_Transmitter(topic_raspberry_attitude,cb_raspberry_attitude_Transmitter);
 
 /* ~~~~~ Transmitter thread ~~~~~ */
 
@@ -65,6 +67,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     controller_errors_s mot_errors;
     additional_sensor_data sensor_data;
     motor_control_value motor_control;
+    float raspberry_attitude = 0;
     TIME_LOOP(0, 100 * MILLISECONDS)
     {
       telem.time = (NOW() / MICROSECONDS);
@@ -101,6 +104,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
 
       cb_motor_control_value_Transmitter.get(motor_control);
       telem.motor_control = motor_control;
+
+      cb_raspberry_attitude_Transmitter.get(raspberry_attitude);
+      telem.raspberry_attitude = raspberry_attitude;
 
       //MW_PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
       //PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
