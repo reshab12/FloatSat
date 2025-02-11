@@ -223,7 +223,7 @@ class PlotWindow(QtWidgets.QMainWindow):
             while((self.dataNames[j][1])==False):
                 j=j+1
             self.text_box[i].setText(self.dataNames[j][0]+": ")
-            self.data_box[i].setText("{:.2f}".format(data[j]))
+            self.data_box[i].setText("{:.2f}".format(0))
             j=j+1
     
     def clearPlotRefs(self):
