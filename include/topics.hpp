@@ -159,7 +159,7 @@ struct telemetry
     imu_data imu;  //9f
 
     //position_data
-    position_data position; //3fB
+    position_data position; //3ff
 
     motor_data motor_dat; //lf
 

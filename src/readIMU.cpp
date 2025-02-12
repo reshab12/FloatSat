@@ -288,7 +288,9 @@ void Sensor::run() {
 
 			//calcHeadingGyro(&attitude, xyzGyro[0], &offsets, dt);
 			calibrateMagneto(&offsets, xyzMagneto[0], xyzMagneto[1], xyzMagneto[2], calibratedMagneto);
-
+			data.w[0]=0;
+			data.w[1]=0;
+			data.w[2]=0;
 			for (size_t i = 0; i < buffer_size; i++)
 			{
 				for (size_t j = 0; j < 3; j++)

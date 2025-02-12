@@ -467,7 +467,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=q3Bx9f3fflfl2f2f4f4f5fHi2x", data)
+    unpacked = struct.unpack("=q3Bx9f3fflfl2f2f4f4f5fHhf", data)
     #for i in unpacked:
     #    print(i)
     #print()
