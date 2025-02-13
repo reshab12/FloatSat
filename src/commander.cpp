@@ -69,7 +69,8 @@ void Commander::run(){
             break;
 
         case 1://check pose
-            if(abs(mod(heading-pose.heading)) < 2 && pose.moving < 5){//change value ------------------------------------------------------
+            topic_requested_conntrol.publish(requested_conntrol); 
+            if(abs(mod(heading-pose.heading)) < 5 && pose.moving < 2){//change value ------------------------------------------------------
                 status = 10;
                 picture_counter++;
                 //send command to raspberry: request picture
@@ -82,9 +83,10 @@ void Commander::run(){
         case 2://set new reqested pose
             if(picture_counter < number_of_pictures){
                 heading += 360/number_of_pictures;
+                MW_PRINTF("%f\n",heading);
                 heading = mod(heading);
                 requested_conntrol.requested_angle = heading;
-                topic_requested_conntrol.publish(requested_conntrol); 
+                topic_user_requested_conntrol.publish(requested_conntrol); 
                 status = 1;
             }else{ 
                 raspberry_command command;

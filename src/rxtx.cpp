@@ -33,6 +33,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
   CommBuffer<controller_errors_s> cb_vel_errors_Transmitter;
   Subscriber sub_vel_errors_Transmitter(topic_vel_errors, cb_vel_errors_Transmitter);
 
+  CommBuffer<controller_errors_s> cb_pos_errors_Transmitter;
+  Subscriber sub_pos_errors_Transmitter(topic_pos_errors, cb_pos_errors_Transmitter);
+
   CommBuffer<controller_errors_s> cb_mot_errors_Transmitter;
   Subscriber sub_mot_errors_Transmitter(topic_mot_errors, cb_mot_errors_Transmitter);
 
@@ -64,6 +67,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     requested_conntrol req_con;
     control_value control;
     controller_errors_s vel_errors;
+    controller_errors_s pos_errors;    
     controller_errors_s mot_errors;
     additional_sensor_data sensor_data;
     motor_control_value motor_control;
@@ -107,6 +111,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
 
       cb_raspberry_attitude_Transmitter.get(raspberry_attitude);
       telem.raspberry_attitude = raspberry_attitude;
+
+      cb_pos_errors_Transmitter.get(pos_errors);
+      telem.pos_errors = pos_errors;
 
       //MW_PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));
       //PRINTF("Rodos sends telemetry: %lld\n",(NOW() / MICROSECONDS));

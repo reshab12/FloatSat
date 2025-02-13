@@ -45,10 +45,10 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, controller_erro
     errors->pIerror += errors->perror * deltaT + errors->peb;
     errors->perror_change = (errors->perror - errors->pLast_error) / deltaT;
     errors->pLast_error = errors->perror;
-    if((errors->pIerror >= max_sat_dps)){ 
-        errors->peb = 1* (max_sat_dps - errors->pIerror);
-    }else if(errors->pIerror <= -max_sat_dps){
-        errors->peb = 1* (-max_sat_dps - errors->pIerror);
+    if((errors->pIerror >= max_sat_dps/KI_P)){ 
+        errors->peb = 1* (max_sat_dps/KI_P - errors->pIerror);
+    }else if(errors->pIerror <= -max_sat_dps/KI_P){
+        errors->peb = 1* (-max_sat_dps/KI_P - errors->pIerror);
     }
 
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
@@ -150,6 +150,7 @@ void VelocityControler::run(){
     float last_heading = 0;
     int64_t time = NOW();
     double deltaT;
+    controller_errors_s vel_errors;
     TIME_LOOP(0, 25 * MILLISECONDS)
     {
         int64_t tempT = NOW();
@@ -175,6 +176,11 @@ void VelocityControler::run(){
                 cb_raspberry_control_value_VelocityController.get(torque);
             else{
                 torque = calcPIDVel(&requested_conntrol, &errors, &pose, last_heading, deltaT);
+                vel_errors.error = errors.perror;
+                vel_errors.error_change = errors.perror_change;
+                vel_errors.Ierror = errors.pIerror;
+                vel_errors.Last_error = requested_conntrol.requested_rot_speed;
+                topic_vel_errors.publish(vel_errors);
             }
             calcVel_with_torque(&motor_data, torque, &control, deltaT);
             topic_control_value.publish(control);
@@ -193,6 +199,9 @@ Subscriber sub_position_data_PositionControler(topic_position_data, cb_position_
 CommBuffer<requested_conntrol> cb_user_requested_conntrol_PositionControler;
 Subscriber sub_user_requested_conntrol_PositionControler(topic_user_requested_conntrol, cb_user_requested_conntrol_PositionControler);
 
+CommBuffer<requested_conntrol> cb_requested_conntrol_PositionControler;
+Subscriber sub_requested_conntrol_PositionControler(topic_requested_conntrol, cb_requested_conntrol_PositionControler);
+
 CommBuffer<satellite_mode> cb_satellite_mode_PositionControler;
 Subscriber sub_satellite_mode_PositionControler(topic_satellite_mode, cb_satellite_mode_PositionControler);
 
@@ -208,7 +217,7 @@ void PositionControler::run(){
     position_data position;
     requested_conntrol requested_conntrol;
     satellite_mode mode;
-    controller_errors_s vel_errors;
+    controller_errors_s pos_errors;
     double deltaT;
     double time = 1.0*NOW()/SECONDS;
     TIME_LOOP(0, 100 * MILLISECONDS)
@@ -219,14 +228,17 @@ void PositionControler::run(){
         cb_satellite_mode_PositionControler.getOnlyIfNewData(mode);
         if(mode.control_mode==control_mode_pos){
             cb_position_data_PositionControler.getOnlyIfNewData(position);
+            /*if(mode.mission_mode == mission_mode_star_mapper)
+                cb_requested_conntrol_PositionControler.getOnlyIfNewData(requested_conntrol);
+            else*/
             cb_user_requested_conntrol_PositionControler.getOnlyIfNewData(requested_conntrol);
             calcPIDPos(&requested_conntrol, &position, &errors, deltaT);
             topic_requested_conntrol.publish(requested_conntrol);
-            vel_errors.error = errors.perror;
-            vel_errors.error_change = errors.perror_change;
-            vel_errors.Ierror = errors.pIerror;
-            vel_errors.Last_error = requested_conntrol.requested_rot_speed;
-            topic_vel_errors.publish(vel_errors);
+            pos_errors.error = errors.perror;
+            pos_errors.error_change = errors.perror_change;
+            pos_errors.Ierror = errors.pIerror;
+            pos_errors.Last_error = requested_conntrol.requested_rot_speed;
+            topic_pos_errors.publish(pos_errors);
         }
     }
 }
