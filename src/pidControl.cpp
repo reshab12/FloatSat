@@ -16,7 +16,8 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
             errors->meb = 1* (MAX_RPM - errors->mIerror);
         }else if((errors->mIerror <= -MAX_RPM)){
             errors->meb = 1* (-MAX_RPM - errors->mIerror);
-        }
+        }else
+            errors->meb = 0;
 
         //data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M/10 * errors->merror_change + data->omega_wheel;
         data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change ;
@@ -49,7 +50,8 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, controller_erro
         errors->peb = 1* (max_sat_dps/KI_P - errors->pIerror);
     }else if(errors->pIerror <= -max_sat_dps/KI_P){
         errors->peb = 1* (-max_sat_dps/KI_P - errors->pIerror);
-    }
+    }else
+        errors->peb = 0;
 
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
 
@@ -73,8 +75,9 @@ float calcPIDVel(requested_conntrol* request, controller_errors* errors, positio
         errors->veb = 1* (max_dot_omega_wheel*I_WHEEL - errors->vIerror);
     else if(errors->vIerror <= -max_dot_omega_wheel*I_WHEEL)
         errors->veb = 1* (-max_dot_omega_wheel*I_WHEEL - errors->vIerror);
-    
-    if((errors->verror < 4 && errors->verror > -4) && (errors->vIerror > 100 || errors->vIerror < -100)){
+    else
+        errors->veb = 0;
+    if((errors->verror < 1 && errors->verror > -1) && (errors->vIerror > 50 || errors->vIerror < -50)){
         errors->vIerror = 0;
     }
 
@@ -176,10 +179,10 @@ void VelocityControler::run(){
                 cb_raspberry_control_value_VelocityController.get(torque);
             else{
                 torque = calcPIDVel(&requested_conntrol, &errors, &pose, last_heading, deltaT);
-                vel_errors.error = errors.perror;
-                vel_errors.error_change = errors.perror_change;
-                vel_errors.Ierror = errors.pIerror;
-                vel_errors.Last_error = requested_conntrol.requested_rot_speed;
+                vel_errors.error = errors.verror;
+                vel_errors.error_change = errors.verror_change;
+                vel_errors.Ierror = errors.vIerror;
+                //vel_errors.Last_error = requested_conntrol.requested_rot_speed;
                 topic_vel_errors.publish(vel_errors);
             }
             calcVel_with_torque(&motor_data, torque, &control, deltaT);
@@ -237,7 +240,7 @@ void PositionControler::run(){
             pos_errors.error = errors.perror;
             pos_errors.error_change = errors.perror_change;
             pos_errors.Ierror = errors.pIerror;
-            pos_errors.Last_error = requested_conntrol.requested_rot_speed;
+            //pos_errors.Last_error = requested_conntrol.requested_rot_speed;
             topic_pos_errors.publish(pos_errors);
         }
     }
