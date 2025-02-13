@@ -4,9 +4,11 @@
 
 void calcPIDMotor(controller_errors* errors, control_value* control,motor_control_value* motor_control, motor_data* data, double deltaT){
     int16_t increments_temp;
-    if(control->desiredMotorSpeed < MIN_RPM && control->desiredMotorSpeed > -MIN_RPM){
+    if(control->desiredMotorSpeed <= MIN_RPM && control->desiredMotorSpeed >= -MIN_RPM){
         motor_control->turnDirection = BREAK;
         motor_control->increments = 0;
+        errors->mIerror = 0;
+        errors->meb = 0;
     }else{
         errors->merror = control->desiredMotorSpeed - data->motorSpeed;
         errors->mIerror += errors->merror * deltaT + errors->meb;
@@ -175,17 +177,19 @@ void VelocityControler::run(){
             
             cb_motor_data_VelocityControler_thread.get(motor_data);
 
-            if((mode.control_mode==control_mode_ai_pos)||(mode.control_mode==control_mode_ai_vel))
+            if((mode.control_mode==control_mode_ai_pos)||(mode.control_mode==control_mode_ai_vel)){
                 cb_raspberry_control_value_VelocityController.get(torque);
-            else{
+                calcVel_with_torque(&motor_data, torque/10, &control, deltaT);
+            }else{
                 torque = calcPIDVel(&requested_conntrol, &errors, &pose, last_heading, deltaT);
                 vel_errors.error = errors.verror;
                 vel_errors.error_change = errors.verror_change;
                 vel_errors.Ierror = errors.vIerror;
                 //vel_errors.Last_error = requested_conntrol.requested_rot_speed;
                 topic_vel_errors.publish(vel_errors);
+                calcVel_with_torque(&motor_data, torque, &control, deltaT);
+                topic_raspberry_control_value.publish(torque);
             }
-            calcVel_with_torque(&motor_data, torque, &control, deltaT);
             topic_control_value.publish(control);
         }else{
             control.desiredMotorSpeed = 0.0;

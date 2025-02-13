@@ -40,7 +40,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
 
         self.number_of_plots = 6
-        self.datasize = 44
+        self.datasize = 45
         self.number_of_boxes = 17
          
         self.dataNames = [["Time",True],                       #0
@@ -81,7 +81,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                           ["Ierror_pos",False],                     #41
                           ["error_change_pos",False],               #42
                           ["Last_error_pos",False],                 #43
-                          ["",False],
+                          ["torque",False],
                           ["",False],
                           ["",False],
                           ["",False],
@@ -103,7 +103,8 @@ class PlotWindow(QtWidgets.QMainWindow):
                         [28,4,True,"mot errors"],
                         [32,5,False,"currents"],
                         [37,1,False,"increments"],
-                        [39,1,False,"raspberry_attitude"]
+                        [39,1,False,"raspberry_attitude"],
+                        [44,1,False,"torque"]
                         ]
 
 
@@ -111,7 +112,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         self.createMenu()
 
-        self.n_data = 100
+        self.n_data = 300
         self.xdata = list(range(self.n_data))
         self.ydata = [[0 for i in range(self.n_data)] for j in range(self.datasize)]
 
@@ -343,7 +344,8 @@ class MainWindow(QtWidgets.QMainWindow):
             ["standby (stops current mission)", 
              "hibernation",
              "star mapper",
-             "object detection"]) 
+             "object detection",
+             "mission_mode_mag_torquers"]) 
         self.command_var_selection.currentIndexChanged.connect( self.command_var_changed )
 
         self.abort_mission_button = QtWidgets.QPushButton("Abort Mission")
@@ -414,10 +416,11 @@ class MainWindow(QtWidgets.QMainWindow):
             for i in range(5):
                 self.command_var_selection.removeItem(0)
             self.command_var_selection.addItems(
-            ["standby", 
+            ["standby (stops current mission)", 
              "hibernation",
              "star mapper",
-             "object detection"]) 
+             "object detection",
+             "mission_mode_mag_torquers"]) 
         elif self.selected_command == 1:
             #self.command_var_selection =  QtWidgets.QComboBox()
             for i in range(5):
@@ -468,7 +471,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=q3Bx9f3fflfl2f2f4f4f5fHhf4f", data)
+    unpacked = struct.unpack("=q3Bx9f3fflfl2f2f4f4f5fHhf4ff4x", data)
     #for i in unpacked:
     #    print(i)
     #print()

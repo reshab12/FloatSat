@@ -41,23 +41,10 @@ void MagTorquer::run(){
         inputMsgBuffer.get(mode);
         if(mode.mission_mode == mission_mode_mag_torquers){
             driveTorquers(5000);
+        }else{
+            driveTorquers(0);
         }
     }
-    
-    
-    /*while(1){
-
-        AT(END_OF_TIME);
-        motor.desiredMotorSpeed = 1000;
-        driveTorquers(5000);
-        topic_control_value.publish(motor);
-    }*/
-    AT(20*SECONDS);
-    driveTorquers(5000);
-    //PRINTF("Torquers are on! \n");
-    AT(NOW() + 8 * SECONDS);
-    driveTorquers(0);
-    //PRINTF("They are off!");
 }
 
 

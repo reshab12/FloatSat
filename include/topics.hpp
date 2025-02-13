@@ -180,6 +180,8 @@ struct telemetry
     float raspberry_attitude;
 
     controller_errors_s pos_errors;//4f
+
+    float torque;//f
 };
 
 

@@ -31,8 +31,8 @@ const uint8_t LSM9DS1_CTRL_REG4_M[2] = {0x23,0b00001100};
 
 struct Offsets{
     float gyro[3] = {-0.69,2.323,0.405};
-	double magnetoMin[3] = {9.0,-2493.0,999.9};
-	double magnetoMax[3] = {3809.0,1510.0,-999.9};
+	double magnetoMin[3] = {10000,10000,10000};
+	double magnetoMax[3] = {-10000,-10000,-10000};
 	//float accel[3] = {0,0,0};
 };
 
