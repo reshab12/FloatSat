@@ -22,3 +22,4 @@ const uint8_t mission_mode_standby = 0x00;
 const uint8_t mission_mode_hibernation = 0x01;
 const uint8_t mission_mode_star_mapper = 0x02;
 const uint8_t mission_mode_object_detection = 0x03;
+const uint8_t mission_mode_mag_torquers = 0x04;

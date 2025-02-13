@@ -8,3 +8,4 @@ static MotorControler motorControllerThread("motorControllerThread",240);
 static Commander raspberryCommanderThread(220);
 static VelocityControler velocityControler("VelocityControlerThread",230);
 static PositionControler positionControler("PositionControler",245);
+static MagTorquer magTorquer("magT",130);

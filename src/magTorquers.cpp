@@ -22,15 +22,29 @@ void driveTorquers(uint16_t value){
     }
 }*/
 
-MagTorquer::MagTorquer(const char* name, int32_t priority):StaticThread(name,priority){}
+MagTorquer::MagTorquer(const char* name, int32_t priority):StaticThread(name,priority),Subscriber(topic_satellite_mode,name){}
 
 void MagTorquer::init(){
     initializeTorquers();
     initializeMotor();
 }
 
+CommBuffer<satellite_mode> cb_satellite_mode_torquers;
+Subscriber sub_satellite_mode_torquers(topic_satellite_mode, cb_satellite_mode_torquers);
+
+
 void MagTorquer::run(){
-    control_value motor;
+    satellite_mode mode;
+    while (true)
+    {
+        suspendCallerUntil();
+        inputMsgBuffer.get(mode);
+        if(mode.mission_mode == mission_mode_mag_torquers){
+            driveTorquers(5000);
+        }
+    }
+    
+    
     /*while(1){
 
         AT(END_OF_TIME);
@@ -45,3 +59,12 @@ void MagTorquer::run(){
     driveTorquers(0);
     //PRINTF("They are off!");
 }
+
+
+uint32_t MagTorquer::put(const uint32_t topicId, const size_t len, void *data, [[gnu::unused]] const NetMsgInfo &netMsgInfo) {
+    inputMsgBuffer.put(*(satellite_mode *) data);
+    this->resume();                         // not to publish from interrupt, call a thread to do it
+    return 1;
+}
+
+
