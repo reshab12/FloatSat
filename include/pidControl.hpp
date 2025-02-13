@@ -25,7 +25,7 @@
 #define FREQUENCY 50
 //#define CONTROLTIME 0.005
 #define MAX_RPM  9000 // 4100
-#define MIN_RPM 200
+#define MIN_RPM 100
 #define MAX_RAD_PER_SEC (MAX_RPM * 2 * M_PI) / 60
 #define MIN_RAD_PER_SECOND (MIN_RPM * 2 * M_PI) / 60
 const int32_t max_rpm_contr = 5000;
