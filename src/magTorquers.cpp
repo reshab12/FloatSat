@@ -14,7 +14,7 @@ void driveTorquers(uint16_t value){
 }
 
 void desaturate(motor_data* motor, controller_errors* errors, control_value* control, motor_control_value* motor_control, double deltaT){
-    motor->motorSpeed = 3000;
+    motor->motorSpeed = 1000;
     driveTorquers(5000);
     while(abs(motor->motorSpeed)-3000>100){
         MotorSpeedUpdate(motor);
@@ -30,6 +30,13 @@ void MagTorquer::init(){
 }
 
 void MagTorquer::run(){
+    control_value motor;
+    while(1){
+        AT(END_OF_TIME);
+        motor.desiredMotorSpeed = 1000;
+        driveTorquers(5000);
+        topic_control_value.publish(motor);
+    }
     driveTorquers(5000);
     PRINTF("Torquers are on! \n");
     AT(NOW() + 5 * SECONDS);

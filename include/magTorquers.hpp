@@ -12,3 +12,10 @@ public:
 
     void run();
 };
+
+struct Receiver : public Subscriber
+{
+  Receiver();
+
+  uint32_t put(const uint32_t topic_id, const size_t len, void *msg, const NetMsgInfo &) override;
+};
