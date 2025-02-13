@@ -21,3 +21,4 @@
 #include "driveMotor.hpp"
 #include "readCurrent.hpp"
 #include "ringbuffer.h"
+#include "sunSensor.hpp"

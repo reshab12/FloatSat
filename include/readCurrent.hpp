@@ -2,13 +2,10 @@
 
 #include "main.hpp"
 
-//void readMotorCurrent(additional_sensor_data* data);
+HAL_ADC mainCurrent(ADC_IDX2);
+HAL_ADC voltage(ADC_IDX1);
 
-//void readMagTorquerCurrent(additional_sensor_data* data);
-
-//void readBoardCurrent(additional_sensor_data* data);
-
-//void readVoltage(additional_sensor_data* data);
+HAL_GPIO safetyPin(GPIO_062);
 
 void initADCPins();
 

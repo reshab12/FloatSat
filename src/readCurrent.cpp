@@ -1,10 +1,5 @@
 #include "readCurrent.hpp"
 
-HAL_ADC mainCurrent(ADC_IDX2);
-HAL_ADC voltage(ADC_IDX1);
-
-HAL_GPIO safetyPin(GPIO_062);
-
 void initADCPins(){
     //mainCurrent.init(ADC_CH_000);
     mainCurrent.init(ADC_CH_004);
@@ -34,9 +29,6 @@ void readADCPins(additional_sensor_data* data){
     uint16_t boardADCValue = mainCurrent.read(ADC_CH_010);
 	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
     AT(NOW() + 3 * MILLISECONDS);
-
-    //uint16_t solarPanel = mainCurrent.read(ADC_CH_002);
-    //data->solarPanel = ((solarPanel / ADCRes) * ADCRef);
 
     //data->allCurrent = motorCurrent + magCurrent + boardCurrent;
 }
