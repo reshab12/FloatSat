@@ -39,16 +39,16 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 3
+        self.number_of_plots = 5
         self.datasize = 40
-        self.number_of_boxes = 27
+        self.number_of_boxes = 17
          
         self.dataNames = [["Time",True],                       #0
                           ["pose_estimation_mode",True],       #1
                           ["control_mode",True],               #2
                           ["mission_mode",True],               #3
-                          ["wx",True],["wy",True],["wz",True],               #4
-                          ["mx",True],["my",True],["mz",True],               #7
+                          ["wx",False],["wy",False],["wz",False],               #4
+                          ["mx",False],["my",False],["mz",False],               #7
                           ["ax",False],["ay",False],["az",False],               #10
                           ["headingMagneto",False],             #13
                           ["headingGyro",False],                #14
@@ -57,17 +57,17 @@ class PlotWindow(QtWidgets.QMainWindow):
                           ["motorSpeed",True],                 #17
                           ["omega_wheel",False],                #18
                           ["control value",False],              #19
-                          ["requested_angle",False],            #20
-                          ["requested_rot_speed",False],        #21
+                          ["requested_angle",True],            #20
+                          ["requested_rot_speed",True],        #21
                           ["user_requested_angle",True],       #22
                           ["user_requested_rot_speed",True],   #23
-                          ["error_vel",True],                      #24
-                          ["Ierror_vel",True],                     #25
-                          ["error_change_vel",True],               #26
+                          ["error_vel",False],                      #24
+                          ["Ierror_vel",False],                     #25
+                          ["error_change_vel",False],               #26
                           ["Last_error_vel",False],                 #27
-                          ["error_mot",True],                      #28
-                          ["Ierror_mot",True],                     #29
-                          ["error_change_mot",True],               #30
+                          ["error_mot",False],                      #28
+                          ["Ierror_mot",False],                     #29
+                          ["error_change_mot",False],               #30
                           ["Last_error_mot",False],                 #31
                           ["motorCurrent",True],               #32
                           ["magTorquerCurrent",True],          #33
@@ -94,11 +94,11 @@ class PlotWindow(QtWidgets.QMainWindow):
                         [7,3,False,"mag"],
                         [10,3,False,"acc"],
                         [13,4,True,"heading"],
-                        [17,1,False,"motor speed"],
+                        [17,1,True,"motor speed"],
                         [18,1,False,"omega_wheel"],
                         [19,1,False,"control value"],
                         [20,4,False,"requested values"],
-                        [24,4,False,"vel errors"],
+                        [24,4,True,"vel errors"],
                         [28,4,True,"mot errors"],
                         [32,5,False,"currents"],
                         [37,1,False,"increments"],
