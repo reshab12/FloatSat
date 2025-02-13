@@ -39,8 +39,8 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.number_of_plots = 5
-        self.datasize = 40
+        self.number_of_plots = 6
+        self.datasize = 44
         self.number_of_boxes = 17
          
         self.dataNames = [["Time",True],                       #0
@@ -77,10 +77,10 @@ class PlotWindow(QtWidgets.QMainWindow):
                           ["increments",False],                 #37
                           ["turnDirection",False],              #38
                           ["raspberry_attitude",True],         #39
-                          ["",False],
-                          ["",False],
-                          ["",False],
-                          ["",False],
+                          ["error_pos",False],                      #40
+                          ["Ierror_pos",False],                     #41
+                          ["error_change_pos",False],               #42
+                          ["Last_error_pos",False],                 #43
                           ["",False],
                           ["",False],
                           ["",False],
@@ -98,6 +98,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                         [18,1,False,"omega_wheel"],
                         [19,1,False,"control value"],
                         [20,4,False,"requested values"],
+                        [40,4,True,"pos errors"],
                         [24,4,True,"vel errors"],
                         [28,4,True,"mot errors"],
                         [32,5,False,"currents"],
@@ -467,7 +468,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=q3Bx9f3fflfl2f2f4f4f5fHhf", data)
+    unpacked = struct.unpack("=q3Bx9f3fflfl2f2f4f4f5fHhf4f", data)
     #for i in unpacked:
     #    print(i)
     #print()
