@@ -341,11 +341,10 @@ class MainWindow(QtWidgets.QMainWindow):
      
         self.command_var_selection = QtWidgets.QComboBox()
         self.command_var_selection.addItems(
-            ["standby (stops current mission)", 
-             "hibernation",
+            ["standby (stops current mission)",
+             "mmag torquers",
              "star mapper",
-             "object detection",
-             "mission_mode_mag_torquers"]) 
+             "object detection"]) 
         self.command_var_selection.currentIndexChanged.connect( self.command_var_changed )
 
         self.abort_mission_button = QtWidgets.QPushButton("Abort Mission")
@@ -417,10 +416,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.command_var_selection.removeItem(0)
             self.command_var_selection.addItems(
             ["standby (stops current mission)", 
-             "hibernation",
+             "mission_mode_mag_torquers",
              "star mapper",
-             "object detection",
-             "mission_mode_mag_torquers"]) 
+             "object detection"]) 
         elif self.selected_command == 1:
             #self.command_var_selection =  QtWidgets.QComboBox()
             for i in range(5):
@@ -429,7 +427,8 @@ class MainWindow(QtWidgets.QMainWindow):
             ["standby", 
              "position control",
              "velocity control",
-             "ai control"]) 
+             "ai control",
+             "stop wheel"]) 
         elif self.selected_command == 2:
             #self.command_var_selection =  QtWidgets.QComboBox()
             for i in range(5):
