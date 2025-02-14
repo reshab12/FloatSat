@@ -32,14 +32,27 @@ void MagTorquer::init(){
 CommBuffer<satellite_mode> cb_satellite_mode_torquers;
 Subscriber sub_satellite_mode_torquers(topic_satellite_mode, cb_satellite_mode_torquers);
 
+CommBuffer<motor_data> cb_motor_data_torquers;
+Subscriber sub_motor_data_torquer(topic_motor_data, cb_motor_data_torquers);
+
 
 void MagTorquer::run(){
     satellite_mode mode;
+    requested_conntrol pose;
+    motor_data motor;
     while (true)
     {
         suspendCallerUntil();
         inputMsgBuffer.get(mode);
         if(mode.mission_mode == mission_mode_mag_torquers){
+            cb_motor_data_torquers.getOnlyIfNewData(motor);
+            if(motor.motorSpeed > 0){
+            /*pose.requested_angle = 90;
+            topic_user_requested_conntrol.publish(pose);*/
+            }else{
+            /*pose.requested_angle = 90;
+            topic_user_requested_conntrol.publish(pose);*/
+            }
             driveTorquers(5000);
         }else{
             driveTorquers(0);
