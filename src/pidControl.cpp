@@ -164,8 +164,7 @@ void VelocityControler::run(){
         cb_satellite_mode_VelocityControler.get(mode);
         if( (mode.control_mode==control_mode_pos)||
             (mode.control_mode==control_mode_vel)||
-            (mode.control_mode==control_mode_ai_pos)||
-            (mode.control_mode==control_mode_ai_vel))
+            (mode.control_mode==control_mode_ai_pos))
         {
             cb_imu_data_VelocityControler_thread.get(data);
             last_heading = pose.heading;
@@ -177,7 +176,7 @@ void VelocityControler::run(){
             
             cb_motor_data_VelocityControler_thread.get(motor_data);
 
-            if((mode.control_mode==control_mode_ai_pos)||(mode.control_mode==control_mode_ai_vel)){
+            if((mode.control_mode==control_mode_ai_pos)){
                 cb_raspberry_control_value_VelocityController.get(torque);
                 calcVel_with_torque(&motor_data, torque/10, &control, deltaT);
             }else{
@@ -191,7 +190,7 @@ void VelocityControler::run(){
                 topic_raspberry_control_value.publish(torque);
             }
             topic_control_value.publish(control);
-        }else{
+        }else if(mode.control_mode == control_mode_stop_wheel){
             control.desiredMotorSpeed = 0.0;
             topic_control_value.publish(control);
         }

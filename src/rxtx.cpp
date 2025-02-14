@@ -165,14 +165,12 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
     switch (telecom->command_id)
     {
     case command_id_abort_mission:
-      if(mode.mission_mode != mission_mode_standby){
         mode.mission_mode = mission_mode_standby;
         mode.control_mode = control_mode_vel;
         requested_conntrol.requested_rot_speed = 0;
 
-        topic_requested_conntrol.publish(requested_conntrol);
+        topic_user_requested_conntrol.publish(requested_conntrol);
         topic_satellite_mode.publish(mode);
-      }
       break;
 
     case command_id_reboot:
@@ -186,12 +184,6 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
         {
         case mission_mode_standby:
           mode.mission_mode = mission_mode_standby;
-          topic_satellite_mode.publish(mode);
-          break;
-
-        case mission_mode_hibernation:
-          //change mode to hibernation
-          mode.mission_mode = mission_mode_hibernation;
           topic_satellite_mode.publish(mode);
           break;
 
@@ -210,11 +202,18 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
           //start object detection
           mode.control_mode = control_mode_vel;
           mode.mission_mode = mission_mode_object_detection;
-          requested_conntrol.requested_rot_speed = 1;
+          requested_conntrol.requested_rot_speed = 30;
 
           topic_user_requested_conntrol.publish(requested_conntrol);
           topic_satellite_mode.publish(mode);
           break;
+
+        case mission_mode_mag_torquers:
+          //start object detection
+          mode.mission_mode = mission_mode_mag_torquers;
+
+          topic_satellite_mode.publish(mode);
+          break;          
 
         default:
           break;
