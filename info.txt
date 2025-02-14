@@ -21,3 +21,9 @@ python3 python_gui_test.py
 pyuic6 mainwindow.ui -o MainWindow.py
 
 hallo 
+
+
+45°
+
++ = +rpm
+- = -rpm

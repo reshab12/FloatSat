@@ -12,9 +12,6 @@ void initADCPins(){
 }
 
 void readADCPins(additional_sensor_data* data){
-    //float motorCurrent = 0;
-    //float magCurrent = 0;
-    //float boardCurrent = 0;
     float boardVoltage = 0;
     uint16_t voltageADC = voltage.read(ADC_CH_012);
     boardVoltage = (voltageADC/ADCRes) * ADCRef;
@@ -52,6 +49,5 @@ void ReadADCPins::run(){
         readADCPins(&data);
         topic_additional_sensor_data.publish(data);
         //if(data.batterieVoltage < 11.0) safetyPin.setPins(1);
-        //PRINTF("Board Current: %f A \n Board Voltage: %f V\n Batterie Voltage: %f V\n", data.boardCurrent, data.boardVoltage, data.batterieVoltage);
     }
 }

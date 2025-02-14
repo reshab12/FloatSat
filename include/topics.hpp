@@ -94,7 +94,7 @@ struct additional_sensor_data
     float batterieVoltage;      //Voltage in the batteries.
     float boardVoltage;         //Voltage after the voltage devider.
     //float solarPanel;           //Current at the solar panel.
-    //float allCurrent;
+    //float allCurrent;           //Entire consumed current
 };
 
 struct motor_data
