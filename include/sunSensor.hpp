@@ -2,7 +2,7 @@
 #include "main.hpp"
 
 
-void readSolarPanel(float voltage);
+void readSolarPanel(float &voltage);
 
 class SunSensor:public Subscriber, public StaticThread<>{
 private:
