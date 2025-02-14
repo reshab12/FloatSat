@@ -41,7 +41,7 @@ void SunSensor::run(){
         for(int i = 0; i < 5000; i++){
             msg.requested_rot_speed = 30;
             msg.requested_angle = 0;
-            topic_requested_conntrol.publish(msg);
+            topic_user_requested_conntrol.publish(msg);
             cb_sunSensor_additional_sensor_data.getOnlyIfNewData(data);
             cb_pose.getOnlyIfNewData(pose);
             readSolarPanel(voltage);
@@ -52,6 +52,11 @@ void SunSensor::run(){
             AT(NOW() + 5 * MILLISECONDS);
         }
     }
+
+    sunMsgBuffer.get(mode);
     msg.requested_angle = sunArray[1];
     topic_requested_conntrol.publish(msg);
+    mode.control_mode = control_mode_pos;
+    mode.mission_mode = mission_mode_standby;
+    topic_satellite_mode.publish(mode);
 }
