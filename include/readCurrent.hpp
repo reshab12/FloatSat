@@ -2,16 +2,17 @@
 
 #include "main.hpp"
 
-HAL_ADC mainCurrent(ADC_IDX2);
-HAL_ADC voltage(ADC_IDX1);
+extern HAL_ADC mainCurrent;
+extern HAL_ADC voltage;
 
-HAL_GPIO safetyPin(GPIO_062);
 
 void initADCPins();
 
 void readADCPins(additional_sensor_data* data);
 
 class ReadADCPins: StaticThread<>{
+private:
+    HAL_GPIO safetyPin;
 public:
     ReadADCPins(const char* name, int32_t priority);
 

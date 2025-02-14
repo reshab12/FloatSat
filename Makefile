@@ -30,6 +30,7 @@ src/rxtx.cpp \
 src/topics.cpp \
 src/readCurrent.cpp \
 src/magTorquers.cpp \
+src/sunSensor.cpp \
 $(main)
 
 

@@ -1,4 +1,6 @@
+#pragma once
 #include "main.hpp"
+
 
 void readSolarPanel(float voltage);
 

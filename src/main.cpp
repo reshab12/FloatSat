@@ -9,4 +9,4 @@ static Commander raspberryCommanderThread(220);
 static VelocityControler velocityControler("VelocityControlerThread",230);
 static PositionControler positionControler("PositionControler",245);
 static MagTorquer magTorquer("magT",130);
-static SunSensor sunSensor("sunSensor",130);
+static SunSensor sunSensor("sunSensor",135);
