@@ -7,6 +7,8 @@ void driveTorquers1(uint16_t value);
 
 void driveTorquers2(uint16_t value);
 
+float dead_angle(float speed);
+
 class MagTorquer: public Subscriber, public StaticThread<>{
 private:
     CommBuffer<satellite_mode> inputMsgBuffer;

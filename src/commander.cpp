@@ -60,7 +60,7 @@ void Commander::run(){
                 status = 0;
             break;
         case 0://start     
-            heading=pose.heading;
+            heading=0;//pose.heading;
 
             requested_conntrol.requested_angle = heading;
             topic_requested_conntrol.publish(requested_conntrol);
