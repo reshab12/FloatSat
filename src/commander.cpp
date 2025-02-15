@@ -50,7 +50,7 @@ void Commander::run(){
         }
         if(lastStatus != status){
             //MW_PRINTF("Commander: new status: %d\n",status);
-            MW_PRINTF("Commander: new status: %d\n",status);
+            //MW_PRINTF("Commander: new status: %d\n",status);
             lastStatus = status;
         }
         switch (status)
@@ -83,7 +83,7 @@ void Commander::run(){
         case 2://set new reqested pose
             if(picture_counter < number_of_pictures){
                 heading += 360/number_of_pictures;
-                MW_PRINTF("%f\n",heading);
+                //MW_PRINTF("%f\n",heading);
                 heading = mod(heading);
                 requested_conntrol.requested_angle = heading;
                 topic_user_requested_conntrol.publish(requested_conntrol); 

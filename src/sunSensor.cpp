@@ -45,10 +45,10 @@ void SunSensor::run(){
                 } 
                 AT(NOW() + 20 * MILLISECONDS);
             }
-            MW_PRINTF("Voltage %f \n", sunArray[0]);
+            //MW_PRINTF("Voltage %f \n", sunArray[0]);
             sunMsgBuffer.get(mode);
             msg.requested_angle = sunArray[1];
-            MW_PRINTF("Heading: %f \n", sunArray[1]);
+            //MW_PRINTF("Heading: %f \n", sunArray[1]);
             topic_user_requested_conntrol.publish(msg);
             mode.control_mode = control_mode_pos;
             mode.mission_mode = mission_mode_standby;
