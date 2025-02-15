@@ -4,8 +4,8 @@ HAL_PWM pwmT1(PWM_IDX13);
 HAL_PWM pwmT2(PWM_IDX14);
 
 void initializeTorquers(){
-    pwmT1.init(MOTORFREQUENCY,MOTROINCREMENTS);
-    pwmT2.init(MOTORFREQUENCY,MOTROINCREMENTS);
+    pwmT1.init(100,MOTROINCREMENTS);
+    pwmT2.init(100,MOTROINCREMENTS);
 }
 
 void driveTorquers1(uint16_t value){
@@ -15,7 +15,15 @@ void driveTorquers1(uint16_t value){
 
 void driveTorquers2(uint16_t value){
     pwmT1.write(0);
-    pwmT2.write(value);
+    pwmT2.write(value/2);
+}
+
+float dead_angle(float speed){
+    float kmag = 2;
+    float angle = 15 + abs(speed) * kmag;
+    if (angle > 45)
+        angle=45;
+    return angle;
 }
 
 MagTorquer::MagTorquer(const char* name, int32_t priority):StaticThread(name,priority),Subscriber(topic_satellite_mode,name){}
@@ -53,29 +61,34 @@ void MagTorquer::run(){
                     pose.requested_angle = -90 + 45;
                     topic_user_requested_conntrol.publish(pose);
                     if(position.heading > 45 + 20 | position.heading < 45-180 -20){
-                        driveTorquers2(5000);
-                    }else if(position.heading < 45 - 20 & position.heading > 45-180 +20){
+                        if(!(position.moving > 30 || position.moving <-30)){
+                            driveTorquers2(5000);
+                        }else{
+                            driveTorquers1(0);
+                        }
+                    }else if(position.heading < 45 - dead_angle(position.moving) & position.heading > 45 - 180 + dead_angle(position.moving)){
                         driveTorquers1(5000);
                     }else{
                         driveTorquers1(0);
-                        driveTorquers2(0);
                     }
                 }else if(motor.motorSpeed < -1000 ){
                     pose.requested_angle = 90 + 45;
                     topic_user_requested_conntrol.publish(pose);
                     if(position.heading > 45 + 20| position.heading < 45-180 - 20){
-                        driveTorquers1(5000);
+                        if(!(position.moving > 30 || position.moving <-30)){
+                            driveTorquers1(5000);
+                        }else{
+                            driveTorquers2(0);
+                        }
                     }else if(position.heading < 45 - 20 & position.heading > 45-180 +20){
                         driveTorquers2(5000);
                     }else{
                         driveTorquers1(0);
-                        driveTorquers2(0);
                     }
                 }else{
                     pose.requested_angle = 45;
                     topic_user_requested_conntrol.publish(pose);
                     driveTorquers1(0);
-                    driveTorquers2(0);
 
                     inputMsgBuffer.getOnlyIfNewData(mode);
                     mode.mission_mode = mission_mode_standby;

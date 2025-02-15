@@ -72,6 +72,7 @@ float calcPIDVel(requested_conntrol* request, controller_errors* errors, positio
         request->requested_rot_speed = max(request->requested_rot_speed,-max_sat_dps);
     
     errors->verror = request->requested_rot_speed - pose->moving;
+    
     errors->vIerror += errors->verror * deltaT + errors->veb;
     if((errors->vIerror >= max_dot_omega_wheel*I_WHEEL))
         errors->veb = 1* (max_dot_omega_wheel*I_WHEEL - errors->vIerror);
