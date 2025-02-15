@@ -47,32 +47,41 @@ void MagTorquer::run(){
         if(mode.mission_mode == mission_mode_mag_torquers){
             cb_motor_data_torquers.getOnlyIfNewData(motor);
             cb_position_data_torquer.getOnlyIfNewData(position);
-            if(motor.motorSpeed > 1000){
-                pose.requested_angle = -90 + 45;
-                topic_user_requested_conntrol.publish(pose);
-                if(position.heading > 45 & position.heading < 45-180){
-                    driveTorquers1(5000);
-                }else{
-                    driveTorquers2(5000);
-                }
-            }else if(motor.motorSpeed < -1000){
-                pose.requested_angle = 90 + 45;
-                topic_user_requested_conntrol.publish(pose);
-                if(position.heading < 45 & position.heading > 180-45){
-                    driveTorquers1(5000);
-                }else{
-                    driveTorquers2(5000);
-                }
+            if(motor.motorSpeed > max_rpm_contr + 200 || motor.motorSpeed < -max_rpm_contr - 200){
             }else{
-                pose.requested_angle = 45;
-                topic_user_requested_conntrol.publish(pose);
-                driveTorquers1(0);
-                driveTorquers2(0);
+                if(motor.motorSpeed > 1000 ){
+                    pose.requested_angle = -90 + 45;
+                    topic_user_requested_conntrol.publish(pose);
+                    if(position.heading > 45 + 20 | position.heading < 45-180 -20){
+                        driveTorquers2(5000);
+                    }else if(position.heading < 45 - 20 & position.heading > 45-180 +20){
+                        driveTorquers1(5000);
+                    }else{
+                        driveTorquers1(0);
+                        driveTorquers2(0);
+                    }
+                }else if(motor.motorSpeed < -1000 ){
+                    pose.requested_angle = 90 + 45;
+                    topic_user_requested_conntrol.publish(pose);
+                    if(position.heading > 45 + 20| position.heading < 45-180 - 20){
+                        driveTorquers1(5000);
+                    }else if(position.heading < 45 - 20 & position.heading > 45-180 +20){
+                        driveTorquers2(5000);
+                    }else{
+                        driveTorquers1(0);
+                        driveTorquers2(0);
+                    }
+                }else{
+                    pose.requested_angle = 45;
+                    topic_user_requested_conntrol.publish(pose);
+                    driveTorquers1(0);
+                    driveTorquers2(0);
 
-                inputMsgBuffer.getOnlyIfNewData(mode);
-                mode.mission_mode = mission_mode_standby;
-                topic_satellite_mode.publish(mode);
-            }   
+                    inputMsgBuffer.getOnlyIfNewData(mode);
+                    mode.mission_mode = mission_mode_standby;
+                    topic_satellite_mode.publish(mode);
+                } 
+            }  
             AT(start_time + 100 * MILLISECONDS);      
         }else{
             driveTorquers1(0);
