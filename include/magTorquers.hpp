@@ -3,7 +3,9 @@
 
 void initializeTorquers();
 
-void driveTorquers(uint16_t value);
+void driveTorquers1(uint16_t value);
+
+void driveTorquers2(uint16_t value);
 
 class MagTorquer: public Subscriber, public StaticThread<>{
 private:
