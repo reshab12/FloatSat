@@ -8,9 +8,14 @@ void initializeTorquers(){
     pwmT2.init(MOTORFREQUENCY,MOTROINCREMENTS);
 }
 
-void driveTorquers(uint16_t value){
+void driveTorquers1(uint16_t value){
     pwmT1.write(value);
     pwmT2.write(0);
+}
+
+void driveTorquers2(uint16_t value){
+    pwmT1.write(0);
+    pwmT2.write(value);
 }
 
 MagTorquer::MagTorquer(const char* name, int32_t priority):StaticThread(name,priority),Subscriber(topic_satellite_mode,name){}
@@ -26,10 +31,14 @@ Subscriber sub_satellite_mode_torquers(topic_satellite_mode, cb_satellite_mode_t
 CommBuffer<motor_data> cb_motor_data_torquers;
 Subscriber sub_motor_data_torquer(topic_motor_data, cb_motor_data_torquers);
 
+CommBuffer<position_data> cb_position_data_torquer;
+Subscriber sub_position_data_torquer(topic_position_data, cb_position_data_torquer);
+
 
 void MagTorquer::run(){
     satellite_mode mode;
     requested_conntrol pose;
+    position_data position;
     motor_data motor;
     while (true)
     {
@@ -37,14 +46,23 @@ void MagTorquer::run(){
         inputMsgBuffer.getOnlyIfNewData(mode);
         if(mode.mission_mode == mission_mode_mag_torquers){
             cb_motor_data_torquers.getOnlyIfNewData(motor);
+            cb_position_data_torquer.getOnlyIfNewData(position);
             if(motor.motorSpeed > 1000){
                 pose.requested_angle = -90 + 45;
                 topic_user_requested_conntrol.publish(pose);
-                driveTorquers(5000);
+                if(position.heading > 0){
+                    driveTorquers1(5000);
+                }else{
+                    driveTorquers2(5000);
+                }
             }else if(motor.motorSpeed < -1000){
                 pose.requested_angle = 90 + 45;
                 topic_user_requested_conntrol.publish(pose);
-                driveTorquers(5000);
+                if(position.heading < 0){
+                    driveTorquers1(5000);
+                }else{
+                    driveTorquers2(5000);
+                }
             }else{
                 pose.requested_angle = 45;
                 topic_user_requested_conntrol.publish(pose);
