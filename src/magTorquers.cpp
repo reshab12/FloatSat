@@ -47,11 +47,11 @@ void MagTorquer::run(){
         if(mode.mission_mode == mission_mode_mag_torquers){
             cb_motor_data_torquers.getOnlyIfNewData(motor);
             if(motor.motorSpeed > 0){
-            /*pose.requested_angle = 90;
-            topic_user_requested_conntrol.publish(pose);*/
+                pose.requested_angle = -90 + 45;
+                topic_user_requested_conntrol.publish(pose);
             }else{
-            /*pose.requested_angle = 90;
-            topic_user_requested_conntrol.publish(pose);*/
+                pose.requested_angle = 90 + 45;
+                topic_user_requested_conntrol.publish(pose);
             }
             driveTorquers(5000);
         }else{
