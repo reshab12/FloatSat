@@ -10,17 +10,8 @@ void initializeTorquers(){
 
 void driveTorquers(uint16_t value){
     pwmT1.write(value);
-    pwmT2.write(value);
+    pwmT2.write(0);
 }
-
-/*void desaturate(motor_data* motor, controller_errors* errors, control_value* control, motor_control_value* motor_control, double deltaT){
-    motor->motorSpeed = 1000;
-    driveTorquers(5000);
-    while(abs(motor->motorSpeed)-3000>100){
-        MotorSpeedUpdate(motor);
-        calcPIDMotor(errors, control, motor_control, motor, deltaT);
-    }
-}*/
 
 MagTorquer::MagTorquer(const char* name, int32_t priority):StaticThread(name,priority),Subscriber(topic_satellite_mode,name){}
 
@@ -42,20 +33,31 @@ void MagTorquer::run(){
     motor_data motor;
     while (true)
     {
-        suspendCallerUntil();
-        inputMsgBuffer.get(mode);
+        int64_t start_time = NOW();
+        inputMsgBuffer.getOnlyIfNewData(mode);
         if(mode.mission_mode == mission_mode_mag_torquers){
             cb_motor_data_torquers.getOnlyIfNewData(motor);
-            if(motor.motorSpeed > 0){
+            if(motor.motorSpeed > 1000){
                 pose.requested_angle = -90 + 45;
                 topic_user_requested_conntrol.publish(pose);
-            }else{
+                driveTorquers(5000);
+            }else if(motor.motorSpeed < -1000){
                 pose.requested_angle = 90 + 45;
                 topic_user_requested_conntrol.publish(pose);
-            }
-            driveTorquers(5000);
+                driveTorquers(5000);
+            }else{
+                pose.requested_angle = 45;
+                topic_user_requested_conntrol.publish(pose);
+                driveTorquers(0);
+
+                inputMsgBuffer.getOnlyIfNewData(mode);
+                mode.mission_mode = mission_mode_standby;
+                topic_satellite_mode.publish(mode);
+            }   
+            AT(start_time + 100 * MILLISECONDS);      
         }else{
             driveTorquers(0);
+            suspendCallerUntil();
         }
     }
 }
