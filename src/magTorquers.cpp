@@ -66,7 +66,8 @@ void MagTorquer::run(){
             }else{
                 pose.requested_angle = 45;
                 topic_user_requested_conntrol.publish(pose);
-                driveTorquers(0);
+                driveTorquers1(0);
+                driveTorquers2(0);
 
                 inputMsgBuffer.getOnlyIfNewData(mode);
                 mode.mission_mode = mission_mode_standby;
@@ -74,7 +75,8 @@ void MagTorquer::run(){
             }   
             AT(start_time + 100 * MILLISECONDS);      
         }else{
-            driveTorquers(0);
+            driveTorquers1(0);
+            driveTorquers2(0);
             suspendCallerUntil();
         }
     }
