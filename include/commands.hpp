@@ -8,6 +8,9 @@ const uint8_t command_id_abort_mission =            0xf0;
 //abort mission
 const uint8_t command_id_reboot =            0xf1;
 
+//safetyPin on
+const uint8_t command_id_safetyPin =            0xf2;
+
 //mission modes
 const uint8_t command_id_mission_mode =             0x00;
 

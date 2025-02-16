@@ -33,7 +33,7 @@ void readADCPins(additional_sensor_data* data){
     //data->allCurrent = motorCurrent + magCurrent + boardCurrent;
 }
 
-ReadADCPins::ReadADCPins(const char* name, int32_t priority):StaticThread(name, priority),safetyPin(GPIO_062){}
+ReadADCPins::ReadADCPins(const char* name, int32_t priority):Subscriber(topic_telecommand_uplink,name),StaticThread(name, priority),safetyPin(GPIO_062){}
 
 void ReadADCPins::init(){
     initializeMotor();
@@ -45,9 +45,24 @@ void ReadADCPins::run(){
     safetyPin.setPins(0);
     motor_control_value motor;
     additional_sensor_data data;
+    int64_t last_time = NOW();
+    int64_t integ_currents = 0; // in nAs
+    bool safetyPinOn = false;
     TIME_LOOP(0, 500 * MILLISECONDS){
         readADCPins(&data);
+        safetyPinMsgBuffer.getOnlyIfNewData(safetyPinOn);
+        int64_t time = NOW();
+        integ_currents += (data.boardCurrent + data.magTorquerCurrent + data.motorCurrent) * 1000000.0 * (time - last_time) / SECONDS;
+        last_time = time;
         topic_additional_sensor_data.publish(data);
-        //if(data.batterieVoltage < 11.0) safetyPin.setPins(1);
+        if(NOW() > 1 * HOURS || safetyPinOn)
+             safetyPin.setPins(1);   
     }
+}
+
+uint32_t ReadADCPins::put(const uint32_t topicId, const size_t len, void *data, [[gnu::unused]] const NetMsgInfo &netMsgInfo) {
+    if ((*(telecommand *) data).command_id == command_id_safetyPin){
+        safetyPinMsgBuffer.put(true);
+    }
+    return 1;
 }

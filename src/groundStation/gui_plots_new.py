@@ -45,6 +45,8 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.datasize = 45
         self.number_of_boxes = 0
          
+
+        # [name,bool_show_in_box]
         self.dataNames = [["Time",True],                       #0
                           ["pose_estimation_mode",True],       #1
                           ["control_mode",True],               #2
@@ -90,6 +92,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                           ["",False]
                           ]
 
+        # [data_start, data_length, bool_show_plot, plot_name]
         self.dataFormat = [
                         [1,3,False,"modes"],
                         [4,3,True,"gyr"],
@@ -139,7 +142,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         #widgets------------------------------------------------------------------------------
         self.send_button = QtWidgets.QPushButton("Send command")
-        self.send_button.setCheckable(True)
+        self.send_button.setCheckable(False)
         self.send_button.clicked.connect(self.send_button_was_clicked)
 
         self.command_selection = QtWidgets.QComboBox()
@@ -166,23 +169,31 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.command_angle_selection.valueChanged.connect(self.command_angle_selection_value_changed)
 
         self.abort_mission_button = QtWidgets.QPushButton("Abort Mission")
-        self.abort_mission_button.setCheckable(True)
+        self.abort_mission_button.setCheckable(False)
         self.abort_mission_button.clicked.connect(self.abort_mission_button_was_clicked)
 
         self.reboot_button = QtWidgets.QPushButton("Reboot")
-        self.reboot_button.setCheckable(True)
+        self.reboot_button.setCheckable(False)
         self.reboot_button.clicked.connect(self.reboot_button_was_clicked)
 
+        self.safetyPin_button = QtWidgets.QPushButton("safetyPin")
+        self.safetyPin_button.setCheckable(False)
+        self.safetyPin_button.clicked.connect(self.safetyPin_button_was_clicked)
 
-        #layout--------------------------------------------------------------------------------
+
+        #commands layout--------------------------------------------------------------------------------
         self.layoutH1 = QtWidgets.QHBoxLayout()
         self.layoutH1.addWidget(self.send_button)
         self.layoutH1.addWidget(self.command_selection)
         self.layoutH1.addWidget(self.command_var_selection)
 
+        self.layoutH2 = QtWidgets.QHBoxLayout()
+        self.layoutH2.addWidget(self.abort_mission_button)
+        self.layoutH2.addWidget(self.reboot_button)
+        self.layoutH2.addWidget(self.safetyPin_button)
+
         self.layoutV = QtWidgets.QVBoxLayout()
-        self.layoutV.addWidget(self.abort_mission_button)
-        self.layoutV.addWidget(self.reboot_button)
+        self.layoutV.addLayout(self.layoutH2)
         self.layoutV.addLayout(self.layoutH1)
         #self.layoutV.addLayout(self.layoutH2)
 
@@ -405,6 +416,12 @@ class PlotWindow(QtWidgets.QMainWindow):
         print("reboot")
         # Pack sensor data to a struct that RODOS recognizes
         command_struct = struct.pack("B3xi",0xf1, 0)
+        python2rodos.publish(command_struct)
+
+    def safetyPin_button_was_clicked(self):
+        print("activate safetyPin")
+        # Pack sensor data to a struct that RODOS recognizes
+        command_struct = struct.pack("B3xi",0xf2, 0)
         python2rodos.publish(command_struct)
     
     def command_selection_changed(self, i): # updatelayoutH1

@@ -175,9 +175,9 @@ struct telemetry
 
     additional_sensor_data sensor_data;//5f
 
-    motor_control_value motor_control;
+    motor_control_value motor_control; //hH
 
-    float raspberry_attitude;
+    float raspberry_attitude;//f
 
     controller_errors_s pos_errors;//4f
 
