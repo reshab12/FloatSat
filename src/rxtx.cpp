@@ -236,8 +236,9 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
 
     case command_id_move_to:
       requested_conntrol.requested_angle = telecom->command_variable;
-      mode.control_mode = control_mode_pos;
-
+      if( ! ((mode.control_mode == control_mode_pos) || (mode.control_mode == control_mode_ai_pos)) ){
+          mode.control_mode = control_mode_pos;
+      }
       topic_user_requested_conntrol.publish(requested_conntrol);
       topic_satellite_mode.publish(mode);
       break;
