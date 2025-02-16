@@ -164,7 +164,7 @@ class PlotWindow(QtWidgets.QMainWindow):
             ["standby (stops current mission)",
              "mmag torquers",
              "star mapper",
-             "object detection"]) 
+             "sun sensor"]) 
         self.command_var_selection.currentIndexChanged.connect( self.command_var_changed )
 
         self.command_angle_selection = QtWidgets.QSpinBox()
@@ -465,7 +465,7 @@ class PlotWindow(QtWidgets.QMainWindow):
             ["standby (stops current mission)", 
              "mission_mode_mag_torquers",
              "star mapper",
-             "object detection"]) 
+             "sun sensor"]) 
         elif self.selected_command == 1:
             self.layoutH1.replaceWidget(self.command_angle_selection,self.command_var_selection)
            
