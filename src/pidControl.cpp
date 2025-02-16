@@ -179,7 +179,7 @@ void VelocityControler::run(){
 
             if((mode.control_mode==control_mode_ai_pos)){
                 cb_raspberry_control_value_VelocityController.get(torque);
-                calcVel_with_torque(&motor_data, torque/10, &control, deltaT);
+                calcVel_with_torque(&motor_data, torque, &control, deltaT);
             }else{
                 torque = calcPIDVel(&requested_conntrol, &errors, &pose, last_heading, deltaT);
                 vel_errors.error = errors.verror;
