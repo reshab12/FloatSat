@@ -6,6 +6,7 @@ import matplotlib
 matplotlib.use('QtAgg')
 
 from PyQt6 import QtCore, QtWidgets, QtGui
+from PyQt6.QtWidgets import QFrame
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -26,6 +27,12 @@ class MplCanvas(FigureCanvas):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
         super().__init__(self.fig)
+
+class QHLine(QFrame):
+    def __init__(self):
+        super(QHLine, self).__init__()
+        self.setFrameShape(QtWidgets.QFrame.Shape.HLine)
+        self.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
 
 
 data = [i for i in range(40)]
@@ -121,15 +128,23 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.layout1 = QtWidgets.QVBoxLayout()
         self.layout2 = QtWidgets.QVBoxLayout()
         self.layout3 = QtWidgets.QVBoxLayout()
+        self.layout1.setSpacing(2)
 
         self.h_layout = QtWidgets.QHBoxLayout()
         self.h_layout.addLayout(self.layout2)
         self.h_layout.addLayout(self.layout3)
-        self.h_layout.addLayout(self.layout1)
+        #self.h_layout.addLayout(self.layout1)
+        self.h_layout.setSpacing(0)
+
+        self.h2_layout = QtWidgets.QHBoxLayout()
+        self.h2_layout.addLayout(self.h_layout)
+        self.h2_layout.addLayout(self.layout1)
+        self.h2_layout.setSpacing(20)
+
         #self.h_layout.addWidget(self.plot_graph[0])
 
         widget = QtWidgets.QWidget()
-        widget.setLayout(self.h_layout)
+        widget.setLayout(self.h2_layout)
         self.setCentralWidget(widget)
 
         self.menuButtonsClicked()
@@ -179,28 +194,46 @@ class PlotWindow(QtWidgets.QMainWindow):
                 self.layout3.removeWidget(self.data_box[i])
                 self.data_box[i].close()
                 self.text_box[i].close()
+            for i in range(self.number_of_boxes*2):
+                self.layout2.removeWidget(self.lines[i])
+                self.layout3.removeWidget(self.lines[i])
+                self.lines[i].close()
             #create new boxes
             self.number_of_boxes = temp_number_of_boxes
-            self.text_box =  [QtWidgets.QPushButton("")for j in range(self.number_of_boxes)]
-            for i in range(self.number_of_boxes):
-                self.text_box[i].setCheckable(False)
-                self.text_box[i].setMaximumWidth(250)
-                self.text_box[i].setText("")
-                self.layout2.addWidget(self.text_box[i])
+            self.text_box =  [QtWidgets.QLabel("")for j in range(self.number_of_boxes)]
+            self.data_box =  [QtWidgets.QLabel("")for j in range(self.number_of_boxes)]
             
-            self.data_box =  [QtWidgets.QPushButton("")for j in range(self.number_of_boxes)]
-            for i in range(self.number_of_boxes):
-                self.data_box[i].setCheckable(False)
-                self.data_box[i].setMaximumWidth(100)
-                self.data_box[i].setText("")
-                self.layout3.addWidget(self.data_box[i])
+
             j=0
+            lastj=0
+            self.number_of_lines = 0
+            self.lines = [QHLine() for x in range(self.number_of_boxes*2)]
             for i in range(self.number_of_boxes):
+                #self.text_box[i].setCheckable(False)
+                self.text_box[i].setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+                self.text_box[i].setAutoFillBackground(False)
+                self.text_box[i].setMaximumWidth(250)
+
+                self.data_box[i].setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+                self.data_box[i].setMaximumWidth(100)
+                
                 while((self.dataNames[j][1])==False):
-                    j=j+1
+                    j += 1
                 self.text_box[i].setText(self.dataNames[j][0]+": ")
-                self.data_box[i].setText("{:.2f}".format(0))
-                j=j+1
+                self.data_box[i].setText("{:.2f}".format(data[j]))
+                for a in self.dataFormat:
+                    if  (j >= a[0] and lastj < a[0]):
+                        self.layout2.addWidget(self.lines[self.number_of_lines])
+                        self.number_of_lines += 1
+                        self.layout3.addWidget(self.lines[self.number_of_lines])
+                        self.number_of_lines += 1
+                        break
+                self.layout2.addWidget(self.text_box[i])
+                self.layout3.addWidget(self.data_box[i])
+                lastj=j
+                j += 1
+            self.layout2.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
+            self.layout3.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
 
         #get new number of plots:
         j=0
