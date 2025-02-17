@@ -19,7 +19,7 @@ import numpy
 
 import pyqtgraph as pg
 
-
+dark_mode = True
 
 class MplCanvas(FigureCanvas):
 
@@ -92,16 +92,16 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         self.dataFormat = [
                         [1,3,False,"modes"],
-                        [4,3,True,"gyr"],
+                        [4,3,False,"gyr"],
                         [7,3,False,"mag"],
                         [10,3,False,"acc"],
-                        [13,4,True,"heading"],
-                        [17,1,False,"motor speed"],
+                        [15,2,True,"heading"],
+                        [17,1,True,"motor speed"],
                         [18,1,False,"omega_wheel"],
                         [19,1,False,"control value"],
                         [20,4,False,"requested values"],
                         [24,4,False,"vel errors"],
-                        [28,4,True,"mot errors"],
+                        [28,4,False,"mot errors"],
                         [32,5,False,"currents"],
                         [37,1,False,"increments"],
                         [39,1,False,"raspberry_attitude"]
@@ -120,7 +120,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         self.count = 0
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(10)
+        self.timer.setInterval(1)
         self.timer.timeout.connect(self.update_plot)
         self.timer.start()
 
@@ -264,34 +264,68 @@ class PlotWindow(QtWidgets.QMainWindow):
         i = 0
         for format in self.dataFormat:
             if format[2]:
-                self.plot_graph[i].setTitle(format[3], color="w", size="20pt")
-                styles = {"color": "white", "font-size": "18px"}
-                #self.plot_graph[i].setLabel("left", "Temperature (°C)", **styles)
-                self.plot_graph[i].setLabel("bottom", "Time [1/10 s]", **styles)
-                self.plot_graph[i].addLegend(brush=pg.mkBrush(0, 0, 0, 200),pen=pg.mkPen(255,255,255,200))
-                #self.plot_graph.showGrid(x=True, y=True)
-                self.plot_graph[i].enableAutoRange(axis='y')
-                
-                data_line_count = format[0]
-                for k in range(format[1]):
-                    match k:
-                        case 0:
-                            pen = pg.mkPen(color="white")
-                        case 1:
-                            pen = pg.mkPen(color="blue")
-                        case 2:
-                            pen = pg.mkPen(color="green")
-                        case 3:
-                            pen = pg.mkPen(color="red")
-                        case 4:
-                            pen = pg.mkPen(color="orange")
+                if dark_mode:
+                    self.plot_graph[i].setTitle(format[3], color="w", size="10pt")
+                    self.plot_graph[i].setBackground(pg.Color(20, 20, 20, 255))
+                    self.plot_graph[i].setFrameShape(QtWidgets.QFrame.Shape.Box)
+                    styles = {"color": "white", "font-size": "10px"}
+                    #self.plot_graph[i].setLabel("left", "Temperature (°C)", **styles)
+                    self.plot_graph[i].setLabel("bottom", "Time [s]", **styles)
+                    self.plot_graph[i].addLegend(brush=pg.mkBrush(20, 20, 20, 200),pen=pg.mkPen(255,255,255,200),offset=[20,0.1])
+                    #self.plot_graph.showGrid(x=True, y=True)
+                    self.plot_graph[i].enableAutoRange(axis='y')
+                    
+                    data_line_count = format[0]
+                    for k in range(format[1]):
+                        match k:
+                            case 0:
+                                pen = pg.mkPen(color="white")
+                            case 1:
+                                pen = pg.mkPen(color="cyan")
+                            case 2:
+                                pen = pg.mkPen(color="green")
+                            case 3:
+                                pen = pg.mkPen(color="red")
+                            case 4:
+                                pen = pg.mkPen(color="yellow")
 
-                    self.line[i][k] = self.plot_graph[i].plot(
-                        self.xdata,
-                        self.ydata[data_line_count + k],
-                        name=self.dataNames[data_line_count + k][0],
-                        pen=pen
-                    )
+                        self.line[i][k] = self.plot_graph[i].plot(
+                            self.xdata,
+                            self.ydata[data_line_count + k],
+                            name=self.dataNames[data_line_count + k][0],
+                            pen=pen
+                        )
+                else:
+                    self.plot_graph[i].setTitle(format[3], color="black", size="10pt")
+                    self.plot_graph[i].setBackground("white")
+                    styles = {"color": "black", "font-size": "10px"}
+                    #self.plot_graph[i].setLabel("left", "Temperature (°C)", **styles)
+                    self.plot_graph[i].setLabel("bottom", "Time [s]", **styles)
+                    self.plot_graph[i].addLegend(brush=pg.mkBrush(0, 0, 0, 0),pen=pg.mkPen("black"),offset=[0.001,0.501])
+                    #self.plot_graph.showGrid(x=True, y=True)
+                    self.plot_graph[i].enableAutoRange(axis='y')
+                    
+                    data_line_count = format[0]
+                    for k in range(format[1]):
+                        w=2
+                        match k:
+                            case 0:
+                                pen = pg.mkPen(color="black",width=w)
+                            case 1:
+                                pen = pg.mkPen(color="darkCyan",width=w)
+                            case 2:
+                                pen = pg.mkPen(color="darkGreen",width=w)
+                            case 3:
+                                pen = pg.mkPen(color="darkRed",width=w)
+                            case 4:
+                                pen = pg.mkPen(color="darkYellow",width=w)
+
+                        self.line[i][k] = self.plot_graph[i].plot(
+                            self.xdata,
+                            self.ydata[data_line_count + k],
+                            name=self.dataNames[data_line_count + k][0],
+                            pen=pen
+                        )
                 #print("create line:" +str(i)+" "+str(k) + " at " + str(data_line_count))
                 i += 1
 

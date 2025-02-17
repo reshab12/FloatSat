@@ -27,7 +27,7 @@ rodos2python = rodos.Topic(1003)
 luart = rodos.LinkinterfaceUART(path="/dev/rfcomm0")
 gwUart = rodos.Gateway(luart)
 
-dark_mode = False
+dark_mode = True
 
 class QHLine(QFrame):
     def __init__(self):
@@ -96,17 +96,17 @@ class PlotWindow(QtWidgets.QMainWindow):
         # [data_start, data_length, bool_show_plot, plot_name]
         self.dataFormat = [
                         [1,3,False,"modes"],
-                        [4,3,True,"gyr"],
+                        [4,3,False,"gyr"],
                         [7,3,False,"mag"],
                         [10,3,False,"acc"],
-                        [13,4,True,"heading"],
+                        [15,2,True,"heading"],
                         [17,1,True,"motor speed"],
                         [18,1,False,"omega_wheel"],
                         [19,1,False,"control value"],
                         [20,4,False,"requested values"],
-                        [42,2,True,"pos errors"],
-                        [24,2,True,"vel errors"],
-                        [28,2,True,"mot errors"],
+                        [42,2,False,"pos errors"],
+                        [24,2,False,"vel errors"],
+                        [28,2,False,"mot errors"],
                         [32,3,False,"currents"],
                         [36,3,False,"voltage"],
                         [39,1,False,"increments"],
@@ -130,9 +130,10 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     def createLayout(self):
         self.layout1 = QtWidgets.QVBoxLayout()
+        self.layout1.setSpacing(2)
         self.layout2 = QtWidgets.QVBoxLayout()
         self.layout3 = QtWidgets.QVBoxLayout()
-        self.layout1.setSpacing(2)
+        
 
         self.h_layout = QtWidgets.QHBoxLayout()
         self.h_layout.addLayout(self.layout2)
@@ -253,10 +254,12 @@ class PlotWindow(QtWidgets.QMainWindow):
             if format[2]:
                 if dark_mode:
                     self.plot_graph[i].setTitle(format[3], color="w", size="10pt")
+                    self.plot_graph[i].setBackground(pg.Color(20, 20, 20, 255))
+                    self.plot_graph[i].setFrameShape(QtWidgets.QFrame.Shape.Box)
                     styles = {"color": "white", "font-size": "10px"}
                     #self.plot_graph[i].setLabel("left", "Temperature (°C)", **styles)
                     self.plot_graph[i].setLabel("bottom", "Time [s]", **styles)
-                    self.plot_graph[i].addLegend(brush=pg.mkBrush(0, 0, 0, 200),pen=pg.mkPen(255,255,255,200),offset=[0.001,0.001])
+                    self.plot_graph[i].addLegend(brush=pg.mkBrush(20, 20, 20, 200),pen=pg.mkPen(255,255,255,255),offset=[20,0.1])
                     #self.plot_graph.showGrid(x=True, y=True)
                     self.plot_graph[i].enableAutoRange(axis='y')
                     
