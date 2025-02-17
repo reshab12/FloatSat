@@ -37,6 +37,7 @@ void MotorControler::init(){
 
 void MotorControler::run(){
     motor_data motor;
+    motor.omega_wheel = 0;
     controller_errors errors;
     control_value control;
     motor_control_value motor_control;

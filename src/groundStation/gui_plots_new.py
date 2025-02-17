@@ -517,8 +517,8 @@ class PlotWindow(QtWidgets.QMainWindow):
             self.command_var_selection = QtWidgets.QComboBox()
             self.command_var_selection.currentIndexChanged.connect( self.command_var_changed )
 
-            self.command_angle_selection.setMinimum(-50)
-            self.command_angle_selection.setMaximum(50)
+            self.command_angle_selection.setMinimum(-5000)
+            self.command_angle_selection.setMaximum(5000)
             #self.layoutH1.update()
             #self.layoutV.update()
         self.command_var = 0

@@ -21,8 +21,9 @@ void calcPIDMotor(controller_errors* errors, control_value* control,motor_contro
         }else
             errors->meb = 0;
 
-        data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M/10 * errors->merror_change + data->omega_wheel;
-        //data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change ;
+        //data->omega_wheel += (5 * errors->merror + 5 * errors->merror_change) * deltaT ;//+ KD_M/10 * errors->merror_change ; + 0.05 * errors->mIerror 
+        
+        data->omega_wheel = KP_M * errors->merror + KI_M * errors->mIerror + KD_M * errors->merror_change ;
 
         increments_temp = (data->omega_wheel / MAX_RPM) * MOTROINCREMENTS;
         if(increments_temp > MOTROINCREMENTS) 

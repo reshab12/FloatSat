@@ -192,7 +192,7 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
           if(mode.control_mode != control_mode_pos || mode.control_mode != control_mode_ai_pos)
             mode.control_mode = control_mode_pos;
           mode.mission_mode = mission_mode_star_mapper;
-          requested_conntrol.requested_angle = pose.heading;
+          requested_conntrol.requested_angle = 0;
 
           topic_user_requested_conntrol.publish(requested_conntrol);
           topic_satellite_mode.publish(mode);
@@ -249,12 +249,12 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
       mode.control_mode = control_mode_vel;
       
       //for motor testing
-      //control.desiredMotorSpeed = telecom->command_variable;
-      //topic_control_value.publish(control);
+      control.desiredMotorSpeed = telecom->command_variable;
+      topic_control_value.publish(control);
 
       //normal operation
-      topic_user_requested_conntrol.publish(requested_conntrol);
-      topic_satellite_mode.publish(mode);
+      //topic_user_requested_conntrol.publish(requested_conntrol);
+      //topic_satellite_mode.publish(mode);
       break;
 
     default:
