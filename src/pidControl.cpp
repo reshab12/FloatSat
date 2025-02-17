@@ -55,6 +55,10 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, controller_erro
     }else
         errors->peb = 0;
 
+    if((errors->perror < 1 && errors->perror > -1)){
+        errors->pIerror = 0;
+    }
+
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
 
     //MW_PRINTF("Req Sat Speed: %f \n", request->requested_rot_speed);
