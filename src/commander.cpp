@@ -70,7 +70,7 @@ void Commander::run(){
 
         case 1://check pose
             topic_requested_conntrol.publish(requested_conntrol); 
-            if(abs(mod(heading-pose.heading)) < 5 && pose.moving < 2){//change value ------------------------------------------------------
+            if(abs(mod(heading-pose.heading)) < 3 && pose.moving < 1){//change value ------------------------------------------------------
                 status = 10;
                 picture_counter++;
                 //send command to raspberry: request picture

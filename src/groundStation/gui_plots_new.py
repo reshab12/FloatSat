@@ -36,6 +36,11 @@ class QHLine(QFrame):
         self.setLineWidth(1)
         #self.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
 
+class SignalCommunicate(QtCore.QObject):
+    request_graph_update = QtCore.pyqtSignal(tuple)
+
+testsignal = SignalCommunicate()
+
 class PlotWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
@@ -128,6 +133,8 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         self.counter1 = 0
         self.counter2 = 0
+
+        testsignal.request_graph_update.connect(self.update_plot)
 
     def createLayout(self):
         self.layout1 = QtWidgets.QVBoxLayout()
@@ -546,7 +553,8 @@ def topicHandler(data):
     #    print(i)
     #print()
     #print("stm sends telemetry: {} {} {}".format(unpacked[4],unpacked[5],unpacked[6]))
-    window.update_plot(unpacked)
+    #window.update_plot(unpacked)
+    testsignal.request_graph_update.emit(unpacked)
   except Exception as e:
     print(e)
     #print(data)
