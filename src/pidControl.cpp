@@ -55,7 +55,7 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, controller_erro
     }else
         errors->peb = 0;
 
-    if((errors->perror < 1 && errors->perror > -1)){
+    if((errors->perror < 1 && errors->perror > -1) && (errors->vIerror > 500 || errors->vIerror < -500)){
         errors->pIerror = 0;
     }
 
