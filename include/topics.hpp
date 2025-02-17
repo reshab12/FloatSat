@@ -91,10 +91,10 @@ struct additional_sensor_data
     float motorCurrent;         //Current consumed by the motor.
     float magTorquerCurrent;    //Current consumed by the mag torquers
     float boardCurrent;         //Current consumed by the boards and LEDs.
+    float allCurrent;           //Entire consumed current
     float batterieVoltage;      //Voltage in the batteries.
     float boardVoltage;         //Voltage after the voltage devider.
-    //float solarPanel;           //Current at the solar panel.
-    //float allCurrent;           //Entire consumed current
+    float solarPanel;           //Current at the solar panel.
 };
 
 struct motor_data
@@ -173,7 +173,7 @@ struct telemetry
 
     controller_errors_s mot_errors;//4f
 
-    additional_sensor_data sensor_data;//5f
+    additional_sensor_data sensor_data;//7f
 
     motor_control_value motor_control; //hH
 

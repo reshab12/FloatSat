@@ -66,7 +66,7 @@ void MagTorquer::run(){
                         }else{
                             driveTorquers1(0);
                         }
-                    }else if(position.heading < 45 - dead_angle(position.moving) & position.heading > 45 - 180 + dead_angle(position.moving)){
+                    }else if(position.heading < 45 - 20 & position.heading > 45 - 180 + 20){
                         driveTorquers1(5000);
                     }else{
                         driveTorquers1(0);

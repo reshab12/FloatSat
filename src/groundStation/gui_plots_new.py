@@ -40,7 +40,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
 
         self.number_of_plots = 0
-        self.datasize = 45
+        self.datasize = 47
         self.number_of_boxes = 0
          
 
@@ -74,16 +74,18 @@ class PlotWindow(QtWidgets.QMainWindow):
                           ["motorCurrent",True],               #32
                           ["magTorquerCurrent",True],          #33
                           ["boardCurrent",True],               #34
-                          ["batterieVoltage",True],            #35
-                          ["boardVoltage",True],               #36
-                          ["increments",False],                 #37
-                          ["turnDirection",False],              #38
-                          ["raspberry_attitude",True],         #39
-                          ["error_pos",False],                      #40
-                          ["Ierror_pos",False],                     #41
-                          ["error_change_pos",False],               #42
-                          ["Last_error_pos",False],                 #43
-                          ["torque",False],
+                          ["allCurrent",True],            #35
+                          ["batterieVoltage",True],            #36
+                          ["boardVoltage",True],               #37
+                          ["solarPanel",True],            #38
+                          ["increments",False],                 #39
+                          ["turnDirection",False],              #40
+                          ["raspberry_attitude",True],         #41
+                          ["error_pos",False],                      #42
+                          ["Ierror_pos",False],                     #43
+                          ["error_change_pos",False],               #44
+                          ["Last_error_pos",False],                 #45
+                          ["torque",False],                     #46
                           ["",False],
                           ["",False],
                           ["",False],
@@ -101,13 +103,14 @@ class PlotWindow(QtWidgets.QMainWindow):
                         [18,1,False,"omega_wheel"],
                         [19,1,False,"control value"],
                         [20,4,False,"requested values"],
-                        [40,4,True,"pos errors"],
-                        [24,4,True,"vel errors"],
-                        [28,4,True,"mot errors"],
-                        [32,5,False,"currents"],
-                        [37,1,False,"increments"],
-                        [39,1,False,"raspberry_attitude"],
-                        [44,1,False,"torque"]
+                        [42,2,True,"pos errors"],
+                        [24,2,True,"vel errors"],
+                        [28,2,True,"mot errors"],
+                        [32,3,False,"currents"],
+                        [36,3,False,"voltage"],
+                        [39,1,False,"increments"],
+                        [41,1,False,"raspberry_attitude"],
+                        [46,1,False,"torque"]
                         ]
 
         self.n_data = 300
@@ -164,7 +167,7 @@ class PlotWindow(QtWidgets.QMainWindow):
             ["standby (stops current mission)",
              "mmag torquers",
              "star mapper",
-             "sun sensor"]) 
+             "object detection"]) 
         self.command_var_selection.currentIndexChanged.connect( self.command_var_changed )
 
         self.command_angle_selection = QtWidgets.QSpinBox()
@@ -465,7 +468,7 @@ class PlotWindow(QtWidgets.QMainWindow):
             ["standby (stops current mission)", 
              "mission_mode_mag_torquers",
              "star mapper",
-             "sun sensor"]) 
+             "object detection"]) 
         elif self.selected_command == 1:
             self.layoutH1.replaceWidget(self.command_angle_selection,self.command_var_selection)
            
@@ -536,7 +539,7 @@ window.show()
 def topicHandler(data):
   try:
     #unpacked = struct.unpack("=lBBBffff", data)
-    unpacked = struct.unpack("=q3Bx9f3fflfl2f2f4f4f5fHhf4ff4x", data)
+    unpacked = struct.unpack("=q3Bx9f3fflfl2f2f4f4f7fHhf4ff4x", data)
     #for i in unpacked:
     #    print(i)
     #print()

@@ -14,8 +14,8 @@ void initADCPins(){
 void readADCPins(additional_sensor_data* data){
     float boardVoltage = 0;
     uint16_t voltageADC = voltage.read(ADC_CH_012);
-    boardVoltage = (voltageADC/ADCRes) * ADCRef;
-    data->batterieVoltage = boardVoltage/0.108712121;
+    data->boardVoltage = (voltageADC/ADCRes) * ADCRef;
+    data->batterieVoltage = data->boardVoltage/0.108712121;
     AT(NOW() + 3 * MILLISECONDS);
 
     uint16_t motorADCValue = mainCurrent.read(ADC_CH_004);
@@ -23,12 +23,14 @@ void readADCPins(additional_sensor_data* data){
     AT(NOW() + 3 * MILLISECONDS);
 
     uint16_t magADCValue = mainCurrent.read(ADC_CH_000);
-	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
+	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef );//-2.5)/ CurrentVoltageRatio;
     AT(NOW() + 10*MILLISECONDS);
 
     uint16_t boardADCValue = mainCurrent.read(ADC_CH_010);
 	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
     AT(NOW() + 3 * MILLISECONDS);
+
+    readSolarPanel(data->solarPanel);
 
     //data->allCurrent = motorCurrent + magCurrent + boardCurrent;
 }
@@ -46,9 +48,9 @@ void ReadADCPins::run(){
     motor_control_value motor;
     additional_sensor_data data;
     int64_t last_time = NOW();
-    int64_t integ_currents = 0; // in nAs
+    int64_t integ_currents = 0; // in As e-6
     bool safetyPinOn = false;
-    RingBuffer<additional_sensor_data,5> ringbuffer;
+    RingBuffer<additional_sensor_data,1> ringbuffer;
     TIME_LOOP(0, 500 * MILLISECONDS){
         readADCPins(&data);
         safetyPinMsgBuffer.getOnlyIfNewData(safetyPinOn);
@@ -74,8 +76,9 @@ void ReadADCPins::run(){
         
 
         int64_t time = NOW();
-        integ_currents += (data.boardCurrent + data.magTorquerCurrent + data.motorCurrent) * 1000000.0 * (time - last_time) / SECONDS;
+        integ_currents += (data.boardCurrent + data.magTorquerCurrent + data.motorCurrent) * 1000000.0 * (time - last_time) * 1.0 / SECONDS;
         last_time = time;
+        data.allCurrent = integ_currents / 3600000.0;
         topic_additional_sensor_data.publish(data);
         
         if(NOW() > 1 * HOURS || safetyPinOn)
