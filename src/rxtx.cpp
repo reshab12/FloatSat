@@ -211,7 +211,8 @@ static Gateway gw_name_not_imp(&link_name_not_imp, true);
         case mission_mode_mag_torquers:
           //start object detection
           mode.mission_mode = mission_mode_mag_torquers;
-          mode.control_mode = control_mode_pos;
+          if(mode.control_mode != control_mode_pos || mode.control_mode != control_mode_ai_pos)
+            mode.control_mode = control_mode_pos;
 
           requested_conntrol.requested_angle = 45;
           topic_user_requested_conntrol.publish(requested_conntrol);
