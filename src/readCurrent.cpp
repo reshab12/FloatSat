@@ -54,25 +54,24 @@ void ReadADCPins::run(){
         safetyPinMsgBuffer.getOnlyIfNewData(safetyPinOn);
         ringbuffer.add(data);
 
-        if(ringbuffer.getNumElements() == 5){
-            data.batterieVoltage = 0;
-            data.boardCurrent = 0;
-            data.boardVoltage = 0;
-            data.magTorquerCurrent = 0;
-            data.motorCurrent = 0;
-            for(int i = 0; i<5;i++){
-                data.batterieVoltage += ringbuffer.getElement(i).batterieVoltage;
-                data.boardCurrent += ringbuffer.getElement(i).boardCurrent;
-                data.boardVoltage += ringbuffer.getElement(i).boardVoltage;
-                data.magTorquerCurrent += ringbuffer.getElement(i).magTorquerCurrent;
-                data.motorCurrent += ringbuffer.getElement(i).motorCurrent;
-            }
-            data.batterieVoltage = data.batterieVoltage/5;
-            data.boardCurrent = data.boardCurrent/5;
-            data.boardVoltage = data.boardVoltage/5;
-            data.magTorquerCurrent = data.magTorquerCurrent/5;
-            data.motorCurrent = data.motorCurrent/5;
+        data.batterieVoltage = 0;
+        data.boardCurrent = 0;
+        data.boardVoltage = 0;
+        data.magTorquerCurrent = 0;
+        data.motorCurrent = 0;
+        for(int i = 0; i<ringbuffer.getNumElements();i++){
+            data.batterieVoltage += ringbuffer.getElement(i).batterieVoltage;
+            data.boardCurrent += ringbuffer.getElement(i).boardCurrent;
+            data.boardVoltage += ringbuffer.getElement(i).boardVoltage;
+            data.magTorquerCurrent += ringbuffer.getElement(i).magTorquerCurrent;
+            data.motorCurrent += ringbuffer.getElement(i).motorCurrent;
         }
+        data.batterieVoltage = data.batterieVoltage/5;
+        data.boardCurrent = data.boardCurrent/5;
+        data.boardVoltage = data.boardVoltage/5;
+        data.magTorquerCurrent = data.magTorquerCurrent/5;
+        data.motorCurrent = data.motorCurrent/5;
+        
 
         int64_t time = NOW();
         integ_currents += (data.boardCurrent + data.magTorquerCurrent + data.motorCurrent) * 1000000.0 * (time - last_time) / SECONDS;
