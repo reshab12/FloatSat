@@ -22,4 +22,3 @@
 #include "readCurrent.hpp"
 #include "ringbuffer.h"
 #include "sunSensor.hpp"
-#include "ringbuffer.h"
