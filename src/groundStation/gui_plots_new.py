@@ -33,7 +33,8 @@ class QHLine(QFrame):
     def __init__(self):
         super(QHLine, self).__init__()
         self.setFrameShape(QtWidgets.QFrame.Shape.HLine)
-        self.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
+        self.setLineWidth(1)
+        #self.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
 
 class PlotWindow(QtWidgets.QMainWindow):
 

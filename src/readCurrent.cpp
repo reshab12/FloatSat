@@ -19,7 +19,7 @@ void readADCPins(additional_sensor_data* data){
     AT(NOW() + 3 * MILLISECONDS);
 
     uint16_t motorADCValue = mainCurrent.read(ADC_CH_004);
-	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef)-0.17)/ NewCurrentVoltage;
+	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef))/ NewCurrentVoltage;
     AT(NOW() + 3 * MILLISECONDS);
 
     uint16_t magADCValue = mainCurrent.read(ADC_CH_000);
