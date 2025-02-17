@@ -60,12 +60,6 @@ void calcPIDPos(requested_conntrol* request, position_data* pos, controller_erro
     }
 
     request->requested_rot_speed = KP_P * errors->perror + KI_P * errors->pIerror + KD_P * errors->pLast_error;
-
-    //MW_PRINTF("Req Sat Speed: %f \n", request->requested_rot_speed);
-    /*if(request->requested_rot_speed >= 0)
-        request->requested_rot_speed = min(request->requested_rot_speed,max_sat_dps);
-    else
-        request->requested_rot_speed = max(request->requested_rot_speed,max_sat_dps);*/
 }
 
 float calcPIDVel(requested_conntrol* request, controller_errors* errors, position_data* pose,float last_heading, double deltaT){

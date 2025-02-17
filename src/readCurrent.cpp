@@ -22,9 +22,9 @@ void readADCPins(additional_sensor_data* data){
 	data->motorCurrent = (((motorADCValue / ADCRes) * ADCRef))/ NewCurrentVoltage;
     AT(NOW() + 3 * MILLISECONDS);
 
-    //uint16_t magADCValue = mainCurrent.read(ADC_CH_000);
-	//data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
-    //AT(NOW() + 10*MILLISECONDS);
+    uint16_t magADCValue = mainCurrent.read(ADC_CH_000);
+	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
+    AT(NOW() + 10*MILLISECONDS);
 
     uint16_t boardADCValue = mainCurrent.read(ADC_CH_010);
 	data->boardCurrent = ((boardADCValue / ADCRes) * ADCRef -2.5) /CurrentVoltageRatio;
@@ -48,13 +48,37 @@ void ReadADCPins::run(){
     int64_t last_time = NOW();
     int64_t integ_currents = 0; // in nAs
     bool safetyPinOn = false;
+    RingBuffer<additional_sensor_data,5> ringbuffer;
     TIME_LOOP(0, 500 * MILLISECONDS){
         readADCPins(&data);
         safetyPinMsgBuffer.getOnlyIfNewData(safetyPinOn);
+        ringbuffer.add(data);
+
+        if(ringbuffer.getNumElements() == 5){
+            data.batterieVoltage = 0;
+            data.boardCurrent = 0;
+            data.boardVoltage = 0;
+            data.magTorquerCurrent = 0;
+            data.motorCurrent = 0;
+            for(int i = 0; i<5;i++){
+                data.batterieVoltage += ringbuffer.getElement(i).batterieVoltage;
+                data.boardCurrent += ringbuffer.getElement(i).boardCurrent;
+                data.boardVoltage += ringbuffer.getElement(i).boardVoltage;
+                data.magTorquerCurrent += ringbuffer.getElement(i).magTorquerCurrent;
+                data.motorCurrent += ringbuffer.getElement(i).motorCurrent;
+            }
+            data.batterieVoltage = data.batterieVoltage/5;
+            data.boardCurrent = data.boardCurrent/5;
+            data.boardVoltage = data.boardVoltage/5;
+            data.magTorquerCurrent = data.magTorquerCurrent/5;
+            data.motorCurrent = data.motorCurrent/5;
+        }
+
         int64_t time = NOW();
         integ_currents += (data.boardCurrent + data.magTorquerCurrent + data.motorCurrent) * 1000000.0 * (time - last_time) / SECONDS;
         last_time = time;
         topic_additional_sensor_data.publish(data);
+        
         if(NOW() > 1 * HOURS || safetyPinOn)
              safetyPin.setPins(1);   
     }
