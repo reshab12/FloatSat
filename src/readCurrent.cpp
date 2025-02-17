@@ -66,11 +66,11 @@ void ReadADCPins::run(){
             data.magTorquerCurrent += ringbuffer.getElement(i).magTorquerCurrent;
             data.motorCurrent += ringbuffer.getElement(i).motorCurrent;
         }
-        data.batterieVoltage = data.batterieVoltage/5;
-        data.boardCurrent = data.boardCurrent/5;
-        data.boardVoltage = data.boardVoltage/5;
-        data.magTorquerCurrent = data.magTorquerCurrent/5;
-        data.motorCurrent = data.motorCurrent/5;
+        data.batterieVoltage = data.batterieVoltage/ringbuffer.getNumElements();
+        data.boardCurrent = data.boardCurrent/ringbuffer.getNumElements();
+        data.boardVoltage = data.boardVoltage/ringbuffer.getNumElements();
+        data.magTorquerCurrent = data.magTorquerCurrent/ringbuffer.getNumElements();
+        data.motorCurrent = data.motorCurrent/ringbuffer.getNumElements();
         
 
         int64_t time = NOW();
