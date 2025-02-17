@@ -35,7 +35,7 @@ void readADCPins(additional_sensor_data* data){
     //data->allCurrent = motorCurrent + magCurrent + boardCurrent;
 }
 
-ReadADCPins::ReadADCPins(const char* name, int32_t priority):Subscriber(topic_telecommand_uplink,name),StaticThread(name, priority),safetyPin(GPIO_062){}
+ReadADCPins::ReadADCPins(const char* name, int32_t priority):Subscriber(topic_telecommand_uplink,name),StaticThread(name, priority),safetyPin(GPIO_060){}
 
 void ReadADCPins::init(){
     initializeMotor();
