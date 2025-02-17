@@ -4,7 +4,7 @@ HAL_ADC mainCurrent(ADC_IDX2);
 HAL_ADC voltage(ADC_IDX1);
 
 void initADCPins(){
-    //mainCurrent.init(ADC_CH_000);
+    mainCurrent.init(ADC_CH_000);
     mainCurrent.init(ADC_CH_004);
     mainCurrent.init(ADC_CH_010);
     mainCurrent.init(ADC_CH_002);
@@ -23,7 +23,7 @@ void readADCPins(additional_sensor_data* data){
     AT(NOW() + 3 * MILLISECONDS);
 
     uint16_t magADCValue = mainCurrent.read(ADC_CH_000);
-	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef );//-2.5)/ CurrentVoltageRatio;
+	data->magTorquerCurrent = ((magADCValue / ADCRes) * ADCRef -2.5)/ CurrentVoltageRatio;
     AT(NOW() + 10*MILLISECONDS);
 
     uint16_t boardADCValue = mainCurrent.read(ADC_CH_010);
@@ -35,7 +35,7 @@ void readADCPins(additional_sensor_data* data){
     //data->allCurrent = motorCurrent + magCurrent + boardCurrent;
 }
 
-ReadADCPins::ReadADCPins(const char* name, int32_t priority):Subscriber(topic_telecommand_uplink,name),StaticThread(name, priority),safetyPin(GPIO_060){}
+ReadADCPins::ReadADCPins(const char* name, int32_t priority):Subscriber(topic_telecommand_uplink,name),StaticThread(name, priority),safetyPin(GPIO_059){}
 
 void ReadADCPins::init(){
     initializeMotor();
@@ -50,8 +50,8 @@ void ReadADCPins::run(){
     int64_t last_time = NOW();
     int64_t integ_currents = 0; // in As e-6
     bool safetyPinOn = false;
-    RingBuffer<additional_sensor_data,1> ringbuffer;
-    TIME_LOOP(0, 500 * MILLISECONDS){
+    RingBuffer<additional_sensor_data,10> ringbuffer;
+    TIME_LOOP(0, 200 * MILLISECONDS){
         readADCPins(&data);
         safetyPinMsgBuffer.getOnlyIfNewData(safetyPinOn);
         ringbuffer.add(data);

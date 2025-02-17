@@ -25,8 +25,8 @@ Development environment specifics:
 #define ADCChannel          ADC_CH_001     			// PA1
 #define ADCRes              4095.0                // ADC full scale resolution of 12 bits = 2^12-1 = 4095
 #define ADCRef              3.0              // ADC adc reference voltage  = 3V = 3000mV
-#define CurrentVoltageRatio 0.1                 //Current-sense feedback voltage of approximately 500 mV per amp
-#define NewCurrentVoltage   0.5
+#define CurrentVoltageRatio 0.1                 //Current-sense feedback voltage of approximately 100 mV per amp
+#define NewCurrentVoltage   0.5					//Current-sense feedback voltage of approximately 500 mV per amp
 
 /* Exported types ------------------------------------------------------------*/
 enum AHRS_Mode
