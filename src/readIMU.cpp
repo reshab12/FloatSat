@@ -266,6 +266,15 @@ void Sensor::run() {
 	int counter = 0;
 	int buffer_size = 10;
 	imu_data data;
+	satellite_mode start_mode;
+	start_mode.control_mode = control_mode_vel;
+	start_mode.mission_mode = mission_mode_standby;
+	start_mode.pose_estimation_mode = pose_estimation_mode_imu;
+	topic_satellite_mode.publish(start_mode);
+	requested_conntrol rcontrol;
+	rcontrol.requested_angle = 0;
+	rcontrol.requested_rot_speed = 0;
+	topic_user_requested_conntrol.publish(rcontrol);
 	TIME_LOOP(1 * SECONDS, 10 * MILLISECONDS){
 		readGyro(xyzGyro);
 		for (size_t i = 0; i < 3; i++)

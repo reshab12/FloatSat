@@ -61,7 +61,7 @@ void MagTorquer::run(){
                     pose.requested_angle = -90 + 45;
                     topic_user_requested_conntrol.publish(pose);
                     if(position.heading > 45 + 20 | position.heading < 45-180 -20){
-                        if(!(position.moving > 30 || position.moving <-30)){
+                        if(!(position.moving > 200 || position.moving <-200)){
                             driveTorquers2(5000);
                         }else{
                             driveTorquers1(0);
@@ -75,7 +75,7 @@ void MagTorquer::run(){
                     pose.requested_angle = 90 + 45;
                     topic_user_requested_conntrol.publish(pose);
                     if(position.heading > 45 + 20| position.heading < 45-180 - 20){
-                        if(!(position.moving > 30 || position.moving <-30)){
+                        if(!(position.moving > 200 || position.moving <-200)){
                             driveTorquers1(5000);
                         }else{
                             driveTorquers2(0);
