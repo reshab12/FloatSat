@@ -114,7 +114,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                         [24,2,False,"vel errors"],
                         [28,2,False,"mot errors"],
                         [32,3,False,"currents"],
-                        [36,3,False,"voltage"],
+                        [38,1,False,"voltage"],
                         [39,1,False,"increments"],
                         [41,1,False,"raspberry_attitude"],
                         [46,1,False,"torque"]
